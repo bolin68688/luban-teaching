@@ -1,91 +1,106 @@
 /* =====================================================
-   鲁班教学大师 · 墨韵黑金设计系统
+   鲁班教学大师 · 墨韵黑金设计系统 v2.0
+   精制高端教育平台风格
    ===================================================== */
 
 /* ---------- CSS 变量：Dark 模式（默认） ---------- */
 :root {
-  /* 背景色 */
-  --bg-primary: #1A1A2E;
-  --bg-secondary: #0F0F1A;
-  --bg-card: #16213E;
-  --bg-card-hover: #1E2A4A;
-  --bg-overlay: rgba(10, 10, 15, 0.85);
+  /* 背景色 - 更深邃的墨色 */
+  --bg-primary: #0D0D14;
+  --bg-secondary: #12121C;
+  --bg-card: #1A1A28;
+  --bg-card-hover: #22223A;
+  --bg-overlay: rgba(8, 8, 12, 0.92);
+  --bg-glass: rgba(26, 26, 40, 0.7);
 
-  /* 文字色 */
-  --text-primary: #F5F5F0;
-  --text-secondary: #8B8B8B;
-  --text-muted: #5A5A6E;
+  /* 文字色 - 温暖的米白 */
+  --text-primary: #F8F6F0;
+  --text-secondary: #9A9AAA;
+  --text-muted: #5A5A6A;
 
-  /* 强调色 */
-  --accent-gold: #C9A227;
-  --accent-gold-light: #E5C76B;
-  --accent-gold-dark: #A07D1C;
-  --accent-red: #E94560;
-  --accent-red-light: #FF6B8A;
+  /* 强调色 - 精制古铜金 */
+  --accent-gold: #D4AF37;
+  --accent-gold-light: #E8C967;
+  --accent-gold-dark: #A68B2D;
+  --accent-gold-glow: rgba(212, 175, 55, 0.4);
+  --accent-red: #C75B5B;
+  --accent-red-light: #E87B7B;
 
-  /* 边框/分割线 */
-  --border: rgba(255, 255, 255, 0.08);
-  --border-gold: rgba(201, 162, 39, 0.25);
+  /* 边框/分割线 - 细腻金线 */
+  --border: rgba(255, 255, 255, 0.06);
+  --border-gold: rgba(212, 175, 55, 0.2);
+  --border-gold-hover: rgba(212, 175, 55, 0.5);
 
-  /* 高亮 */
-  --highlight: rgba(201, 162, 39, 0.12);
-  --highlight-strong: rgba(201, 162, 39, 0.25);
+  /* 高亮 - 柔和金芒 */
+  --highlight: rgba(212, 175, 55, 0.1);
+  --highlight-strong: rgba(212, 175, 55, 0.2);
 
-  /* 阴影 */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-gold: 0 0 20px rgba(201, 162, 39, 0.2);
+  /* 阴影 - 多层次 */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.6);
+  --shadow-gold: 0 0 30px rgba(212, 175, 55, 0.15);
+  --shadow-glow: 0 0 60px rgba(212, 175, 55, 0.1);
 
-  /* 圆角 */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  /* 圆角 - 精致微圆 */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 20px;
 
   /* 动效 */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
   --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 
   /* 字体 */
   --font-display: 'ZCOOL QingKe HuangYou', 'Noto Serif SC', serif;
-  --font-serif: 'Noto Serif SC', serif;
-  --font-sans: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: 'Noto Serif SC', 'Source Serif 4', serif;
+  --font-sans: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
-  /* 榫卯暗纹 */
-  --mortise-pattern: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 30h60M30 0v60' stroke='%23C9A227' stroke-width='0.5' opacity='0.06'/%3E%3C/svg%3E");
+  /* 榫卯结构装饰 - 精致版 */
+  --mortise-pattern: url("data:image/svg+xml,%3Csvg width='80' height='80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 40h80M40 0v80' stroke='%23D4AF37' stroke-width='0.4' opacity='0.05'/%3E%3Ccircle cx='40' cy='40' r='8' stroke='%23D4AF37' stroke-width='0.3' fill='none' opacity='0.04'/%3E%3Ccircle cx='0' cy='0' r='6' stroke='%23D4AF37' stroke-width='0.3' fill='none' opacity='0.03'/%3E%3Ccircle cx='80' cy='0' r='6' stroke='%23D4AF37' stroke-width='0.3' fill='none' opacity='0.03'/%3E%3Ccircle cx='0' cy='80' r='6' stroke='%23D4AF37' stroke-width='0.3' fill='none' opacity='0.03'/%3E%3Ccircle cx='80' cy='80' r='6' stroke='%23D4AF37' stroke-width='0.3' fill='none' opacity='0.03'/%3E%3C/svg%3E");
+
+  /* 金属纹理渐变 */
+  --gold-gradient: linear-gradient(135deg, #D4AF37 0%, #E8C967 50%, #D4AF37 100%);
+  --gold-shimmer: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
 }
 
 /* ---------- Light 模式 ---------- */
 body.light-mode {
-  --bg-primary: #FAF8F5;
-  --bg-secondary: #F2EDE6;
+  --bg-primary: #F9F7F4;
+  --bg-secondary: #F2EEE8;
   --bg-card: #FFFFFF;
   --bg-card-hover: #FAFAF8;
-  --bg-overlay: rgba(250, 248, 245, 0.9);
+  --bg-overlay: rgba(249, 247, 244, 0.95);
+  --bg-glass: rgba(255, 255, 255, 0.8);
 
-  --text-primary: #2C2C2C;
-  --text-secondary: #6B6B6B;
+  --text-primary: #1A1A1A;
+  --text-secondary: #5A5A5A;
   --text-muted: #9A9A9A;
 
-  --accent-gold: #B8860B;
-  --accent-gold-light: #D4A84B;
-  --accent-gold-dark: #8B6508;
-  --accent-red: #C41E3A;
-  --accent-red-light: #E85A75;
+  --accent-gold: #A68B2D;
+  --accent-gold-light: #C9A227;
+  --accent-gold-dark: #8B7320;
+  --accent-gold-glow: rgba(166, 139, 45, 0.3);
+  --accent-red: #B54A4A;
 
-  --border: rgba(139, 69, 19, 0.1);
-  --border-gold: rgba(184, 134, 11, 0.3);
+  --border: rgba(139, 115, 85, 0.1);
+  --border-gold: rgba(166, 139, 45, 0.25);
+  --border-gold-hover: rgba(166, 139, 45, 0.5);
 
-  --highlight: rgba(201, 162, 39, 0.08);
-  --highlight-strong: rgba(201, 162, 39, 0.15);
+  --highlight: rgba(166, 139, 45, 0.08);
+  --highlight-strong: rgba(166, 139, 45, 0.15);
 
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
-  --shadow-gold: 0 0 20px rgba(184, 134, 11, 0.15);
+  --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.1);
+  --shadow-gold: 0 0 30px rgba(166, 139, 45, 0.1);
+  --shadow-glow: 0 0 60px rgba(166, 139, 45, 0.08);
+
+  --mortise-pattern: url("data:image/svg+xml,%3Csvg width='80' height='80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 40h80M40 0v80' stroke='%23A68B2D' stroke-width='0.4' opacity='0.06'/%3E%3Ccircle cx='40' cy='40' r='8' stroke='%23A68B2D' stroke-width='0.3' fill='none' opacity='0.05'/%3E%3C/svg%3E");
 }
 
 /* ---------- 基础重置 ---------- */
@@ -104,14 +119,14 @@ body {
   font-family: var(--font-sans);
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  line-height: 1.6;
+  line-height: 1.7;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.4s var(--ease-out), color 0.4s var(--ease-out);
+  transition: background-color 0.5s var(--ease-smooth), color 0.5s var(--ease-smooth);
 }
 
-/* 榫卯暗纹背景（可复用类） */
+/* 榫卯暗纹背景 */
 .mortise-bg {
   background-image: var(--mortise-pattern);
   background-repeat: repeat;
@@ -119,17 +134,17 @@ body {
 
 /* ---------- 滚动条样式 ---------- */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--border-gold);
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -146,13 +161,14 @@ body {
 :focus-visible {
   outline: 2px solid var(--accent-gold);
   outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 
 /* ---------- 通用工具类 ---------- */
 .container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 32px;
 }
 
 .visually-hidden {
@@ -166,7 +182,6 @@ body {
   border: 0;
 }
 
-/* 文字截断 */
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -192,7 +207,7 @@ body {
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(30px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -212,10 +227,32 @@ body {
 }
 
 @keyframes glow {
-  0%, 100% { box-shadow: 0 0 5px var(--accent-gold); }
-  50% { box-shadow: 0 0 20px var(--accent-gold), 0 0 30px var(--accent-gold); }
+  0%, 100% { box-shadow: 0 0 15px var(--accent-gold-glow); }
+  50% { box-shadow: 0 0 35px var(--accent-gold-glow), 0 0 60px var(--accent-gold-glow); }
 }
 
-.animate-fade-in { animation: fadeIn 0.5s var(--ease-out) forwards; }
-.animate-slide-up { animation: slideUp 0.5s var(--ease-out) forwards; }
-.animate-pulse { animation: pulse 2s ease-in-out infinite; }
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-fade-in { animation: fadeIn 0.6s var(--ease-out) forwards; }
+.animate-slide-up { animation: slideUp 0.6s var(--ease-out) forwards; }
+.animate-pulse { animation: pulse 3s ease-in-out infinite; }
+.animate-glow { animation: glow 3s ease-in-out infinite; }
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 0%, var(--gold-shimmer) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+.animate-float { animation: float 4s ease-in-out infinite; }
