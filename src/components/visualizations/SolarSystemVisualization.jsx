@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 // 太阳系颜色配置
-const SOLAR_COLORS = {
+const COLORS = {
   sun: '#FFD700',
   mercury: '#B0B0B0',
   venus: '#E6C200',
@@ -9,297 +9,219 @@ const SOLAR_COLORS = {
   mars: '#CD5C5C',
   jupiter: '#D4A574',
   saturn: '#F4D03F',
-  orbit: 'rgba(255, 255, 255, 0.12)',
+  uranus: '#7FDBFF',
+  neptune: '#4169E1',
+  orbit: 'rgba(255, 255, 255, 0.1)',
   text: '#D4AF37',
-  background: '#050510'
+  bg: '#050510'
 }
+
+// 8大行星数据（距离按比例缩放，确保全部可见）
+const PLANETS = [
+  { name: '水星', dist: 0.12, speed: 0.025, size: 2.5, color: COLORS.mercury },
+  { name: '金星', dist: 0.18, speed: 0.018, size: 4, color: COLORS.venus },
+  { name: '地球', dist: 0.25, speed: 0.014, size: 4.5, color: COLORS.earth },
+  { name: '火星', dist: 0.32, speed: 0.011, size: 3.5, color: COLORS.mars },
+  { name: '木星', dist: 0.45, speed: 0.006, size: 10, color: COLORS.jupiter },
+  { name: '土星', dist: 0.58, speed: 0.004, size: 8.5, color: COLORS.saturn },
+  { name: '天王星', dist: 0.72, speed: 0.003, size: 6, color: COLORS.uranus },
+  { name: '海王星', dist: 0.88, speed: 0.002, size: 5.5, color: COLORS.neptune }
+]
+
+// 星空数据（固定，避免每帧重新生成）
+const STARS = Array.from({ length: 200 }, (_, i) => ({
+  x: (i * 7919 + 3571) % 1000 / 1000,
+  y: (i * 6571 + 2143) % 1000 / 1000,
+  size: ((i * 13) % 30) / 20 + 0.3,
+  bright: 0.2 + ((i * 37) % 80) / 100
+}))
 
 export default function SolarSystemVisualization() {
   const canvasRef = useRef(null)
-  const animationRef = useRef(null)
-  const [params, setParams] = useState({
-    sunMass: 1,
-    initialVelocity: 1,
-    gravityStrength: 1,
-    showOrbit: true,
-    showVelocity: false
-  })
+  const animRef = useRef(null)
+  const planetsRef = useRef(
+    PLANETS.map((p, i) => ({
+      ...p,
+      angle: i * 0.8 + Math.random() * 2
+    }))
+  )
 
-  // 行星初始数据 - 8大行星（调整距离确保全部在太阳之外可见）
-  const [planets, setPlanets] = useState([
-    { name: '水星', distance: 55, angle: 0, speed: 0.20, size: 3.5, color: SOLAR_COLORS.mercury },
-    { name: '金星', distance: 72, angle: 2.5, speed: 0.15, size: 5.5, color: SOLAR_COLORS.venus },
-    { name: '地球', distance: 90, angle: 5, speed: 0.12, size: 6, color: SOLAR_COLORS.earth },
-    { name: '火星', distance: 108, angle: 1.2, speed: 0.09, size: 4.5, color: SOLAR_COLORS.mars },
-    { name: '木星', distance: 135, angle: 3.5, speed: 0.05, size: 13, color: SOLAR_COLORS.jupiter },
-    { name: '土星', distance: 158, angle: 4.2, speed: 0.035, size: 11, color: SOLAR_COLORS.saturn },
-    { name: '天王星', distance: 180, angle: 1.8, speed: 0.025, size: 7.5, color: '#7FDBFF' },
-    { name: '海王星', distance: 200, angle: 3.0, speed: 0.018, size: 7, color: '#4169E1' }
-  ])
-
-  // 动画循环
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const dpr = window.devicePixelRatio || 1
-    const displayWidth = canvas.clientWidth
-    const displayHeight = canvas.clientHeight
-    canvas.width = displayWidth * dpr
-    canvas.height = displayHeight * dpr
-    canvas.style.width = displayWidth + 'px'
-    canvas.style.height = displayHeight + 'px'
-
     const ctx = canvas.getContext('2d')
-    ctx.scale(dpr, dpr)
+    const dpr = window.devicePixelRatio || 1
 
-    const width = displayWidth
-    const height = displayHeight
-    const centerX = width / 2
-    const centerY = height / 2
-
-    // 适应画布的缩放因子 - 确保海王星(distance=200)在画布内
-    const maxOrbitRadius = 200 + 15 // 海王星距离 + 标签空间
-    const scale = Math.min(width, height) / (maxOrbitRadius * 2.4)
-
-    let animationId
-
-    const animate = () => {
-      ctx.fillStyle = SOLAR_COLORS.background
-      ctx.fillRect(0, 0, width, height)
-
-      // 绘制星空背景
-      drawStars(ctx, width, height)
-
-      // 绘制太阳 - 减小尺寸避免遮挡内行星
-      const sunSize = 18 * params.sunMass * scale
-      const sunGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, sunSize * 1.5)
-      sunGradient.addColorStop(0, '#fff')
-      sunGradient.addColorStop(0.2, '#fffacd')
-      sunGradient.addColorStop(0.5, SOLAR_COLORS.sun)
-      sunGradient.addColorStop(1, 'rgba(255, 150, 0, 0)')
-      ctx.fillStyle = sunGradient
-      ctx.beginPath()
-      ctx.arc(centerX, centerY, sunSize * 1.5, 0, Math.PI * 2)
-      ctx.fill()
-
-      // 太阳光晕 - 减小范围
-      for (let i = 0; i < 2; i++) {
-        const glowRadius = sunSize * 1.8 + i * 8
-        const glowGradient = ctx.createRadialGradient(centerX, centerY, sunSize, centerX, centerY, glowRadius)
-        glowGradient.addColorStop(0, `rgba(255, 200, 50, ${0.15 - i * 0.05})`)
-        glowGradient.addColorStop(1, 'rgba(255, 200, 50, 0)')
-        ctx.fillStyle = glowGradient
-        ctx.beginPath()
-        ctx.arc(centerX, centerY, glowRadius, 0, Math.PI * 2)
-        ctx.fill()
-      }
-
-      // 更新和绘制行星
-      setPlanets(prevPlanets => {
-        return prevPlanets.map((planet) => {
-          const newAngle = planet.angle + planet.speed * params.initialVelocity
-          const scaledDistance = planet.distance * params.gravityStrength * scale
-          const x = centerX + Math.cos(newAngle) * scaledDistance
-          const y = centerY + Math.sin(newAngle) * scaledDistance
-
-          // 绘制轨道
-          if (params.showOrbit) {
-            ctx.strokeStyle = SOLAR_COLORS.orbit
-            ctx.lineWidth = 1
-            ctx.beginPath()
-            ctx.arc(centerX, centerY, scaledDistance, 0, Math.PI * 2)
-            ctx.stroke()
-          }
-
-          // 绘制行星
-          const planetSize = planet.size * scale * 0.8
-          const planetGradient = ctx.createRadialGradient(x - planetSize / 3, y - planetSize / 3, 0, x, y, planetSize)
-          planetGradient.addColorStop(0, '#fff')
-          planetGradient.addColorStop(0.5, planet.color)
-          planetGradient.addColorStop(1, `${planet.color}88`)
-          ctx.fillStyle = planetGradient
-          ctx.beginPath()
-          ctx.arc(x, y, planetSize, 0, Math.PI * 2)
-          ctx.fill()
-
-          // 土星环
-          if (planet.name === '土星') {
-            ctx.strokeStyle = 'rgba(244, 208, 63, 0.6)'
-            ctx.lineWidth = 3 * scale
-            ctx.beginPath()
-            ctx.ellipse(x, y, planetSize * 2, planetSize * 0.6, Math.PI / 6, 0, Math.PI * 2)
-            ctx.stroke()
-          }
-
-          // 行星标签
-          ctx.fillStyle = 'rgba(255,255,255,0.7)'
-          ctx.font = `${10 * scale}px monospace`
-          ctx.fillText(planet.name, x + planetSize + 5, y + 3)
-
-          // 速度矢量
-          if (params.showVelocity) {
-            const vx = -Math.sin(newAngle) * planet.speed * 30 * scale
-            const vy = Math.cos(newAngle) * planet.speed * 30 * scale
-            ctx.strokeStyle = '#4A90D9'
-            ctx.lineWidth = 2
-            ctx.beginPath()
-            ctx.moveTo(x, y)
-            ctx.lineTo(x + vx, y + vy)
-            ctx.stroke()
-          }
-
-          return { ...planet, angle: newAngle, x, y }
-        })
-      })
-
-      // 中心标签
-      ctx.fillStyle = SOLAR_COLORS.text
-      ctx.font = `bold ${12 * scale}px serif`
-      ctx.fillText('☀ 太阳', centerX + sunSize + 10, centerY - sunSize / 2)
-
-      animationId = requestAnimationFrame(animate)
+    const resize = () => {
+      const w = canvas.clientWidth
+      const h = canvas.clientHeight
+      canvas.width = w * dpr
+      canvas.height = h * dpr
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     }
 
-    animate()
+    resize()
+    window.addEventListener('resize', resize)
 
-    return () => cancelAnimationFrame(animationId)
-  }, [params])
+    const draw = () => {
+      const width = canvas.clientWidth
+      const height = canvas.clientHeight
+      const cx = width / 2
+      const cy = height / 2
+      const maxR = Math.min(cx, cy) - 20 // 留出标签空间
 
-  const updateParam = (key, value) => {
-    setParams(prev => ({ ...prev, [key]: value }))
-  }
+      // 清除背景
+      ctx.fillStyle = COLORS.bg
+      ctx.fillRect(0, 0, width, height)
 
-  // 计算地球相关数据
-  const earthPlanet = planets[2] || {}
-  const earthSpeed = (earthPlanet.speed * params.initialVelocity * 100).toFixed(1)
+      // 绘制星空
+      STARS.forEach(star => {
+        ctx.fillStyle = `rgba(255, 255, 255, ${star.bright})`
+        ctx.beginPath()
+        ctx.arc(star.x * width, star.y * height, star.size, 0, Math.PI * 2)
+        ctx.fill()
+      })
+
+      // 绘制轨道
+      PLANETS.forEach(p => {
+        const r = p.dist * maxR
+        ctx.strokeStyle = COLORS.orbit
+        ctx.lineWidth = 0.8
+        ctx.beginPath()
+        ctx.arc(cx, cy, r, 0, Math.PI * 2)
+        ctx.stroke()
+      })
+
+      // 绘制太阳（小的，不遮挡行星）
+      const sunR = Math.max(8, maxR * 0.04)
+      const sunGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, sunR * 2)
+      sunGrad.addColorStop(0, '#ffffff')
+      sunGrad.addColorStop(0.3, '#fffacd')
+      sunGrad.addColorStop(0.6, COLORS.sun)
+      sunGrad.addColorStop(1, 'rgba(255, 150, 0, 0)')
+      ctx.fillStyle = sunGrad
+      ctx.beginPath()
+      ctx.arc(cx, cy, sunR * 2, 0, Math.PI * 2)
+      ctx.fill()
+
+      // 太阳光晕（小范围）
+      const glowGrad = ctx.createRadialGradient(cx, cy, sunR, cx, cy, sunR * 3)
+      glowGrad.addColorStop(0, 'rgba(255, 200, 50, 0.12)')
+      glowGrad.addColorStop(1, 'rgba(255, 200, 50, 0)')
+      ctx.fillStyle = glowGrad
+      ctx.beginPath()
+      ctx.arc(cx, cy, sunR * 3, 0, Math.PI * 2)
+      ctx.fill()
+
+      // 更新和绘制行星（使用ref，不触发React重渲染）
+      planetsRef.current.forEach(planet => {
+        planet.angle += planet.speed
+
+        const orbitR = planet.dist * maxR
+        const px = cx + Math.cos(planet.angle) * orbitR
+        const py = cy + Math.sin(planet.angle) * orbitR
+        const pr = Math.max(2, planet.size * (maxR / 250))
+
+        // 行星本体
+        const pGrad = ctx.createRadialGradient(px - pr * 0.3, py - pr * 0.3, 0, px, py, pr)
+        pGrad.addColorStop(0, '#ffffff')
+        pGrad.addColorStop(0.4, planet.color)
+        pGrad.addColorStop(1, planet.color + '88')
+        ctx.fillStyle = pGrad
+        ctx.beginPath()
+        ctx.arc(px, py, pr, 0, Math.PI * 2)
+        ctx.fill()
+
+        // 土星环
+        if (planet.name === '土星') {
+          ctx.save()
+          ctx.strokeStyle = 'rgba(244, 208, 63, 0.5)'
+          ctx.lineWidth = Math.max(1.5, pr * 0.25)
+          ctx.beginPath()
+          ctx.ellipse(px, py, pr * 2, pr * 0.5, Math.PI / 6, 0, Math.PI * 2)
+          ctx.stroke()
+          ctx.restore()
+        }
+
+        // 行星名称标签
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.75)'
+        ctx.font = `${Math.max(9, 10 * maxR / 250)}px monospace`
+        ctx.fillText(planet.name, px + pr + 4, py + 3)
+      })
+
+      // 太阳标签
+      ctx.fillStyle = COLORS.text
+      ctx.font = `bold ${Math.max(10, 11 * maxR / 250)}px serif`
+      ctx.fillText('太阳', cx + sunR * 2.5, cy - 4)
+
+      // 右上角标题
+      ctx.fillStyle = 'rgba(212, 175, 55, 0.6)'
+      ctx.font = '14px serif'
+      ctx.textAlign = 'right'
+      ctx.fillText('太阳系 · 8大行星', width - 16, 24)
+      ctx.textAlign = 'left'
+
+      animRef.current = requestAnimationFrame(draw)
+    }
+
+    draw()
+
+    return () => {
+      window.removeEventListener('resize', resize)
+      if (animRef.current) cancelAnimationFrame(animRef.current)
+    }
+  }, [])
 
   return (
     <div style={{
       width: '100%',
       height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      background: SOLAR_COLORS.background,
+      background: COLORS.bg,
       borderRadius: 'var(--radius-lg)',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      position: 'relative'
     }}>
-      {/* Canvas区域 */}
-      <div style={{ flex: 1, minHeight: 0, position: 'relative' }}>
-        <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />
-      </div>
-
-      {/* 控制面板 */}
-      <div style={{
-        padding: '16px',
-        background: 'rgba(0,0,0,0.4)',
-        borderTop: '1px solid rgba(255,255,255,0.1)'
-      }}>
-        {/* 参数显示 */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: '12px' }}>
-          <ParamDisplay label="太阳质量" value={`${params.sunMass.toFixed(1)}M☉`} color={SOLAR_COLORS.sun} />
-          <ParamDisplay label="引力强度" value={`${params.gravityStrength.toFixed(1)}G`} color={SOLAR_COLORS.text} />
-          <ParamDisplay label="地球速度" value={earthSpeed} color={SOLAR_COLORS.earth} />
-          <ParamDisplay label="行星数量" value="8颗" color={SOLAR_COLORS.jupiter} />
-        </div>
-
-        {/* 滑块 */}
-        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-          <SliderControl label="太阳质量" value={params.sunMass} min={0.5} max={2} step={0.1} unit="M☉" onChange={v => updateParam('sunMass', v)} color={SOLAR_COLORS.sun} />
-          <SliderControl label="初始速度" value={params.initialVelocity} min={0.5} max={2} step={0.1} unit="v₀" onChange={v => updateParam('initialVelocity', v)} color={SOLAR_COLORS.earth} />
-          <SliderControl label="引力强度" value={params.gravityStrength} min={0.1} max={2} step={0.1} unit="G" onChange={v => updateParam('gravityStrength', v)} color={SOLAR_COLORS.text} />
-        </div>
-
-        {/* 切换 */}
-        <div style={{ display: 'flex', gap: '16px', marginTop: '12px' }}>
-          <ToggleControl label="显示轨道" checked={params.showOrbit} onChange={v => updateParam('showOrbit', v)} color={SOLAR_COLORS.orbit} />
-          <ToggleControl label="速度矢量" checked={params.showVelocity} onChange={v => updateParam('showVelocity', v)} color={SOLAR_COLORS.earth} />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// 绘制星空背景
-function drawStars(ctx, width, height) {
-  const starCount = 150
-  for (let i = 0; i < starCount; i++) {
-    const x = (i * 7919) % width
-    const y = (i * 6571) % height
-    const size = ((i * 13) % 3) / 2 + 0.5
-    const brightness = 0.3 + ((i * 37) % 70) / 100
-    ctx.fillStyle = `rgba(255, 255, 255, ${brightness})`
-    ctx.beginPath()
-    ctx.arc(x, y, size, 0, Math.PI * 2)
-    ctx.fill()
-  }
-}
-
-function ParamDisplay({ label, value, color }) {
-  return (
-    <div style={{
-      textAlign: 'center',
-      padding: '6px 8px',
-      background: 'rgba(255,255,255,0.05)',
-      borderRadius: '6px',
-      border: `1px solid ${color}30`
-    }}>
-      <div style={{ fontSize: '9px', color: '#888', marginBottom: '2px' }}>{label}</div>
-      <div style={{ fontSize: '14px', fontWeight: '600', color, fontFamily: 'monospace' }}>{value}</div>
-    </div>
-  )
-}
-
-function SliderControl({ label, value, min, max, step, unit = '', onChange, color }) {
-  return (
-    <div style={{ flex: '1 1 100px', minWidth: '90px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-        <span style={{ fontSize: '11px', color: '#aaa' }}>{label}</span>
-        <span style={{ fontSize: '11px', fontWeight: '600', color }}>{value}{unit}</span>
-      </div>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={e => onChange(parseFloat(e.target.value))}
+      <canvas
+        ref={canvasRef}
         style={{
           width: '100%',
-          height: '4px',
-          appearance: 'none',
-          background: `linear-gradient(to right, ${color} 0%, ${color} ${((value - min) / (max - min)) * 100}%, #444 ${((value - min) / (max - min)) * 100}%, #444 100%)`,
-          borderRadius: '2px',
-          cursor: 'pointer'
+          height: '100%',
+          display: 'block'
         }}
       />
-    </div>
-  )
-}
-
-function ToggleControl({ label, checked, onChange, color }) {
-  return (
-    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+      {/* 左下角行星图例 */}
       <div style={{
-        width: '32px',
-        height: '18px',
-        background: checked ? color : '#333',
-        borderRadius: '9px',
-        position: 'relative',
-        transition: 'background 0.3s'
+        position: 'absolute',
+        bottom: '12px',
+        left: '12px',
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '6px',
+        pointerEvents: 'none'
       }}>
-        <div style={{
-          width: '14px',
-          height: '14px',
-          background: '#fff',
-          borderRadius: '50%',
-          position: 'absolute',
-          top: '2px',
-          left: checked ? '16px' : '2px',
-          transition: 'left 0.3s'
-        }} />
+        {PLANETS.map(p => (
+          <div key={p.name} style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '3px',
+            background: 'rgba(0,0,0,0.5)',
+            padding: '2px 6px',
+            borderRadius: '4px',
+            fontSize: '10px',
+            color: '#aaa'
+          }}>
+            <span style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              background: p.color,
+              display: 'inline-block'
+            }} />
+            {p.name}
+          </div>
+        ))}
       </div>
-      <span style={{ fontSize: '11px', color: '#aaa' }}>{label}</span>
-    </label>
+    </div>
   )
 }

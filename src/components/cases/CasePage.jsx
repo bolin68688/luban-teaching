@@ -12,45 +12,6 @@ const TABS = [
   { id: 'wenda', label: '鲁班问答', icon: HelpCircle }
 ]
 
-function TabButton({ tab, isActive, onClick }) {
-  const Icon = tab.icon
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '6px',
-        padding: '10px 20px',
-        background: isActive ? 'var(--highlight)' : 'transparent',
-        border: isActive ? '1px solid var(--border-gold)' : '1px solid transparent',
-        borderRadius: 'var(--radius-md)',
-        color: isActive ? 'var(--accent-gold)' : 'var(--text-secondary)',
-        cursor: 'pointer',
-        fontSize: '14px',
-        fontWeight: '500',
-        transition: 'all 0.3s var(--ease-out)',
-        fontFamily: 'var(--font-sans)'
-      }}
-      onMouseEnter={e => {
-        if (!isActive) {
-          e.currentTarget.style.background = 'var(--highlight)'
-          e.currentTarget.style.color = 'var(--text-primary)'
-        }
-      }}
-      onMouseLeave={e => {
-        if (!isActive) {
-          e.currentTarget.style.background = 'transparent'
-          e.currentTarget.style.color = 'var(--text-secondary)'
-        }
-      }}
-    >
-      <Icon size={16} />
-      {tab.label}
-    </button>
-  )
-}
-
 function XinfaPanel({ caseData }) {
   const { xinfa } = caseData
   return (
@@ -182,7 +143,6 @@ function KaiwuPanel({ caseData, simParams, onParamChange, displayValues }) {
         鲁班开物
       </h3>
 
-      {/* 控件区 */}
       <div style={{ marginBottom: '24px' }}>
         <div style={{
           fontSize: '12px',
@@ -261,7 +221,6 @@ function KaiwuPanel({ caseData, simParams, onParamChange, displayValues }) {
         </div>
       </div>
 
-      {/* 实时数据区 */}
       <div>
         <div style={{
           fontSize: '12px',
@@ -349,7 +308,6 @@ function WendaPanel({ caseData }) {
         鲁班问答
       </h3>
 
-      {/* 进度 */}
       <div style={{
         display: 'flex',
         gap: '6px',
@@ -376,7 +334,6 @@ function WendaPanel({ caseData }) {
         ))}
       </div>
 
-      {/* 题号 */}
       <div style={{
         fontSize: '13px',
         color: 'var(--text-muted)',
@@ -385,7 +342,6 @@ function WendaPanel({ caseData }) {
         第 {currentQ + 1} / {wenda.length} 题
       </div>
 
-      {/* 题目 */}
       <div style={{
         fontSize: '16px',
         color: 'var(--text-primary)',
@@ -396,7 +352,6 @@ function WendaPanel({ caseData }) {
         {q.question}
       </div>
 
-      {/* 选项 */}
       <div style={{ display: 'grid', gap: '10px', marginBottom: '20px' }}>
         {q.options.map((opt, i) => {
           const isSelected = selected === opt
@@ -481,7 +436,6 @@ function WendaPanel({ caseData }) {
         })}
       </div>
 
-      {/* 解析 */}
       {answered && (
         <div style={{
           background: isCorrect
@@ -490,8 +444,7 @@ function WendaPanel({ caseData }) {
           border: `1px solid ${isCorrect ? 'var(--border-gold)' : 'var(--accent-red)'}`,
           borderRadius: 'var(--radius-md)',
           padding: '16px',
-          marginBottom: '20px',
-          animation: 'fadeIn 0.3s var(--ease-out)'
+          marginBottom: '20px'
         }}>
           <div style={{
             fontSize: '14px',
@@ -511,7 +464,6 @@ function WendaPanel({ caseData }) {
         </div>
       )}
 
-      {/* 导航按钮 */}
       <div style={{ display: 'flex', gap: '12px' }}>
         {currentQ < wenda.length - 1 && answered && (
           <button
@@ -554,7 +506,6 @@ function WendaPanel({ caseData }) {
   )
 }
 
-// 根据案例ID选择可视化组件
 function VisualizationComponent({ caseId, simParams, isFullscreen }) {
   switch (caseId) {
     case 'wave-interference':
@@ -572,47 +523,21 @@ function VisualizationComponent({ caseId, simParams, isFullscreen }) {
 
 export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
   const caseData = getCaseById(caseId)
-  const [activeTab, setActiveTab] = useState('xinfa')
+  const [panelState, setPanelState] = useState({ tab: 'xinfa', open: false })
   const [isFullscreen, setIsFullscreen] = useState(false)
-  const [panelOpen, setPanelOpen] = useState(false)
   const containerRef = useRef(null)
 
-  // 模拟参数状态 - 根据案例初始化不同参数
+  // 模拟参数状态
   const getInitialParams = (id) => {
     switch (id) {
       case 'wave-interference':
-        return {
-          '波长': 1.5,
-          '双缝间距': 4,
-          '屏幕距离': 10,
-          '显示加强区': true,
-          '显示相消区': true
-        }
+        return { '波长': 1.5, '双缝间距': 4, '屏幕距离': 10, '显示加强区': true, '显示相消区': true }
       case 'solar-system':
-        return {
-          '太阳质量': 1,
-          '初始速度': 1,
-          '引力强度': 1,
-          '显示轨道': true,
-          '速度矢量': false
-        }
+        return { '太阳质量': 1, '初始速度': 1, '引力强度': 1, '显示轨道': true, '速度矢量': false }
       case 'acid-base':
-        return {
-          '酸浓度': 0.05,
-          '碱浓度': 0.05,
-          '初始体积': 25,
-          '指示剂': 'phenolphthalein'
-        }
+        return { '酸浓度': 0.05, '碱浓度': 0.05, '初始体积': 25, '指示剂': 'phenolphthalein' }
       case 'trigonometry':
-        return {
-          '角度θ': 45,
-          '振幅A': 1,
-          '频率ω': 1,
-          '相位φ': 0,
-          '正弦': true,
-          '余弦': true,
-          '正切': false
-        }
+        return { '角度θ': 45, '振幅A': 1, '频率ω': 1, '相位φ': 0, '正弦': true, '余弦': true, '正切': false }
       default:
         return {}
     }
@@ -620,37 +545,16 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
 
   const [simParams, setSimParams] = useState(() => getInitialParams(caseId))
 
-  // 实时计算值
   const getInitialDisplayValues = (id) => {
     switch (id) {
       case 'wave-interference':
-        return {
-          fringeSpacing: '0.75 px',
-          maxOrder: '5',
-          constructiveCount: '6',
-          destructiveCount: '5'
-        }
+        return { fringeSpacing: '0.75 px', maxOrder: '5', constructiveCount: '6', destructiveCount: '5' }
       case 'solar-system':
-        return {
-          orbitalPeriod: '125.6s',
-          orbitalSpeed: '5.0',
-          eccentricity: '0.00',
-          energy: '-0.5 J'
-        }
+        return { orbitalPeriod: '125.6s', orbitalSpeed: '5.0', eccentricity: '0.00', energy: '-0.5 J' }
       case 'acid-base':
-        return {
-          equivalencePoint: '7.0',
-          titrantVolume: '0.00 mL',
-          phIndicator: '8.2-10.0',
-          neutralizationHeat: '-57.3 kJ/mol'
-        }
+        return { equivalencePoint: '7.0', titrantVolume: '0.00 mL', phIndicator: '8.2-10.0', neutralizationHeat: '-57.3 kJ/mol' }
       case 'trigonometry':
-        return {
-          sinValue: '0.707',
-          cosValue: '0.707',
-          tanValue: '1.000',
-          unitCirclePoint: '(0.71, 0.71)'
-        }
+        return { sinValue: '0.707', cosValue: '0.707', tanValue: '1.000', unitCirclePoint: '(0.71, 0.71)' }
       default:
         return {}
     }
@@ -661,15 +565,12 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
   const handleParamChange = useCallback((label, value) => {
     setSimParams(prev => ({ ...prev, [label]: value }))
 
-    // 根据案例计算实时参数
     if (caseId === 'wave-interference') {
       const wavelength = label === '波长' ? value : simParams['波长']
       const slitDistance = label === '双缝间距' ? value : simParams['双缝间距']
       const screenDistance = label === '屏幕距离' ? value : simParams['屏幕距离']
-
       const fringeSpacing = (wavelength * screenDistance / slitDistance * 2).toFixed(2)
       const maxOrder = Math.floor(slitDistance / wavelength * 2)
-
       setDisplayValues({
         fringeSpacing: `${fringeSpacing} px`,
         maxOrder: String(maxOrder),
@@ -681,7 +582,6 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
     if (caseId === 'trigonometry') {
       const angle = label === '角度θ' ? value : simParams['角度θ']
       const angleRad = (angle * Math.PI) / 180
-
       setDisplayValues({
         sinValue: Math.sin(angleRad).toFixed(3),
         cosValue: Math.cos(angleRad).toFixed(3),
@@ -690,11 +590,6 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
       })
     }
   }, [caseId, simParams])
-
-  // 实时更新计算
-  useEffect(() => {
-    // 参数变化时更新显示值已在handleParamChange中处理
-  }, [simParams, caseId])
 
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
@@ -706,20 +601,22 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
     }
   }, [])
 
-  // 面板切换 - 使用普通函数避免闭包问题
-  const togglePanel = (tabId) => {
-    setActiveTab(currentActive => {
-      if (currentActive === tabId) {
-        // 同一标签，切换面板开关
-        setPanelOpen(currentOpen => !currentOpen)
-        return currentActive
+  // ★ 核心修复：面板切换使用单一state对象，避免嵌套setState
+  const handleTabClick = useCallback((tabId) => {
+    setPanelState(prev => {
+      if (prev.tab === tabId && prev.open) {
+        // 点击同一标签 → 关闭面板
+        return { ...prev, open: false }
       } else {
-        // 不同标签，切换并打开面板
-        setPanelOpen(true)
-        return tabId
+        // 点击不同标签 → 切换并打开面板
+        return { tab: tabId, open: true }
       }
     })
-  }
+  }, [])
+
+  const closePanel = useCallback(() => {
+    setPanelState(prev => ({ ...prev, open: false }))
+  }, [])
 
   // 全屏变化监听
   useEffect(() => {
@@ -730,18 +627,9 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange)
   }, [])
 
-  // ESC关闭面板
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && panelOpen && !isFullscreen) {
-        setPanelOpen(false)
-      }
-    }
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [panelOpen, isFullscreen])
-
   if (!caseData) return null
+
+  const { tab: activeTab, open: panelOpen } = panelState
 
   return (
     <div
@@ -755,7 +643,7 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
         overflow: 'hidden'
       }}
     >
-      {/* 顶部导航 - 非全屏时显示 */}
+      {/* 顶部导航 */}
       {!isFullscreen && (
         <header style={{
           padding: '12px 20px',
@@ -765,7 +653,8 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
           borderBottom: '1px solid var(--border)',
           background: 'var(--bg-secondary)',
           flexShrink: 0,
-          zIndex: 10
+          position: 'relative',
+          zIndex: 50
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <button
@@ -876,9 +765,10 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
         {/* 可视化区域 */}
         <div style={{
           flex: panelOpen ? '0 0 65%' : '1',
-          transition: 'flex 0.4s var(--ease-out)',
+          transition: 'flex 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           position: 'relative',
-          background: 'var(--bg-secondary)'
+          background: 'var(--bg-secondary)',
+          zIndex: 1
         }}>
           <VisualizationComponent
             caseId={caseId}
@@ -886,7 +776,6 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
             isFullscreen={isFullscreen}
           />
 
-          {/* 全屏退出按钮 */}
           {isFullscreen && (
             <button
               onClick={toggleFullscreen}
@@ -918,77 +807,109 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
           )}
         </div>
 
-        {/* 右侧面板 */}
+        {/* 右侧面板 - 使用transform动画更可靠 */}
         <div style={{
-          width: panelOpen ? '35%' : '0',
-          transition: 'width 0.4s var(--ease-out)',
-          overflow: 'hidden',
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          width: '35%',
+          height: '100%',
           background: 'var(--bg-card)',
-          borderLeft: panelOpen ? '1px solid var(--border)' : 'none',
-          position: 'relative',
-          flexShrink: 0
+          borderLeft: '1px solid var(--border)',
+          transform: panelOpen ? 'translateX(0)' : 'translateX(100%)',
+          transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          zIndex: 10,
+          boxShadow: panelOpen ? '-4px 0 20px rgba(0,0,0,0.3)' : 'none'
         }}>
-          {panelOpen && (
+          <div style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            {/* 面板头部 */}
             <div style={{
-              width: '100%',
-              height: '100%',
+              padding: '12px 16px',
+              borderBottom: '1px solid var(--border)',
               display: 'flex',
-              flexDirection: 'column',
-              animation: 'slideInRight 0.4s var(--ease-out)'
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexShrink: 0
             }}>
-              {/* 面板头部 */}
-              <div style={{
-                padding: '12px 16px',
-                borderBottom: '1px solid var(--border)',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexShrink: 0
-              }}>
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  {TABS.map(tab => (
-                    <TabButton
+              <div style={{ display: 'flex', gap: '6px' }}>
+                {TABS.map(tab => {
+                  const Icon = tab.icon
+                  const isActive = activeTab === tab.id
+                  return (
+                    <button
                       key={tab.id}
-                      tab={tab}
-                      isActive={activeTab === tab.id}
-                      onClick={() => togglePanel(tab.id)}
-                    />
-                  ))}
-                </div>
-                <button
-                  onClick={() => setPanelOpen(false)}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    color: 'var(--text-muted)',
-                    cursor: 'pointer',
-                    padding: '4px',
-                    display: 'flex'
-                  }}
-                >
-                  <X size={18} />
-                </button>
+                      onClick={() => handleTabClick(tab.id)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '8px 16px',
+                        background: isActive ? 'var(--highlight)' : 'transparent',
+                        border: isActive ? '1px solid var(--border-gold)' : '1px solid transparent',
+                        borderRadius: 'var(--radius-md)',
+                        color: isActive ? 'var(--accent-gold)' : 'var(--text-secondary)',
+                        cursor: 'pointer',
+                        fontSize: '13px',
+                        fontWeight: '500',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={e => {
+                        if (!isActive) {
+                          e.currentTarget.style.background = 'var(--highlight)'
+                          e.currentTarget.style.color = 'var(--text-primary)'
+                        }
+                      }}
+                      onMouseLeave={e => {
+                        if (!isActive) {
+                          e.currentTarget.style.background = 'transparent'
+                          e.currentTarget.style.color = 'var(--text-secondary)'
+                        }
+                      }}
+                    >
+                      <Icon size={14} />
+                      {tab.label}
+                    </button>
+                  )
+                })}
               </div>
-
-              {/* 面板内容 */}
-              <div style={{ flex: 1, overflow: 'hidden' }}>
-                {activeTab === 'xinfa' && <XinfaPanel caseData={caseData} />}
-                {activeTab === 'kaiwu' && (
-                  <KaiwuPanel
-                    caseData={caseData}
-                    simParams={simParams}
-                    onParamChange={handleParamChange}
-                    displayValues={displayValues}
-                  />
-                )}
-                {activeTab === 'wenda' && <WendaPanel caseData={caseData} />}
-              </div>
+              <button
+                onClick={closePanel}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  display: 'flex'
+                }}
+              >
+                <X size={18} />
+              </button>
             </div>
-          )}
+
+            {/* 面板内容 */}
+            <div style={{ flex: 1, overflow: 'hidden' }}>
+              {activeTab === 'xinfa' && <XinfaPanel caseData={caseData} />}
+              {activeTab === 'kaiwu' && (
+                <KaiwuPanel
+                  caseData={caseData}
+                  simParams={simParams}
+                  onParamChange={handleParamChange}
+                  displayValues={displayValues}
+                />
+              )}
+              {activeTab === 'wenda' && <WendaPanel caseData={caseData} />}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* 底部标签栏 - 非全屏时显示 */}
+      {/* ★ 底部标签栏 - 简洁按钮，确保可点击 */}
       {!isFullscreen && (
         <div style={{
           padding: '12px 20px',
@@ -1001,39 +922,45 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
           position: 'relative',
           zIndex: 100
         }}>
-          {TABS.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => togglePanel(tab.id)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '10px 24px',
-                background: activeTab === tab.id && panelOpen ? 'var(--highlight)' : 'var(--bg-card)',
-                border: activeTab === tab.id && panelOpen ? '1px solid var(--border-gold)' : '1px solid var(--border)',
-                borderRadius: 'var(--radius-md)',
-                color: activeTab === tab.id && panelOpen ? 'var(--accent-gold)' : 'var(--text-secondary)',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '500',
-                transition: 'all 0.2s var(--ease-out)'
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.borderColor = 'var(--border-gold)'
-                e.currentTarget.style.color = 'var(--accent-gold)'
-              }}
-              onMouseLeave={e => {
-                if (!(activeTab === tab.id && panelOpen)) {
-                  e.currentTarget.style.borderColor = 'var(--border)'
-                  e.currentTarget.style.color = 'var(--text-secondary)'
-                }
-              }}
-            >
-              <tab.icon size={16} />
-              {tab.label}
-            </button>
-          ))}
+          {TABS.map(tab => {
+            const Icon = tab.icon
+            const isActive = activeTab === tab.id && panelOpen
+            return (
+              <button
+                key={tab.id}
+                onClick={() => handleTabClick(tab.id)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '10px 24px',
+                  background: isActive ? 'var(--highlight)' : 'var(--bg-card)',
+                  border: isActive ? '1px solid var(--border-gold)' : '1px solid var(--border)',
+                  borderRadius: 'var(--radius-md)',
+                  color: isActive ? 'var(--accent-gold)' : 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s',
+                  position: 'relative',
+                  zIndex: 101
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.borderColor = 'var(--border-gold)'
+                  e.currentTarget.style.color = 'var(--accent-gold)'
+                }}
+                onMouseLeave={e => {
+                  if (!isActive) {
+                    e.currentTarget.style.borderColor = 'var(--border)'
+                    e.currentTarget.style.color = 'var(--text-secondary)'
+                  }
+                }}
+              >
+                <Icon size={16} />
+                {tab.label}
+              </button>
+            )
+          })}
         </div>
       )}
     </div>
