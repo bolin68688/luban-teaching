@@ -887,18 +887,15 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
           )}
         </div>
 
-        {/* 右侧面板 - 使用transform动画更可靠 */}
+        {/* 右侧面板 - flex布局，真正挤开可视化区域 */}
         <div style={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          width: '35%',
+          flex: panelOpen ? '0 0 35%' : '0 0 0%',
+          minWidth: 0,
           height: '100%',
           background: 'var(--bg-card)',
-          borderLeft: '1px solid var(--border)',
-          transform: panelOpen ? 'translateX(0)' : 'translateX(100%)',
-          transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-          zIndex: 10,
+          borderLeft: panelOpen ? '1px solid var(--border)' : 'none',
+          transition: 'flex 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          overflow: 'hidden',
           boxShadow: panelOpen ? '-4px 0 20px rgba(0,0,0,0.3)' : 'none'
         }}>
           <div style={{
