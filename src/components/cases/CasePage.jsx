@@ -589,7 +589,7 @@ function VisualizationComponent({ caseId, simParams, isFullscreen, vizActions })
     case 'wave-interference':
       return <WaveInterferenceVisualization {...commonProps} />
     case 'solar-system':
-      return <SolarSystemVisualization {...commonProps} />
+      return <SolarSystemVisualization {...commonProps} actions={vizActions || {}} />
     case 'acid-base':
       return <AcidBaseVisualization {...commonProps} actions={vizActions || {}} />
     case 'trigonometry':
