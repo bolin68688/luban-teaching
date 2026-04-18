@@ -945,7 +945,7 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
                       key={tab.id}
                       tab={tab}
                       isActive={activeTab === tab.id}
-                      onClick={() => setActiveTab(tab.id)}
+                      onClick={() => togglePanel(tab.id)}
                     />
                   ))}
                 </div>

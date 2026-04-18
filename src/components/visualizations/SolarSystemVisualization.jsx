@@ -25,14 +25,16 @@ export default function SolarSystemVisualization() {
     showVelocity: false
   })
 
-  // 行星初始数据
+  // 行星初始数据 - 8大行星
   const [planets, setPlanets] = useState([
-    { name: '水星', distance: 45, angle: 0, speed: 0.12, size: 4, color: SOLAR_COLORS.mercury },
-    { name: '金星', distance: 65, angle: 2.5, speed: 0.09, size: 6, color: SOLAR_COLORS.venus },
-    { name: '地球', distance: 90, angle: 5, speed: 0.07, size: 7, color: SOLAR_COLORS.earth },
-    { name: '火星', distance: 115, angle: 1.2, speed: 0.05, size: 5, color: SOLAR_COLORS.mars },
-    { name: '木星', distance: 150, angle: 3.5, speed: 0.03, size: 14, color: SOLAR_COLORS.jupiter },
-    { name: '土星', distance: 180, angle: 4.2, speed: 0.02, size: 11, color: SOLAR_COLORS.saturn }
+    { name: '水星', distance: 35, angle: 0, speed: 0.16, size: 3, color: SOLAR_COLORS.mercury },
+    { name: '金星', distance: 50, angle: 2.5, speed: 0.12, size: 5, color: SOLAR_COLORS.venus },
+    { name: '地球', distance: 65, angle: 5, speed: 0.10, size: 5.5, color: SOLAR_COLORS.earth },
+    { name: '火星', distance: 80, angle: 1.2, speed: 0.08, size: 4, color: SOLAR_COLORS.mars },
+    { name: '木星', distance: 105, angle: 3.5, speed: 0.04, size: 12, color: SOLAR_COLORS.jupiter },
+    { name: '土星', distance: 130, angle: 4.2, speed: 0.03, size: 10, color: SOLAR_COLORS.saturn },
+    { name: '天王星', distance: 155, angle: 1.8, speed: 0.02, size: 7, color: '#7FDBFF' },
+    { name: '海王星', distance: 175, angle: 3.0, speed: 0.015, size: 6.5, color: '#4169E1' }
   ])
 
   // 动画循环
