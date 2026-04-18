@@ -7,60 +7,57 @@ const SOLAR_COLORS = {
   venus: '#E6C200',
   earth: '#4A90D9',
   mars: '#CD5C5C',
-  orbit: 'rgba(255, 255, 255, 0.15)',
+  jupiter: '#D4A574',
+  saturn: '#F4D03F',
+  orbit: 'rgba(255, 255, 255, 0.12)',
   text: '#D4AF37',
   background: '#050510'
 }
 
-export default function SolarSystemVisualization({ params, controls }) {
+export default function SolarSystemVisualization() {
   const canvasRef = useRef(null)
   const animationRef = useRef(null)
-  const [solarParams, setSolarParams] = useState({
+  const [params, setParams] = useState({
     sunMass: 1,
     initialVelocity: 1,
     gravityStrength: 1,
     showOrbit: true,
-    showVelocity: false,
-    planets: []
+    showVelocity: false
   })
 
   // 行星初始数据
-  const initialPlanets = [
-    { name: '水星', distance: 50, angle: 0, speed: 0.08, size: 4, color: SOLAR_COLORS.mercury },
-    { name: '金星', distance: 80, angle: 2, speed: 0.06, size: 6, color: SOLAR_COLORS.venus },
-    { name: '地球', distance: 115, angle: 4, speed: 0.05, size: 7, color: SOLAR_COLORS.earth },
-    { name: '火星', distance: 150, angle: 1, speed: 0.04, size: 5, color: SOLAR_COLORS.mars }
-  ]
-
-  const [planets, setPlanets] = useState(initialPlanets)
-
-  // 绑定控制器
-  useEffect(() => {
-    const handleSlider = (e) => {
-      const { name, value } = e.detail
-      setSolarParams(prev => ({ ...prev, [name]: parseFloat(value) }))
-    }
-    const handleToggle = (e) => {
-      const { name, checked } = e.detail
-      setSolarParams(prev => ({ ...prev, [name]: checked }))
-    }
-    window.addEventListener('solar-control', handleSlider)
-    window.addEventListener('solar-toggle', handleToggle)
-    return () => {
-      window.removeEventListener('solar-control', handleSlider)
-      window.removeEventListener('solar-toggle', handleToggle)
-    }
-  }, [])
+  const [planets, setPlanets] = useState([
+    { name: '水星', distance: 45, angle: 0, speed: 0.12, size: 4, color: SOLAR_COLORS.mercury },
+    { name: '金星', distance: 65, angle: 2.5, speed: 0.09, size: 6, color: SOLAR_COLORS.venus },
+    { name: '地球', distance: 90, angle: 5, speed: 0.07, size: 7, color: SOLAR_COLORS.earth },
+    { name: '火星', distance: 115, angle: 1.2, speed: 0.05, size: 5, color: SOLAR_COLORS.mars },
+    { name: '木星', distance: 150, angle: 3.5, speed: 0.03, size: 14, color: SOLAR_COLORS.jupiter },
+    { name: '土星', distance: 180, angle: 4.2, speed: 0.02, size: 11, color: SOLAR_COLORS.saturn }
+  ])
 
   // 动画循环
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
+
+    const dpr = window.devicePixelRatio || 1
+    const displayWidth = canvas.clientWidth
+    const displayHeight = canvas.clientHeight
+    canvas.width = displayWidth * dpr
+    canvas.height = displayHeight * dpr
+    canvas.style.width = displayWidth + 'px'
+    canvas.style.height = displayHeight + 'px'
+
     const ctx = canvas.getContext('2d')
-    const width = canvas.width
-    const height = canvas.height
+    ctx.scale(dpr, dpr)
+
+    const width = displayWidth
+    const height = displayHeight
     const centerX = width / 2
     const centerY = height / 2
+
+    // 适应画布的缩放因子
+    const scale = Math.min(width, height) / 400
 
     let animationId
 
@@ -72,90 +69,90 @@ export default function SolarSystemVisualization({ params, controls }) {
       drawStars(ctx, width, height)
 
       // 绘制太阳
-      const sunGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 40 * solarParams.sunMass)
+      const sunSize = 35 * params.sunMass * scale
+      const sunGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, sunSize * 1.5)
       sunGradient.addColorStop(0, '#fff')
-      sunGradient.addColorStop(0.3, SOLAR_COLORS.sun)
+      sunGradient.addColorStop(0.2, '#fffacd')
+      sunGradient.addColorStop(0.5, SOLAR_COLORS.sun)
       sunGradient.addColorStop(1, 'rgba(255, 150, 0, 0)')
       ctx.fillStyle = sunGradient
       ctx.beginPath()
-      ctx.arc(centerX, centerY, 40 * solarParams.sunMass, 0, Math.PI * 2)
+      ctx.arc(centerX, centerY, sunSize * 1.5, 0, Math.PI * 2)
       ctx.fill()
 
       // 太阳光晕
       for (let i = 0; i < 3; i++) {
-        const glowGradient = ctx.createRadialGradient(centerX, centerY, 30, centerX, centerY, 60 + i * 15)
-        glowGradient.addColorStop(0, `rgba(255, 200, 50, ${0.15 - i * 0.04})`)
+        const glowGradient = ctx.createRadialGradient(centerX, centerY, sunSize, centerX, centerY, sunSize * 2 + i * 10)
+        glowGradient.addColorStop(0, `rgba(255, 200, 50, ${0.2 - i * 0.05})`)
         glowGradient.addColorStop(1, 'rgba(255, 200, 50, 0)')
         ctx.fillStyle = glowGradient
         ctx.beginPath()
-        ctx.arc(centerX, centerY, 60 + i * 15, 0, Math.PI * 2)
+        ctx.arc(centerX, centerY, sunSize * 2 + i * 10, 0, Math.PI * 2)
         ctx.fill()
       }
 
       // 更新和绘制行星
       setPlanets(prevPlanets => {
-        return prevPlanets.map((planet, index) => {
-          const newAngle = planet.angle + planet.speed * solarParams.initialVelocity * (1 / Math.sqrt(planet.distance / 100))
-          const x = centerX + Math.cos(newAngle) * planet.distance * solarParams.gravityStrength
-          const y = centerY + Math.sin(newAngle) * planet.distance * solarParams.gravityStrength
+        return prevPlanets.map((planet) => {
+          const newAngle = planet.angle + planet.speed * params.initialVelocity
+          const scaledDistance = planet.distance * params.gravityStrength * scale
+          const x = centerX + Math.cos(newAngle) * scaledDistance
+          const y = centerY + Math.sin(newAngle) * scaledDistance
 
           // 绘制轨道
-          if (solarParams.showOrbit) {
+          if (params.showOrbit) {
             ctx.strokeStyle = SOLAR_COLORS.orbit
             ctx.lineWidth = 1
             ctx.beginPath()
-            ctx.arc(centerX, centerY, planet.distance * solarParams.gravityStrength, 0, Math.PI * 2)
+            ctx.arc(centerX, centerY, scaledDistance, 0, Math.PI * 2)
             ctx.stroke()
           }
 
           // 绘制行星
-          const planetGradient = ctx.createRadialGradient(x - planet.size / 3, y - planet.size / 3, 0, x, y, planet.size)
+          const planetSize = planet.size * scale * 0.8
+          const planetGradient = ctx.createRadialGradient(x - planetSize / 3, y - planetSize / 3, 0, x, y, planetSize)
           planetGradient.addColorStop(0, '#fff')
           planetGradient.addColorStop(0.5, planet.color)
           planetGradient.addColorStop(1, `${planet.color}88`)
           ctx.fillStyle = planetGradient
           ctx.beginPath()
-          ctx.arc(x, y, planet.size, 0, Math.PI * 2)
+          ctx.arc(x, y, planetSize, 0, Math.PI * 2)
           ctx.fill()
 
+          // 土星环
+          if (planet.name === '土星') {
+            ctx.strokeStyle = 'rgba(244, 208, 63, 0.6)'
+            ctx.lineWidth = 3 * scale
+            ctx.beginPath()
+            ctx.ellipse(x, y, planetSize * 2, planetSize * 0.6, Math.PI / 6, 0, Math.PI * 2)
+            ctx.stroke()
+          }
+
           // 行星标签
-          if (planet.distance < 130) {
-            ctx.fillStyle = 'rgba(255,255,255,0.6)'
-            ctx.font = '10px var(--font-mono)'
-            ctx.fillText(planet.name, x + planet.size + 5, y + 3)
+          ctx.fillStyle = 'rgba(255,255,255,0.7)'
+          ctx.font = `${10 * scale}px monospace`
+          ctx.fillText(planet.name, x + planetSize + 5, y + 3)
+
+          // 速度矢量
+          if (params.showVelocity) {
+            const vx = -Math.sin(newAngle) * planet.speed * 30 * scale
+            const vy = Math.cos(newAngle) * planet.speed * 30 * scale
+            ctx.strokeStyle = '#4A90D9'
+            ctx.lineWidth = 2
+            ctx.beginPath()
+            ctx.moveTo(x, y)
+            ctx.lineTo(x + vx, y + vy)
+            ctx.stroke()
           }
 
           return { ...planet, angle: newAngle, x, y }
         })
       })
 
-      // 绘制速度矢量
-      if (solarParams.showVelocity) {
-        planets.forEach(planet => {
-          if (planet.x !== undefined) {
-            const vx = -Math.sin(planet.angle) * planet.speed * 15
-            const vy = Math.cos(planet.angle) * planet.speed * 15
-            ctx.strokeStyle = '#4A90D9'
-            ctx.lineWidth = 2
-            ctx.beginPath()
-            ctx.moveTo(planet.x, planet.y)
-            ctx.lineTo(planet.x + vx, planet.y + vy)
-            ctx.stroke()
-            // 箭头
-            ctx.beginPath()
-            ctx.moveTo(planet.x + vx, planet.y + vy)
-            ctx.lineTo(planet.x + vx - 4, planet.y + vy - 8)
-            ctx.moveTo(planet.x + vx, planet.y + vy)
-            ctx.lineTo(planet.x + vx + 4, planet.y + vy - 8)
-            ctx.stroke()
-          }
-        })
-      }
-
       // 中心标签
       ctx.fillStyle = SOLAR_COLORS.text
-      ctx.font = 'bold 12px var(--font-serif)'
-      ctx.fillText('☀ 太阳', centerX + 50, centerY - 30)
+      ctx.font = `bold ${12 * scale}px serif`
+      ctx.fillText('☀ 太阳', centerX + sunSize + 10, centerY - sunSize / 2)
 
       animationId = requestAnimationFrame(animate)
     }
@@ -163,101 +160,56 @@ export default function SolarSystemVisualization({ params, controls }) {
     animate()
 
     return () => cancelAnimationFrame(animationId)
-  }, [solarParams])
+  }, [params])
 
-  // 计算当前行星数据
-  const selectedPlanet = planets[2] || {} // 默认地球
+  const updateParam = (key, value) => {
+    setParams(prev => ({ ...prev, [key]: value }))
+  }
+
+  // 计算地球相关数据
+  const earthPlanet = planets[2] || {}
+  const earthSpeed = (earthPlanet.speed * params.initialVelocity * 100).toFixed(1)
 
   return (
     <div style={{
       width: '100%',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      background: SOLAR_COLORS.background,
       borderRadius: 'var(--radius-lg)',
-      overflow: 'hidden',
-      border: '1px solid var(--border)',
-      background: SOLAR_COLORS.background
+      overflow: 'hidden'
     }}>
-      <canvas
-        ref={canvasRef}
-        width={700}
-        height={400}
-        style={{ width: '100%', height: 'auto', display: 'block' }}
-      />
-
-      {/* 参数显示 */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: '12px',
-        padding: '16px',
-        background: 'rgba(0,0,0,0.3)'
-      }}>
-        <ParameterDisplay
-          label="地球公转周期"
-          value={selectedPlanet.speed ? `${(2 * Math.PI / (selectedPlanet.speed * solarParams.initialVelocity)).toFixed(1)}s` : '-'}
-          color={SOLAR_COLORS.earth}
-        />
-        <ParameterDisplay
-          label="地球轨道速度"
-          value={selectedPlanet.speed ? `${(selectedPlanet.speed * solarParams.initialVelocity * 100).toFixed(1)}` : '-'}
-          color={SOLAR_COLORS.sun}
-        />
-        <ParameterDisplay
-          label="太阳质量倍数"
-          value={`${solarParams.sunMass.toFixed(1)}M☉`}
-          color={SOLAR_COLORS.sun}
-        />
-        <ParameterDisplay
-          label="引力强度"
-          value={`${solarParams.gravityStrength.toFixed(1)}G`}
-          color={SOLAR_COLORS.text}
-        />
+      {/* Canvas区域 */}
+      <div style={{ flex: 1, minHeight: 0, position: 'relative' }}>
+        <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />
       </div>
 
       {/* 控制面板 */}
-      <div style={{ padding: '16px', borderTop: '1px solid var(--border)' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-          <ControlSlider
-            label="太阳质量"
-            name="sunMass"
-            min={0.5}
-            max={2}
-            step={0.1}
-            value={solarParams.sunMass}
-            unit="M☉"
-            color={SOLAR_COLORS.sun}
-          />
-          <ControlSlider
-            label="初始速度"
-            name="initialVelocity"
-            min={0.5}
-            max={2}
-            step={0.1}
-            value={solarParams.initialVelocity}
-            unit="v₀"
-            color={SOLAR_COLORS.earth}
-          />
-          <ControlSlider
-            label="引力强度"
-            name="gravityStrength"
-            min={0.1}
-            max={2}
-            step={0.1}
-            value={solarParams.gravityStrength}
-            unit="G"
-            color={SOLAR_COLORS.text}
-          />
-          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-            <ControlToggle
-              label="显示轨道"
-              checked={solarParams.showOrbit}
-              color={SOLAR_COLORS.orbit}
-            />
-            <ControlToggle
-              label="速度矢量"
-              checked={solarParams.showVelocity}
-              color={SOLAR_COLORS.earth}
-            />
-          </div>
+      <div style={{
+        padding: '16px',
+        background: 'rgba(0,0,0,0.4)',
+        borderTop: '1px solid rgba(255,255,255,0.1)'
+      }}>
+        {/* 参数显示 */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: '12px' }}>
+          <ParamDisplay label="太阳质量" value={`${params.sunMass.toFixed(1)}M☉`} color={SOLAR_COLORS.sun} />
+          <ParamDisplay label="引力强度" value={`${params.gravityStrength.toFixed(1)}G`} color={SOLAR_COLORS.text} />
+          <ParamDisplay label="地球速度" value={earthSpeed} color={SOLAR_COLORS.earth} />
+          <ParamDisplay label="行星数量" value="6颗" color={SOLAR_COLORS.jupiter} />
+        </div>
+
+        {/* 滑块 */}
+        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+          <SliderControl label="太阳质量" value={params.sunMass} min={0.5} max={2} step={0.1} unit="M☉" onChange={v => updateParam('sunMass', v)} color={SOLAR_COLORS.sun} />
+          <SliderControl label="初始速度" value={params.initialVelocity} min={0.5} max={2} step={0.1} unit="v₀" onChange={v => updateParam('initialVelocity', v)} color={SOLAR_COLORS.earth} />
+          <SliderControl label="引力强度" value={params.gravityStrength} min={0.1} max={2} step={0.1} unit="G" onChange={v => updateParam('gravityStrength', v)} color={SOLAR_COLORS.text} />
+        </div>
+
+        {/* 切换 */}
+        <div style={{ display: 'flex', gap: '16px', marginTop: '12px' }}>
+          <ToggleControl label="显示轨道" checked={params.showOrbit} onChange={v => updateParam('showOrbit', v)} color={SOLAR_COLORS.orbit} />
+          <ToggleControl label="速度矢量" checked={params.showVelocity} onChange={v => updateParam('showVelocity', v)} color={SOLAR_COLORS.earth} />
         </div>
       </div>
     </div>
@@ -266,7 +218,7 @@ export default function SolarSystemVisualization({ params, controls }) {
 
 // 绘制星空背景
 function drawStars(ctx, width, height) {
-  const starCount = 100
+  const starCount = 150
   for (let i = 0; i < starCount; i++) {
     const x = (i * 7919) % width
     const y = (i * 6571) % height
@@ -279,35 +231,27 @@ function drawStars(ctx, width, height) {
   }
 }
 
-// 参数显示组件
-function ParameterDisplay({ label, value, color }) {
+function ParamDisplay({ label, value, color }) {
   return (
     <div style={{
       textAlign: 'center',
-      padding: '8px 12px',
-      background: 'rgba(255,255,255,0.03)',
-      borderRadius: 'var(--radius-sm)',
+      padding: '6px 8px',
+      background: 'rgba(255,255,255,0.05)',
+      borderRadius: '6px',
       border: `1px solid ${color}30`
     }}>
-      <div style={{ fontSize: '10px', color: '#888', marginBottom: '4px' }}>{label}</div>
-      <div style={{ fontSize: '16px', fontWeight: '600', color }}>{value}</div>
+      <div style={{ fontSize: '9px', color: '#888', marginBottom: '2px' }}>{label}</div>
+      <div style={{ fontSize: '14px', fontWeight: '600', color, fontFamily: 'monospace' }}>{value}</div>
     </div>
   )
 }
 
-// 滑块控制器
-function ControlSlider({ label, name, min, max, step, value, unit, color }) {
-  const handleChange = (e) => {
-    window.dispatchEvent(new CustomEvent('solar-control', {
-      detail: { name, value: parseFloat(e.target.value) }
-    }))
-  }
-
+function SliderControl({ label, value, min, max, step, unit = '', onChange, color }) {
   return (
-    <div style={{ flex: '1 1 120px', minWidth: '110px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-        <span style={{ fontSize: '12px', color: '#aaa' }}>{label}</span>
-        <span style={{ fontSize: '12px', fontWeight: '600', color }}>{value}{unit}</span>
+    <div style={{ flex: '1 1 100px', minWidth: '90px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+        <span style={{ fontSize: '11px', color: '#aaa' }}>{label}</span>
+        <span style={{ fontSize: '11px', fontWeight: '600', color }}>{value}{unit}</span>
       </div>
       <input
         type="range"
@@ -315,12 +259,12 @@ function ControlSlider({ label, name, min, max, step, value, unit, color }) {
         max={max}
         step={step}
         value={value}
-        onChange={handleChange}
+        onChange={e => onChange(parseFloat(e.target.value))}
         style={{
           width: '100%',
           height: '4px',
           appearance: 'none',
-          background: `linear-gradient(to right, ${color} 0%, ${color} ${((value - min) / (max - min)) * 100}%, #333 ${((value - min) / (max - min)) * 100}%, #333 100%)`,
+          background: `linear-gradient(to right, ${color} 0%, ${color} ${((value - min) / (max - min)) * 100}%, #444 ${((value - min) / (max - min)) * 100}%, #444 100%)`,
           borderRadius: '2px',
           cursor: 'pointer'
         }}
@@ -329,30 +273,29 @@ function ControlSlider({ label, name, min, max, step, value, unit, color }) {
   )
 }
 
-// 切换控制器
-function ControlToggle({ label, checked, color }) {
+function ToggleControl({ label, checked, onChange, color }) {
   return (
-    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
       <div style={{
-        width: '36px',
-        height: '20px',
+        width: '32px',
+        height: '18px',
         background: checked ? color : '#333',
-        borderRadius: '10px',
+        borderRadius: '9px',
         position: 'relative',
         transition: 'background 0.3s'
       }}>
         <div style={{
-          width: '16px',
-          height: '16px',
+          width: '14px',
+          height: '14px',
           background: '#fff',
           borderRadius: '50%',
           position: 'absolute',
           top: '2px',
-          left: checked ? '18px' : '2px',
+          left: checked ? '16px' : '2px',
           transition: 'left 0.3s'
         }} />
       </div>
-      <span style={{ fontSize: '12px', color: '#aaa' }}>{label}</span>
+      <span style={{ fontSize: '11px', color: '#aaa' }}>{label}</span>
     </label>
   )
 }

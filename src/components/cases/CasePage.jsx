@@ -558,15 +558,15 @@ function WendaPanel({ caseData }) {
 function VisualizationComponent({ caseId, simParams, isFullscreen }) {
   switch (caseId) {
     case 'wave-interference':
-      return <WaveInterferenceVisualization params={simParams} controls={[]} />
+      return <WaveInterferenceVisualization />
     case 'solar-system':
-      return <SolarSystemVisualization params={simParams} controls={[]} />
+      return <SolarSystemVisualization />
     case 'acid-base':
-      return <AcidBaseVisualization params={simParams} controls={[]} />
+      return <AcidBaseVisualization />
     case 'trigonometry':
-      return <TrigonometryVisualization params={simParams} controls={[]} />
+      return <TrigonometryVisualization />
     default:
-      return <WaveInterferenceVisualization params={simParams} controls={[]} />
+      return <WaveInterferenceVisualization />
   }
 }
 
