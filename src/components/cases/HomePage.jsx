@@ -1,11 +1,11 @@
-import { Scale, Eye, Grid3X3, Atom, Sun, Moon, ArrowRight, BookOpen, Crown, Github, ExternalLink, Gem } from 'lucide-react'
+import { Waves, Zap, Triangle, Sun, Moon, ArrowRight, BookOpen, Crown, Github, ExternalLink, Gem } from 'lucide-react'
 import { cases } from '../../data/cases.js'
 
 const iconMap = {
-  'scale': Scale,
-  'eye': Eye,
-  'grid-3x3': Grid3X3,
-  'atom': Atom
+  'waves': Waves,
+  'sun': Sun,
+  'bolt': Zap,
+  'triangle': Triangle
 }
 
 const features = [
@@ -43,12 +43,12 @@ function MortiseDecor({ style }) {
 function CaseCard({ caseData, onClick, index }) {
   const Icon = iconMap[caseData.icon] || Scale
   const colors = {
-    lever: { primary: '#D4AF37', secondary: '#E8C967', gradient: 'linear-gradient(135deg, #D4AF37 0%, #B8960F 100%)' },
-    refraction: { primary: '#4A9FD4', secondary: '#7BC4F0', gradient: 'linear-gradient(135deg, #4A9FD4 0%, #2D7FAD 100%)' },
-    equation: { primary: '#50C878', secondary: '#7DE89A', gradient: 'linear-gradient(135deg, #50C878 0%, #3AA85D 100%)' },
-    periodic: { primary: '#9B6BD4', secondary: '#C4A0F0', gradient: 'linear-gradient(135deg, #9B6BD4 0%, #7A4FB8 100%)' }
+    'wave-interference': { primary: '#4ECDC4', secondary: '#7FE8E0', gradient: 'linear-gradient(135deg, #4ECDC4 0%, #2DB5AB 100%)', glow: 'rgba(78,205,196,0.2)' },
+    'solar-system': { primary: '#D4AF37', secondary: '#E8C967', gradient: 'linear-gradient(135deg, #D4AF37 0%, #B8960F 100%)', glow: 'rgba(212,175,55,0.2)' },
+    'electrolysis': { primary: '#50C878', secondary: '#7DE89A', gradient: 'linear-gradient(135deg, #50C878 0%, #3AA85D 100%)', glow: 'rgba(80,200,120,0.2)' },
+    'trigonometry': { primary: '#9B6BD4', secondary: '#C4A0F0', gradient: 'linear-gradient(135deg, #9B6BD4 0%, #7A4FB8 100%)', glow: 'rgba(155,107,212,0.2)' }
   }
-  const color = colors[caseData.id] || colors.lever
+  const color = colors[caseData.id] || colors['solar-system']
 
   return (
     <button
