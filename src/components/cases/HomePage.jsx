@@ -40,6 +40,26 @@ function MortiseDecor({ style }) {
   )
 }
 
+/* 榫卯结构图标 — 十字燕尾榫简化 */
+function MortiseJointIcon({ size = 22, color = 'var(--accent-gold)' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      {/* 上方横木 */}
+      <path d="M2 9h8.5M13.5 9H22" />
+      {/* 下方横木 */}
+      <path d="M2 15h8.5M13.5 15H22" />
+      {/* 竖木主体 */}
+      <path d="M10.5 4v16M13.5 4v16" />
+      {/* 燕尾榫头（竖木中间凸出） */}
+      <path d="M10.5 9l-1.5-1.5M10.5 9l-1.5 1.5" />
+      <path d="M13.5 9l1.5-1.5M13.5 9l1.5 1.5" />
+      {/* 榫眼底部（竖木中间下方） */}
+      <path d="M10.5 15l-1.5 1.5M10.5 15l-1.5-1.5" />
+      <path d="M13.5 15l1.5 1.5M13.5 15l1.5-1.5" />
+    </svg>
+  )
+}
+
 function CaseCard({ caseData, onClick, index }) {
   const Icon = iconMap[caseData.icon] || Scale
   const colors = {
@@ -362,28 +382,31 @@ export default function HomePage({ onOpenCase, theme, onToggleTheme }) {
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '1000px', margin: '0 auto' }}>
           {/* 主题标签 */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginBottom: '40px' }}>
-            <div style={{ width: '50px', height: '1px', background: 'var(--accent-gold)' }} />
+            <div style={{ width: '60px', height: '1.5px', background: 'linear-gradient(90deg, transparent, var(--accent-gold))' }} />
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '10px',
-              padding: '10px 28px',
-              background: 'linear-gradient(135deg, var(--highlight) 0%, transparent 100%)',
-              border: '1px solid var(--border-gold)',
-              borderRadius: '30px'
+              gap: '12px',
+              padding: '12px 32px',
+              background: 'linear-gradient(135deg, rgba(212,175,55,0.08) 0%, transparent 100%)',
+              border: '1.5px solid var(--border-gold)',
+              borderRadius: '8px',
+              boxShadow: '0 0 20px rgba(212,175,55,0.06), inset 0 1px 0 rgba(212,175,55,0.1)'
             }}>
-              <Crown size={18} color="var(--accent-gold)" />
+              <MortiseJointIcon size={20} color="var(--accent-gold)" />
               <span style={{
-                fontSize: '16px',
+                fontSize: '20px',
                 fontFamily: 'var(--font-display)',
+                fontWeight: '700',
                 color: 'var(--accent-gold)',
-                letterSpacing: '0.15em'
+                letterSpacing: '0.2em',
+                textShadow: '0 0 12px rgba(212,175,55,0.25)'
               }}>
                 鲁班开物
               </span>
-              <Gem size={16} color="var(--accent-gold-light)" />
+              <MortiseJointIcon size={20} color="var(--accent-gold)" />
             </div>
-            <div style={{ width: '50px', height: '1px', background: 'var(--accent-gold)' }} />
+            <div style={{ width: '60px', height: '1.5px', background: 'linear-gradient(90deg, var(--accent-gold), transparent)' }} />
           </div>
 
           {/* 主标题 - 并排 */}
