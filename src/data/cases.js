@@ -1,287 +1,293 @@
-// 案例数据
+// 案例数据 - 精选4个高质量可视化案例
 export const cases = [
   {
-    id: 'lever',
-    title: '杠杆原理',
-    subject: '物理 · 力学',
-    grade: '八年级',
-    difficulty: 2,
-    icon: 'scale',
-    tagline: '省力必费距离，费力必省距离——天地之道也',
-    description: '通过3D交互实验，深入理解杠杆平衡原理，探索力与距离的trade-off关系。',
-    xinfa: {
-      theory: '杠杆平衡条件：F₁·L₁ = F₂·L₂',
-      luBanView: '鲁班造器，必依杠杆之理。砣秤量金，剪裁成形，皆源于此。生活中，杠杆无处不在——从杆秤到指甲剪，无一不遵循此道。',
-      scenarios: [
-        { name: '杆秤', desc: '等臂杠杆的典范，古代鲁班发明' },
-        { name: '裁纸刀', desc: '省力杠杆，降低手指疲劳' },
-        { name: '镊子', desc: '费力杠杆，便于精细操作' },
-        { name: '核桃夹', desc: '省力杠杆，轻松碎壳' }
-      ]
-    },
-    kaiwu: {
-      controls: [
-        { type: 'slider', label: '支点位置', min: 0.2, max: 0.8, default: 0.5, step: 0.01 },
-        { type: 'slider', label: '动力臂长度', min: 0.5, max: 3, default: 1.5, step: 0.1, unit: 'm' },
-        { type: 'slider', label: '阻力臂长度', min: 0.5, max: 3, default: 1.5, step: 0.1, unit: 'm' },
-        { type: 'select', label: '动力大小', options: ['1N', '2N', '5N', '10N'], default: '5N' },
-        { type: 'select', label: '阻力物质量', options: ['1kg', '2kg', '5kg', '10kg'], default: '5kg' }
-      ],
-      displayParams: [
-        { key: 'leftTorque', label: '左侧力矩' },
-        { key: 'rightTorque', label: '右侧力矩' },
-        { key: 'balanceState', label: '平衡状态' },
-        { key: 'mechanicalAdvantage', label: '机械效率' }
-      ]
-    },
-    wenda: [
-      {
-        id: 'lever-q1',
-        question: '下列工具中，哪个是费力杠杆？',
-        options: ['A. 核桃夹', 'B. 裁纸刀', 'C. 镊子', 'D. 开瓶器'],
-        answer: 'C',
-        explanation: '镊子属于费力杠杆，其目的是省距离而非省力，便于夹取细小物体。费力杠杆的特点是动力臂小于阻力臂。'
-      },
-      {
-        id: 'lever-q2',
-        question: '用杠杆撬起一块200N的石头，若动力臂长3m，阻力臂长0.5m，则需要施加的力为多少？',
-        options: ['A. 30N', 'B. 33.3N', 'C. 50N', 'D. 100N'],
-        answer: 'B',
-        explanation: '根据杠杆平衡条件 F₁·L₁ = F₂·L₂，F₁ = F₂·L₂/L₁ = 200×0.5/3 ≈ 33.3N'
-      },
-      {
-        id: 'lever-q3',
-        question: '"省力必费距离"的本质是什么定律？',
-        options: ['A. 能量守恒定律', 'B. 牛顿第三定律', 'C. 功的原理', 'D. 摩擦力'],
-        answer: 'C',
-        explanation: '功的原理指出，使用任何机械都不能省功。省力则意味着力减小，距离必增加，保持功不变。'
-      },
-      {
-        id: 'lever-q4',
-        question: '若支点无限靠近重物，杠杆会变成哪种简单机械？',
-        options: ['A. 斜面', 'B. 滑轮', 'C. 轮轴', 'D. 劈'],
-        answer: 'C',
-        explanation: '当支点无限靠近阻力点时，杠杆演变为轮轴，本质上是连续旋转的杠杆。'
-      },
-      {
-        id: 'lever-q5',
-        question: '为什么裁纸刀通常设计成省力杠杆？',
-        options: ['A. 省力', 'B. 省距离', 'C. 更稳定', 'D. 更省材料'],
-        answer: 'A',
-        explanation: '裁纸需要较大力量，设计成省力杠杆可以用较小的手部力量完成裁切任务。'
-      }
-    ]
-  },
-  {
-    id: 'refraction',
-    title: '光的折射',
+    id: 'wave-interference',
+    title: '波的干涉',
     subject: '物理 · 光学',
+    grade: '九年级',
+    difficulty: 2,
+    icon: 'waves',
+    tagline: '两波相遇，或增或减——干涉条纹，明暗相间，此光之密语也',
+    description: '通过交互式双缝干涉模拟，直观理解波的叠加原理，探索明暗相间条纹的形成机制。',
+    xinfa: {
+      theory: '波的干涉条件：频率相同、振动方向相同、相位差恒定',
+      luBanView: '鲁班制器，知共振之和、干涉之妙。两波相遇，或增或减，此自然之理。声学之和谐、光学之五彩，皆源于此。',
+      scenarios: [
+        { name: '水波干涉', desc: '湖面双石击水，形成同心圆波纹相交' },
+        { name: '光学干涉', desc: '肥皂泡薄膜呈现彩色条纹' },
+        { name: '降噪耳机', desc: '主动降噪利用声波干涉相消原理' },
+        { name: '全息摄影', desc: '利用干涉记录物光相位信息' }
+      ]
+    },
+    kaiwu: {
+      controls: [
+        { type: 'slider', label: '波长', min: 0.5, max: 3, default: 1.5, step: 0.1, unit: 'λ' },
+        { type: 'slider', label: '双缝间距', min: 1, max: 10, default: 4, step: 0.5, unit: 'd' },
+        { type: 'slider', label: '屏幕距离', min: 5, max: 20, default: 10, step: 0.5, unit: 'L' },
+        { type: 'toggle', label: '显示加强区', default: true },
+        { type: 'toggle', label: '显示相消区', default: true }
+      ],
+      displayParams: [
+        { key: 'fringeSpacing', label: '条纹间距' },
+        { key: 'maxOrder', label: '可见最大级次' },
+        { key: 'constructiveCount', label: '加强条纹数' },
+        { key: 'destructiveCount', label: '相消位置数' }
+      ]
+    },
+    wenda: [
+      {
+        id: 'wave-q1',
+        question: '双缝干涉实验中，若将双缝间距减小，干涉条纹间距如何变化？',
+        options: ['A. 增大', 'B. 减小', 'C. 不变', 'D. 先增后减'],
+        answer: 'A',
+        explanation: '根据条纹间距公式 Δx = λL/d，间距d减小，条纹间距Δx增大。'
+      },
+      {
+        id: 'wave-q2',
+        question: '两列波发生稳定干涉的条件是？',
+        options: ['A. 振幅相同', 'B. 频率相同且相位差恒定', 'C. 波长相同', 'D. 传播方向相同'],
+        answer: 'B',
+        explanation: '产生稳定干涉的条件：频率相同、振动方向相同、相位差恒定。'
+      },
+      {
+        id: 'wave-q3',
+        question: '在波的干涉中，加强点的相位关系是？',
+        options: ['A. 反相', 'B. 同相或相位差为2π的整数倍', 'C. 相差π/2', 'D. 无规律'],
+        answer: 'B',
+        explanation: '加强点（相长干涉）条件：相位差为2π的整数倍，即波峰与波峰相遇。'
+      },
+      {
+        id: 'wave-q4',
+        question: '牛顿环实验属于哪种干涉？',
+        options: ['A. 双缝干涉', 'B. 薄膜干涉', 'C. 多缝干涉', 'D. 麦克尔逊干涉'],
+        answer: 'B',
+        explanation: '牛顿环是平凸透镜与平板玻璃形成的空气薄膜产生的等厚干涉。'
+      },
+      {
+        id: 'wave-q5',
+        question: '关于光的干涉，下列说法正确的是？',
+        options: ['A. 干涉说明光具有波动性', 'B. 干涉条纹等间距', 'C. 白光干涉产生彩色条纹', 'D. 以上都对'],
+        answer: 'D',
+        explanation: '干涉证明光具有波动性；双缝干涉条纹等间距；白光含多种波长，各自有不同条纹间距故呈彩色。'
+      }
+    ]
+  },
+  {
+    id: 'solar-system',
+    title: '太阳系运行',
+    subject: '天文 · 动力学',
     grade: '八年级',
     difficulty: 2,
-    icon: 'eye',
-    tagline: '光行水里，如人行陆——变的是介质，不变的是心',
-    description: '通过交互式光路实验，理解斯涅尔定律，探索折射与全反射的奥秘。',
+    icon: 'sun',
+    tagline: '引力如丝，行星如珠——宇宙之舞，万有引力之证',
+    description: '模拟太阳系行星轨道运动，探索万有引力定律与开普勒定律的奥秘。',
     xinfa: {
-      theory: '斯涅尔定律：n₁·sinθ₁ = n₂·sinθ₂',
-      luBanView: '光入异质必折，此天地之常理。鲁班制灯，须知光之折向，方能聚照成形。',
+      theory: '万有引力定律：F = G·M·m/r²',
+      luBanView: '鲁班观天象，知日月五星之行，皆循天道。引力无形，化万物于轨中，此造物之妙也。太阳系者，天地之微缩也。',
       scenarios: [
-        { name: '叉鱼', desc: '看到的鱼比实际位置浅' },
-        { name: '筷子折断', desc: '水中筷子看起来变弯' },
-        { name: '钻石火彩', desc: '高折射率产生绚烂光彩' },
-        { name: '彩虹', desc: '水滴折射+反射分解阳光' }
+        { name: '行星公转', desc: '八大行星各行其道，公转周期不同' },
+        { name: '卫星环绕', desc: '月球绕地、地月系绕太阳' },
+        { name: '彗星椭圆轨道', desc: '哈雷彗星76年一回归' },
+        { name: '潮汐锁定', desc: '月球始终以同一面对着地球' }
       ]
     },
     kaiwu: {
       controls: [
-        { type: 'slider', label: '入射角', min: 0, max: 90, default: 45, step: 1, unit: '°' },
-        { type: 'select', label: '介质组合', options: ['空气→水(n=1.33)', '空气→玻璃(n=1.50)', '空气→钻石(n=2.42)'], default: '空气→水(n=1.33)' },
-        { type: 'toggle', label: '显示全反射', default: false }
+        { type: 'slider', label: '太阳质量', min: 0.5, max: 2, default: 1, step: 0.1, unit: 'M☉' },
+        { type: 'slider', label: '初始速度', min: 0.5, max: 2, default: 1, step: 0.1, unit: 'v₀' },
+        { type: 'slider', label: '引力强度', min: 0.1, max: 2, default: 1, step: 0.1 },
+        { type: 'toggle', label: '显示轨道', default: true },
+        { type: 'toggle', label: '显示速度矢量', default: false },
+        { type: 'button', label: '重置', options: ['圆形轨道', '椭圆轨道', '抛物线轨道'] }
       ],
       displayParams: [
-        { key: 'refractionAngle', label: '折射角' },
-        { key: 'criticalAngle', label: '临界角' },
-        { key: 'refractiveIndex', label: '折射率' },
-        { key: 'totalReflection', label: '全反射' }
+        { key: 'orbitalPeriod', label: '公转周期' },
+        { key: 'orbitalSpeed', label: '轨道速度' },
+        { key: 'eccentricity', label: '离心率' },
+        { key: 'energy', label: '机械能' }
       ]
     },
     wenda: [
       {
-        id: 'refraction-q1',
-        question: '光从空气垂直射入水中时，传播方向会怎样？',
-        options: ['A. 向法线偏折', 'B. 背向法线偏折', 'C. 不变', 'D. 无法确定'],
+        id: 'solar-q1',
+        question: '地球绕太阳公转的周期约为多少？',
+        options: ['A. 24小时', 'B. 30天', 'C. 365天', 'D. 3650天'],
         answer: 'C',
-        explanation: '当光线垂直入射（入射角为0°）时，不发生偏折，沿着原来的方向传播。'
+        explanation: '地球公转周期约为365.25天，即一年。'
       },
       {
-        id: 'refraction-q2',
-        question: '水的折射率约为1.33，若入射角为60°，折射角约为多少？',
-        options: ['A. 40.8°', 'B. 45°', 'C. 22.5°', 'D. 60°'],
+        id: 'solar-q2',
+        question: '若地球公转轨道是椭圆，则地球在哪个月份离太阳最近？',
+        options: ['A. 1月', 'B. 7月', 'C. 无固定规律', 'D. 始终相同距离'],
         answer: 'A',
-        explanation: '根据斯涅尔定律：sin60°/1.33 ≈ 0.65，arcsin(0.65) ≈ 40.8°'
+        explanation: '地球近日点在1月初，远日点在7月初。北半球冬季时地球离太阳最近。'
       },
       {
-        id: 'refraction-q3',
-        question: '全反射现象发生在什么条件下？',
-        options: ['A. 光从光密介质到光疏介质，入射角>临界角', 'B. 光从光疏介质到光密介质', 'C. 任何情况', 'D. 光垂直入射时'],
-        answer: 'A',
-        explanation: '全反射仅当光从光密介质射向光疏介质，且入射角大于临界角时才会发生。'
+        id: 'solar-q3',
+        question: '太阳系中，哪颗行星的公转周期最短？',
+        options: ['A. 金星', 'B. 地球', 'C. 火星', 'D. 水星'],
+        answer: 'D',
+        explanation: '水星距太阳最近，公转周期最短，约为88地球天。'
       },
       {
-        id: 'refraction-q4',
-        question: '为什么钻石看起来特别闪亮？',
-        options: ['A. 颜色特别', 'B. 硬度高', 'C. 折射率大，全反射多', 'D. 体积小'],
-        answer: 'C',
-        explanation: '钻石折射率高达2.42，临界角很小，切割角度使光在内部多次全反射，产生火彩。'
-      },
-      {
-        id: 'refraction-q5',
-        question: '池水看起来比实际深度要浅，这是因为？',
-        options: ['A. 水的密度不均匀', 'B. 折射使光线向法线偏折', 'C. 心理作用', 'D. 水面波动'],
+        id: 'solar-q4',
+        question: '人造地球卫星绕地球做圆周运动，其向心力来源于？',
+        options: ['A. 燃料推力', 'B. 地球引力', 'C. 太阳能', 'D. 大气阻力'],
         answer: 'B',
-        explanation: '从水中物体发出的光线经水面折射后进入空气，折射角大于入射角，人眼逆着光路看到虚像在较浅位置。'
+        explanation: '卫星在轨运行时，只受地球引力作用，该引力提供其做圆周运动的向心力。'
+      },
+      {
+        id: 'solar-q5',
+        question: '开普勒第三定律T²/R³ = k中，T和R分别代表什么？',
+        options: ['A. T是公转周期，R是轨道半径', 'B. T是自转周期，R是行星半径', 'C. T是公转周期，R是日地距离', 'D. 以上都不对'],
+        answer: 'A',
+        explanation: '开普勒第三定律：T² ∝ R³，T为公转周期，R为轨道半长轴（对于圆轨道即为半径）。'
       }
     ]
   },
   {
-    id: 'equation',
-    title: '二元一次方程组',
-    subject: '数学 · 代数',
-    grade: '七年级',
-    difficulty: 1,
-    icon: 'grid-3x3',
-    tagline: '一线定势，两线相交，知交点则知全局',
-    description: '通过动态坐标系，直观理解方程组的解的几何意义。',
-    xinfa: {
-      theory: '方程组解的几何意义：两条直线的交点坐标',
-      luBanView: '解方程如寻两线之交点，交点既得，问题自明。鲁班制图，必先定点位，方能成器。',
-      scenarios: [
-        { name: '购物决策', desc: '比较两家店的性价比' },
-        { name: '行程规划', desc: '两人相向而行的相遇时间' },
-        { name: '配料配比', desc: '两种原料混合达到目标浓度' },
-        { name: '工程预算', desc: '材料与人工成本的最优组合' }
-      ]
-    },
-    kaiwu: {
-      controls: [
-        { type: 'slider', label: '直线1斜率', min: -5, max: 5, default: 1, step: 0.1 },
-        { type: 'slider', label: '直线1截距', min: -10, max: 10, default: 0, step: 0.5 },
-        { type: 'slider', label: '直线2斜率', min: -5, max: 5, default: -1, step: 0.1 },
-        { type: 'slider', label: '直线2截距', min: -10, max: 10, default: 5, step: 0.5 },
-        { type: 'button', label: '预设场景', options: ['购物决策', '行程相遇', '配料配比'] }
-      ],
-      displayParams: [
-        { key: 'solution', label: '交点坐标' },
-        { key: 'solutionType', label: '解的类型' },
-        { key: 'eq1', label: '方程1' },
-        { key: 'eq2', label: '方程2' }
-      ]
-    },
-    wenda: [
-      {
-        id: 'eq-q1',
-        question: '方程组 {x + y = 5, x - y = 1} 的解是？',
-        options: ['A. (3, 2)', 'B. (2, 3)', 'C. (4, 1)', 'D. (3, 1)'],
-        answer: 'A',
-        explanation: '两式相加得2x=6，x=3；代入得y=2。故解为(3, 2)。'
-      },
-      {
-        id: 'eq-q2',
-        question: '若两条直线平行无交点，方程组的解的情况是？',
-        options: ['A. 唯一解', 'B. 无解', 'C. 无数解', 'D. 无法确定'],
-        answer: 'B',
-        explanation: '平行直线无交点，对应方程组无解（矛盾方程）。'
-      },
-      {
-        id: 'eq-q3',
-        question: '用代入消元法解 {2x + y = 7, x - y = 2}，第一步是？',
-        options: ['A. 将x=y+2代入第一个方程', 'B. 将y=2x-7代入第二个方程', 'C. 两式相加消元', 'D. 将x=2+y代入'],
-        answer: 'A',
-        explanation: '代入消元法应从一个方程中解出一个未知数，再代入另一个方程。这里从第二个方程解出x=y+2代入第一个方程。'
-      },
-      {
-        id: 'eq-q4',
-        question: '方程组 {ax + by = 6, 2ax + 2by = 12} 有多少解？',
-        options: ['A. 0个', 'B. 1个', 'C. 无数个', 'D. 无法确定'],
-        answer: 'C',
-        explanation: '第二个方程是第一个方程的2倍，两式等价，因此有无数解（两方程表示同一条直线）。'
-      },
-      {
-        id: 'eq-q5',
-        question: '"代入消元法"的核心思想是什么？',
-        options: ['A. 消去一个未知数', 'B. 用一个问题表示另一个', 'C. 两式相加', 'D. 画图求解'],
-        answer: 'B',
-        explanation: '代入消元的核心是用一个未知数表示另一个，将二元转化为一元，体现了鲁班"以简驭繁"的思想。'
-      }
-    ]
-  },
-  {
-    id: 'periodic',
-    title: '元素周期表',
-    subject: '化学 · 原子结构',
+    id: 'acid-base',
+    title: '酸碱滴定',
+    subject: '化学 · 反应原理',
     grade: '九年级',
-    difficulty: 3,
-    icon: 'atom',
-    tagline: '万物皆有数，数目定则性——原子之数，化学之本',
-    description: '探索元素周期律的本质，理解原子结构与化学性质的关系。',
+    difficulty: 2,
+    icon: 'flask',
+    tagline: '酸碱相遇，氢氧相会——滴定终点，颜色突变，如化学之魔术',
+    description: '通过虚拟滴定实验，理解酸碱中和反应的原理，掌握滴定曲线与指示剂变色原理。',
     xinfa: {
-      theory: '元素性质呈周期性变化的本质：电子层结构周期性',
-      luBanView: '天下之物，皆有定数。原子电子之数，定化学之性。周期表者，天地物质之谱也。',
+      theory: '酸碱中和反应：H⁺ + OH⁻ → H₂O',
+      luBanView: '鲁班炼丹，知酸碱之性。相遇则中和，如阴阳相济。滴定之法，以少测多，精确万分，此化学之巧也。',
       scenarios: [
-        { name: '钠钾剧烈反应', desc: '同族元素，都与水剧烈反应' },
-        { name: '卤族氧化性', desc: '氟氯溴碘氧化性从上到下递减' },
-        { name: '惰性气体稳定', desc: '难得"不动心"，化学性质稳定' },
-        { name: '金属活动顺序', desc: '置换反应的"江湖地位排序"' }
+        { name: '胃药制酸', desc: '氢氧化铝中和过多胃酸' },
+        { name: '土壤改良', desc: '石灰中和酸性土壤' },
+        { name: '工业酸洗', desc: '酸碱废水处理' },
+        { name: '食品加工', desc: '柠檬酸调节饮料酸度' }
       ]
     },
     kaiwu: {
       controls: [
-        { type: 'element-select', label: '选择元素' },
-        { type: 'dimension', label: '属性维度', options: ['原子半径', '电负性', '金属性', '化合价'], default: '电负性' },
-        { type: 'toggle', label: '同族高亮', default: false },
-        { type: 'toggle', label: '3D电子层模型', default: false }
+        { type: 'slider', label: '酸浓度', min: 0.01, max: 0.1, default: 0.05, step: 0.01, unit: 'mol/L' },
+        { type: 'slider', label: '碱浓度', min: 0.01, max: 0.1, default: 0.05, step: 0.01, unit: 'mol/L' },
+        { type: 'slider', label: '初始体积', min: 10, max: 50, default: 25, step: 1, unit: 'mL' },
+        { type: 'select', label: '指示剂', options: ['酚酞(8.2-10.0)', '甲基橙(3.1-4.4)', '石蕊(5.0-8.0)'], default: '酚酞(8.2-10.0)' },
+        { type: 'toggle', label: '显示滴定曲线', default: true }
       ],
       displayParams: [
-        { key: 'symbol', label: '元素符号' },
-        { key: 'atomicNumber', label: '原子序数' },
-        { key: 'electronConfig', label: '电子排布' },
-        { key: 'electronegativity', label: '电负性' }
+        { key: 'equivalencePoint', label: '等当点pH' },
+        { key: 'titrantVolume', label: '滴定体积' },
+        { key: 'phIndicator', label: '指示剂变色范围' },
+        { key: 'neutralizationHeat', label: '中和热' }
       ]
     },
     wenda: [
       {
-        id: 'pt-q1',
-        question: '下列元素中，电负性最大的是？',
-        options: ['A. C', 'B. N', 'C. O', 'D. F'],
-        answer: 'D',
-        explanation: '氟(F)是电负性最强的元素，鲍林标度为3.98。'
-      },
-      {
-        id: 'pt-q2',
-        question: 'Na和Al在元素周期表中的位置关系是？',
-        options: ['A. 同周期，Na在Al左边', 'B. 同周期，Na在Al右边', 'C. 同族', 'D. 无法确定'],
-        answer: 'A',
-        explanation: 'Na和Al同属第三周期，金属性Na>Al，故Na在Al左边（金属性越强越靠左）。'
-      },
-      {
-        id: 'pt-q3',
-        question: '某元素原子序数为17，它在化学反应中通常显示什么价态？',
-        options: ['A. -1', 'B. +1', 'C. +5', 'D. -1或+5或+7'],
-        answer: 'D',
-        explanation: '氯(Cl)原子序数为17，常见价态有-1、+1、+3、+5、+7等多种氧化态。'
-      },
-      {
-        id: 'pt-q4',
-        question: '元素周期律的本质原因是什么？',
-        options: ['A. 原子量递增', 'B. 最外层电子数周期性变化', 'C. 核电荷数递增', 'D. 中子数变化'],
+        id: 'acid-q1',
+        question: '酸碱滴定中，等当点是指？',
+        options: ['A. 指示剂变色的点', 'B. 酸碱物质的量相等的点', 'C. 溶液呈中性的点', 'D. 反应完全停止的点'],
         answer: 'B',
-        explanation: '随着核电荷数递增，最外层电子数呈周期性变化，导致化学性质周期性变化，这正是元素周期律的本质。'
+        explanation: '等当点是指加入的酸和碱的物质的量恰好相等的点，此时二者完全反应。'
       },
       {
-        id: 'pt-q5',
-        question: '为什么He/Ne/Ar等惰性气体化学性质稳定？',
-        options: ['A. 原子最小', 'B. 电子数为偶数', 'C. 最外层8电子稳定结构', 'D. 密度小'],
+        id: 'acid-q2',
+        question: '用强酸滴定弱碱时，等当点的pH值是多少？',
+        options: ['A. 等于7', 'B. 小于7', 'C. 大于7', 'D. 无法确定'],
+        answer: 'B',
+        explanation: '强酸滴定弱碱生成的盐会水解，使溶液呈酸性，故等当点pH小于7。'
+      },
+      {
+        id: 'acid-q3',
+        question: '下列哪种指示剂适用于强酸强碱滴定？',
+        options: ['A. 甲基橙', 'B. 酚酞', 'C. 两者均可', 'D. 两者均不行'],
         answer: 'C',
-        explanation: '惰性气体的最外层电子数达到稳定结构（氦为2电子，其他为8电子），难得失电子，化学性质稳定。'
+        explanation: '强酸强碱滴定等当点pH=7，甲基橙(3.1-4.4)和酚酞(8.2-10.0)的变色范围都在7附近，都可使用。'
+      },
+      {
+        id: 'acid-q4',
+        question: '滴定管读数时，视线应与哪处平齐？',
+        options: ['A. 液面上缘', 'B. 液面下缘', 'C. 液面凹液面最低处', 'D. 任意位置'],
+        answer: 'C',
+        explanation: '读数时应视线与凹液面最低处相平，以减小误差。'
+      },
+      {
+        id: 'acid-q5',
+        question: '若用NaOH滴定HCl，以酚酞为指示剂，终点颜色变化为？',
+        options: ['A. 无色→红色', 'B. 红色→无色', 'C. 黄色→蓝色', 'D. 无变化'],
+        answer: 'A',
+        explanation: '酚酞在碱性溶液中呈红色，在酸性或中性溶液中无色。滴定终点由无色变为淡红色。'
+      }
+    ]
+  },
+  {
+    id: 'trigonometry',
+    title: '三角函数',
+    subject: '数学 · 三角学',
+    grade: '九年级',
+    difficulty: 2,
+    icon: 'triangle',
+    tagline: '正弦余弦，如波起伏——周而复始，此数学之美也',
+    description: '通过动态单位圆与函数图像，探索三角函数的周期性变化规律。',
+    xinfa: {
+      theory: '三角函数定义：sinθ = y/r, cosθ = x/r, tanθ = y/x',
+      luBanView: '鲁班制图量角，知三角之妙用。sin与cos如阴阳两极，此消彼长，周而复始。建筑之斜度、声音之波形，皆三角之理也。',
+      scenarios: [
+        { name: '建筑工程', desc: '斜拉桥索力分析、屋顶坡度计算' },
+        { name: '声音与光', desc: '声波是正弦波，广谱颜色由频率决定' },
+        { name: 'GPS定位', desc: '三角定位确定位置' },
+        { name: '动画制作', desc: '骨骼动画使用三角函数计算关节旋转' }
+      ]
+    },
+    kaiwu: {
+      controls: [
+        { type: 'slider', label: '角度θ', min: 0, max: 360, default: 45, step: 1, unit: '°' },
+        { type: 'slider', label: '振幅A', min: 0.5, max: 3, default: 1, step: 0.1, unit: '' },
+        { type: 'slider', label: '频率ω', min: 0.5, max: 3, default: 1, step: 0.1, unit: '' },
+        { type: 'slider', label: '相位φ', min: 0, max: 360, default: 0, step: 15, unit: '°' },
+        { type: 'toggle', label: '显示正弦', default: true },
+        { type: 'toggle', label: '显示余弦', default: true },
+        { type: 'toggle', label: '显示正切', default: false }
+      ],
+      displayParams: [
+        { key: 'sinValue', label: 'sin(θ)' },
+        { key: 'cosValue', label: 'cos(θ)' },
+        { key: 'tanValue', label: 'tan(θ)' },
+        { key: 'unitCirclePoint', label: '单位圆对应点' }
+      ]
+    },
+    wenda: [
+      {
+        id: 'trig-q1',
+        question: '若点P在单位圆上，∠AOP = 60°，则P点坐标为？',
+        options: ['A. (1/2, √3/2)', 'B. (√3/2, 1/2)', 'C. (√2/2, √2/2)', 'D. (1, 0)'],
+        answer: 'A',
+        explanation: 'cos60° = 1/2, sin60° = √3/2，故P点坐标为(1/2, √3/2)。'
+      },
+      {
+        id: 'trig-q2',
+        question: 'sin30° + cos60° = ?',
+        options: ['A. 1', 'B. √3', 'C. 1/2', 'D. √3/2'],
+        answer: 'A',
+        explanation: 'sin30° = 1/2, cos60° = 1/2, 故和为1。'
+      },
+      {
+        id: 'trig-q3',
+        question: '三角函数y = sinx的周期是？',
+        options: ['A. π', 'B. 2π', 'C. π/2', 'D. 4π'],
+        answer: 'B',
+        explanation: '正弦函数周期为2π，sin(x + 2π) = sinx。'
+      },
+      {
+        id: 'trig-q4',
+        question: '当θ = 45°时，tanθ的值是？',
+        options: ['A. 1', 'B. √3', 'C. √3/3', 'D. 0'],
+        answer: 'A',
+        explanation: 'tan45° = sin45°/cos45° = (√2/2)/(√2/2) = 1。'
+      },
+      {
+        id: 'trig-q5',
+        question: '在直角三角形ABC中，∠C = 90°，若AC = 3，BC = 4，则sinA = ?',
+        options: ['A. 3/5', 'B. 4/5', 'C. 3/4', 'D. 4/3'],
+        answer: 'B',
+        explanation: 'AB(斜边) = √(3²+4²) = 5，sinA = 对边/斜边 = BC/AB = 4/5。'
       }
     ]
   }

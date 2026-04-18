@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { ArrowLeft, Maximize2, Minimize2, Sun, Moon, X, BookOpen, Sliders, HelpCircle } from 'lucide-react'
 import { getCaseById } from '../../data/cases.js'
-import LeverVisualization from '../visualizations/LeverVisualization.jsx'
-import RefractionVisualization from '../visualizations/RefractionVisualization.jsx'
-import EquationVisualization from '../visualizations/EquationVisualization.jsx'
-import PeriodicVisualization from '../visualizations/PeriodicVisualization.jsx'
+import WaveInterferenceVisualization from '../visualizations/WaveInterferenceVisualization.jsx'
+import SolarSystemVisualization from '../visualizations/SolarSystemVisualization.jsx'
+import AcidBaseVisualization from '../visualizations/AcidBaseVisualization.jsx'
+import TrigonometryVisualization from '../visualizations/TrigonometryVisualization.jsx'
 
 const TABS = [
   { id: 'xinfa', label: '鲁班心法', icon: BookOpen },
@@ -557,16 +557,16 @@ function WendaPanel({ caseData }) {
 // 根据案例ID选择可视化组件
 function VisualizationComponent({ caseId, simParams, isFullscreen }) {
   switch (caseId) {
-    case 'lever':
-      return <LeverVisualization caseId={caseId} simParams={simParams} isFullscreen={isFullscreen} />
-    case 'refraction':
-      return <RefractionVisualization caseId={caseId} simParams={simParams} isFullscreen={isFullscreen} />
-    case 'equation':
-      return <EquationVisualization caseId={caseId} simParams={simParams} isFullscreen={isFullscreen} />
-    case 'periodic':
-      return <PeriodicVisualization caseId={caseId} simParams={simParams} isFullscreen={isFullscreen} />
+    case 'wave-interference':
+      return <WaveInterferenceVisualization params={simParams} controls={[]} />
+    case 'solar-system':
+      return <SolarSystemVisualization params={simParams} controls={[]} />
+    case 'acid-base':
+      return <AcidBaseVisualization params={simParams} controls={[]} />
+    case 'trigonometry':
+      return <TrigonometryVisualization params={simParams} controls={[]} />
     default:
-      return <LeverVisualization caseId={caseId} simParams={simParams} isFullscreen={isFullscreen} />
+      return <WaveInterferenceVisualization params={simParams} controls={[]} />
   }
 }
 
@@ -580,34 +580,38 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
   // 模拟参数状态 - 根据案例初始化不同参数
   const getInitialParams = (id) => {
     switch (id) {
-      case 'lever':
+      case 'wave-interference':
         return {
-          '支点位置': 0.5,
-          '动力臂长度': 1.5,
-          '阻力臂长度': 1.5,
-          '动力大小': '5N',
-          '阻力物质量': '5kg'
+          '波长': 1.5,
+          '双缝间距': 4,
+          '屏幕距离': 10,
+          '显示加强区': true,
+          '显示相消区': true
         }
-      case 'refraction':
+      case 'solar-system':
         return {
-          '入射角': 45,
-          '介质组合': '空气→水(n=1.33)',
-          '显示全反射': false
+          '太阳质量': 1,
+          '初始速度': 1,
+          '引力强度': 1,
+          '显示轨道': true,
+          '速度矢量': false
         }
-      case 'equation':
+      case 'acid-base':
         return {
-          '直线1斜率': 1,
-          '直线1截距': 0,
-          '直线2斜率': -1,
-          '直线2截距': 5,
-          '预设场景': '购物决策'
+          '酸浓度': 0.05,
+          '碱浓度': 0.05,
+          '初始体积': 25,
+          '指示剂': 'phenolphthalein'
         }
-      case 'periodic':
+      case 'trigonometry':
         return {
-          '选择元素': 'H',
-          '属性维度': '电负性',
-          '同族高亮': false,
-          '3D电子层模型': false
+          '角度θ': 45,
+          '振幅A': 1,
+          '频率ω': 1,
+          '相位φ': 0,
+          '正弦': true,
+          '余弦': true,
+          '正切': false
         }
       default:
         return {}
@@ -619,33 +623,33 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
   // 实时计算值
   const getInitialDisplayValues = (id) => {
     switch (id) {
-      case 'lever':
+      case 'wave-interference':
         return {
-          leftTorque: '7.5 N·m',
-          rightTorque: '7.5 N·m',
-          balanceState: '平衡',
-          mechanicalAdvantage: '100%'
+          fringeSpacing: '0.75 px',
+          maxOrder: '5',
+          constructiveCount: '6',
+          destructiveCount: '5'
         }
-      case 'refraction':
+      case 'solar-system':
         return {
-          refractionAngle: '32.1°',
-          criticalAngle: '48.8°',
-          refractiveIndex: '1.33',
-          totalReflection: '否'
+          orbitalPeriod: '125.6s',
+          orbitalSpeed: '5.0',
+          eccentricity: '0.00',
+          energy: '-0.5 J'
         }
-      case 'equation':
+      case 'acid-base':
         return {
-          solution: '(2.5, 2.5)',
-          solutionType: '唯一解',
-          eq1: 'y = x',
-          eq2: 'y = -x + 5'
+          equivalencePoint: '7.0',
+          titrantVolume: '0.00 mL',
+          phIndicator: '8.2-10.0',
+          neutralizationHeat: '-57.3 kJ/mol'
         }
-      case 'periodic':
+      case 'trigonometry':
         return {
-          symbol: 'H',
-          atomicNumber: '1',
-          electronConfig: '1',
-          electronegativity: '2.20'
+          sinValue: '0.707',
+          cosValue: '0.707',
+          tanValue: '1.000',
+          unitCirclePoint: '(0.71, 0.71)'
         }
       default:
         return {}
@@ -658,76 +662,38 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
     setSimParams(prev => ({ ...prev, [label]: value }))
 
     // 根据案例计算实时参数
-    if (caseId === 'refraction') {
-      const mediaIndex = {
-        '空气→水(n=1.33)': 1.33,
-        '空气→玻璃(n=1.50)': 1.50,
-        '空气→钻石(n=2.42)': 2.42
-      }
-      const n = mediaIndex[value] || (label === '介质组合' ? 1.33 : mediaIndex[simParams['介质组合'] || '空气→水(n=1.33)'])
-      const incidentAngle = label === '入射角' ? value : simParams['入射角']
-      const incidentRad = (incidentAngle * Math.PI) / 180
-      const sinRefracted = Math.sin(incidentRad) / n
-      const refractionAngle = sinRefracted > 1 ? null : Math.asin(sinRefracted) * 180 / Math.PI
-      const criticalAngle = Math.asin(1 / n) * 180 / Math.PI
-      const isTotalReflection = sinRefracted > 1
+    if (caseId === 'wave-interference') {
+      const wavelength = label === '波长' ? value : simParams['波长']
+      const slitDistance = label === '双缝间距' ? value : simParams['双缝间距']
+      const screenDistance = label === '屏幕距离' ? value : simParams['屏幕距离']
+
+      const fringeSpacing = (wavelength * screenDistance / slitDistance * 2).toFixed(2)
+      const maxOrder = Math.floor(slitDistance / wavelength * 2)
 
       setDisplayValues({
-        refractionAngle: refractionAngle !== null ? `${refractionAngle.toFixed(1)}°` : 'N/A',
-        criticalAngle: `${criticalAngle.toFixed(1)}°`,
-        refractiveIndex: n.toFixed(2),
-        totalReflection: isTotalReflection ? '是' : '否'
+        fringeSpacing: `${fringeSpacing} px`,
+        maxOrder: String(maxOrder),
+        constructiveCount: String(maxOrder + 1),
+        destructiveCount: String(maxOrder)
       })
     }
 
-    if (caseId === 'equation') {
-      const m1 = label === '直线1斜率' ? value : simParams['直线1斜率']
-      const b1 = label === '直线1截距' ? value : simParams['直线1截距']
-      const m2 = label === '直线2斜率' ? value : simParams['直线2斜率']
-      const b2 = label === '直线2截距' ? value : simParams['直线2截距']
-
-      let solution = null
-      let solutionType = '唯一解'
-      if (Math.abs(m1 - m2) < 0.0001) {
-        if (Math.abs(b1 - b2) < 0.0001) {
-          solutionType = '无数解（两直线重合）'
-        } else {
-          solutionType = '无解（两直线平行）'
-        }
-      } else {
-        const x = (b2 - b1) / (m1 - m2)
-        const y = m1 * x + b1
-        solution = { x: x.toFixed(2), y: y.toFixed(2) }
-      }
+    if (caseId === 'trigonometry') {
+      const angle = label === '角度θ' ? value : simParams['角度θ']
+      const angleRad = (angle * Math.PI) / 180
 
       setDisplayValues({
-        solution: solution ? `(${solution.x}, ${solution.y})` : '无',
-        solutionType,
-        eq1: `y = ${m1}x + ${b1}`,
-        eq2: `y = ${m2}x + ${b2}`
+        sinValue: Math.sin(angleRad).toFixed(3),
+        cosValue: Math.cos(angleRad).toFixed(3),
+        tanValue: Math.tan(angleRad).toFixed(3),
+        unitCirclePoint: `(${Math.cos(angleRad).toFixed(2)}, ${Math.sin(angleRad).toFixed(2)})`
       })
     }
   }, [caseId, simParams])
 
   // 实时更新计算
   useEffect(() => {
-    if (caseId === 'lever') {
-      const pArm = simParams['动力臂长度']
-      const rArm = simParams['阻力臂长度']
-      const power = parseInt(simParams['动力大小']) || 5
-      const resistance = (parseInt(simParams['阻力物质量']) || 5) * 9.8 / 100
-
-      const leftTorque = power * pArm
-      const rightTorque = resistance * rArm
-      const diff = leftTorque - rightTorque
-
-      setDisplayValues({
-        leftTorque: `${leftTorque.toFixed(1)} N·m`,
-        rightTorque: `${rightTorque.toFixed(1)} N·m`,
-        balanceState: Math.abs(diff) < 0.5 ? '平衡' : diff > 0 ? '左倾' : '右倾',
-        mechanicalAdvantage: `${Math.round((pArm / rArm) * 100)}%`
-      })
-    }
+    // 参数变化时更新显示值已在handleParamChange中处理
   }, [simParams, caseId])
 
   const toggleFullscreen = useCallback(() => {
