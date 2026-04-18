@@ -36,7 +36,7 @@ export default function WaveInterferenceVisualization({ params = {} }) {
     ctx.scale(dpr, dpr)
 
     const width = displayWidth
-    const height = height
+    const height = displayHeight
     const centerY = displayHeight / 2
 
     const leftX = width * 0.1
