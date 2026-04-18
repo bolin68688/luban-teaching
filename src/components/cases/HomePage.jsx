@@ -209,8 +209,7 @@ export default function HomePage({ onOpenCase, theme, onToggleTheme }) {
   return (
     <div className="mortise-bg" style={{
       minHeight: '100vh',
-      background: 'var(--bg-primary)',
-      backgroundBlendMode: 'overlay'
+      backgroundColor: 'var(--bg-primary)'
     }}>
       {/* 导航栏 */}
       <header style={{
