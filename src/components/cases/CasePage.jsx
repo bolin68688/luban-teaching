@@ -3,7 +3,7 @@ import { ArrowLeft, Maximize2, Minimize2, Sun, Moon, X, BookOpen, Sliders, HelpC
 import { getCaseById } from '../../data/cases.js'
 import WaveInterferenceVisualization from '../visualizations/WaveInterferenceVisualization.jsx'
 import SolarSystemVisualization from '../visualizations/SolarSystemVisualization.jsx'
-import AcidBaseVisualization from '../visualizations/AcidBaseVisualization.jsx'
+import ElectrolysisVisualization from '../visualizations/ElectrolysisVisualization.jsx'
 import TrigonometryVisualization from '../visualizations/TrigonometryVisualization.jsx'
 
 const TABS = [
@@ -590,8 +590,8 @@ function VisualizationComponent({ caseId, simParams, isFullscreen, vizActions })
       return <WaveInterferenceVisualization {...commonProps} />
     case 'solar-system':
       return <SolarSystemVisualization {...commonProps} actions={vizActions || {}} />
-    case 'acid-base':
-      return <AcidBaseVisualization {...commonProps} actions={vizActions || {}} />
+    case 'electrolysis':
+      return <ElectrolysisVisualization {...commonProps} actions={vizActions || {}} />
     case 'trigonometry':
       return <TrigonometryVisualization {...commonProps} />
     default:
@@ -613,8 +613,8 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
         return { '波长': 1.5, '双缝间距': 4, '屏幕距离': 10, '显示加强区': true, '显示相消区': true }
       case 'solar-system':
         return { '太阳质量': 1, '初始速度': 1, '引力强度': 1, '显示轨道': true, '速度矢量': false }
-      case 'acid-base':
-        return { '酸浓度': 0.05, '碱浓度': 0.05, '初始体积': 25, '指示剂': 'phenolphthalein' }
+      case 'electrolysis':
+        return { '电压': 6, '电解质浓度': 15, '电解质类型': 'Na₂SO₄(中性)', '显示分子式': true, '显示电子流向': false }
       case 'trigonometry':
         return { '角度θ': 45, '振幅A': 1, '频率ω': 1, '相位φ': 0, '正弦': true, '余弦': true, '正切': false }
       default:
@@ -630,8 +630,8 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
         return { fringeSpacing: '0.75 px', maxOrder: '5', constructiveCount: '6', destructiveCount: '5' }
       case 'solar-system':
         return { orbitalPeriod: '125.6s', orbitalSpeed: '5.0', eccentricity: '0.00', energy: '-0.5 J' }
-      case 'acid-base':
-        return { equivalencePoint: '7.0', titrantVolume: '0.00 mL', phIndicator: '8.2-10.0', neutralizationHeat: '-57.3 kJ/mol' }
+      case 'electrolysis':
+        return { h2Volume: '0.0 mL', o2Volume: '0.0 mL', ratio: '--', current: '0.00 A' }
       case 'trigonometry':
         return { sinValue: '0.707', cosValue: '0.707', tanValue: '1.000', unitCirclePoint: '(0.71, 0.71)' }
       default:

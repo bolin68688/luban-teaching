@@ -146,74 +146,75 @@ export const cases = [
     ]
   },
   {
-    id: 'acid-base',
-    title: '酸碱滴定',
-    subject: '化学 · 反应原理',
+    id: 'electrolysis',
+    title: '电解水实验',
+    subject: '化学 · 电化学',
     grade: '九年级',
     difficulty: 2,
-    icon: 'flask',
-    tagline: '酸碱相遇，氢氧相会——滴定终点，颜色突变，如化学之魔术',
-    description: '通过虚拟滴定实验，理解酸碱中和反应的原理，掌握滴定曲线与指示剂变色原理。',
+    icon: 'bolt',
+    tagline: '水之分解，电为媒——氢氧二气，二比一之妙，此化学之奇也',
+    description: '模拟电解水实验全过程，观察电极气泡、气体收集，理解水的组成与电化学原理。',
     xinfa: {
-      theory: '酸碱中和反应：H⁺ + OH⁻ → H₂O',
-      luBanView: '鲁班炼丹，知酸碱之性。相遇则中和，如阴阳相济。滴定之法，以少测多，精确万分，此化学之巧也。',
+      theory: '电解水：2H₂O → 2H₂↑ + O₂↑（正极氧气，负极氢气）',
+      luBanView: '鲁班治水，知水性可分。以电为刃，断水成气。氢氧各半，量有定数（二与一），此万物化生之理也。',
       scenarios: [
-        { name: '胃药制酸', desc: '氢氧化铝中和过多胃酸' },
-        { name: '土壤改良', desc: '石灰中和酸性土壤' },
-        { name: '工业酸洗', desc: '酸碱废水处理' },
-        { name: '食品加工', desc: '柠檬酸调节饮料酸度' }
+        { name: '燃料电池', desc: '氢气燃烧或燃料电池发电，产物只有水' },
+        { name: '工业制氢', desc: '大规模电解水制取清洁能源' },
+        { name: '潜水艇供氧', desc: '电解海水产生氧气供给呼吸' },
+        { name: '太空站', desc: '国际空间站用电解水获取氧气和氢气' }
       ]
     },
     kaiwu: {
       controls: [
-        { type: 'slider', label: '酸浓度', min: 0.01, max: 0.1, default: 0.05, step: 0.01, unit: 'mol/L' },
-        { type: 'slider', label: '碱浓度', min: 0.01, max: 0.1, default: 0.05, step: 0.01, unit: 'mol/L' },
-        { type: 'slider', label: '初始体积', min: 10, max: 50, default: 25, step: 1, unit: 'mL' },
-        { type: 'select', label: '指示剂', options: ['酚酞(8.2-10.0)', '甲基橙(3.1-4.4)', '石蕊(5.0-8.0)'], default: '酚酞(8.2-10.0)' },
-        { type: 'button', label: '滴定操作', options: ['开始滴定', '重置'] }
+        { type: 'slider', label: '电压', min: 1, max: 12, default: 6, step: 0.5, unit: 'V' },
+        { type: 'slider', label: '电解质浓度', min: 5, max: 30, default: 15, step: 1, unit: '%' },
+        { type: 'select', label: '电解质类型', options: ['Na₂SO₄(中性)', 'NaOH(碱性)', 'H₂SO₄(酸性)'], default: 'Na₂SO₄(中性)' },
+        { type: 'toggle', label: '显示分子式', default: true },
+        { type: 'toggle', label: '显示电子流向', default: false },
+        { type: 'button', label: '实验操作', options: ['通电开始', '暂停', '重置'] }
       ],
       displayParams: [
-        { key: 'equivalencePoint', label: '等当点pH' },
-        { key: 'titrantVolume', label: '滴定体积' },
-        { key: 'phIndicator', label: '指示剂变色范围' },
-        { key: 'neutralizationHeat', label: '中和热' }
+        { key: 'h2Volume', label: 'H₂体积' },
+        { key: 'o2Volume', label: 'O₂体积' },
+        { key: 'ratio', label: '气体体积比' },
+        { key: 'current', label: '电流强度' }
       ]
     },
     wenda: [
       {
-        id: 'acid-q1',
-        question: '酸碱滴定中，等当点是指？',
-        options: ['A. 指示剂变色的点', 'B. 酸碱物质的量相等的点', 'C. 溶液呈中性的点', 'D. 反应完全停止的点'],
+        id: 'elec-q1',
+        question: '电解水时，负极和正极分别产生什么气体？',
+        options: ['A. 负极O₂，正极H₂', 'B. 负极H₂，正极O₂', 'C. 两极都是H₂', 'D. 两极都是O₂'],
         answer: 'B',
-        explanation: '等当点是指加入的酸和碱的物质的量恰好相等的点，此时二者完全反应。'
+        explanation: '电解水中，负极（阴极）发生还原反应：2H⁺+2e⁻→H₂↑，产生氢气；正极（阳极）氧化反应：4OH⁻-4e⁻→2H₂O+O₂↑，产生氧气。'
       },
       {
-        id: 'acid-q2',
-        question: '用强酸滴定弱碱时，等当点的pH值是多少？',
-        options: ['A. 等于7', 'B. 小于7', 'C. 大于7', 'D. 无法确定'],
+        id: 'elec-q2',
+        question: '电解水产生的氢气和氧气的体积比约为？',
+        options: ['A. 1:1', 'B. 1:2', 'C. 2:1', 'D. 3:1'],
+        answer: 'C',
+        explanation: '由反应方程式2H₂O=2H₂↑+O₂↑可知，每2摩尔水生成2摩尔H₂和1摩尔O₂，同温同压下体积比为2:1。'
+      },
+      {
+        id: 'elec-q3',
+        question: '电解水时为什么要加入少量硫酸钠或氢氧化钠？',
+        options: ['A. 增加产气量', 'B. 增强导电性', 'C. 改变生成物', 'D. 加快反应速度但不影响导电'],
         answer: 'B',
-        explanation: '强酸滴定弱碱生成的盐会水解，使溶液呈酸性，故等当点pH小于7。'
+        explanation: '纯水几乎不导电，加入电解质可增加溶液中自由移动的离子浓度，从而增强导电性使电解正常进行。'
       },
       {
-        id: 'acid-q3',
-        question: '下列哪种指示剂适用于强酸强碱滴定？',
-        options: ['A. 甲基橙', 'B. 酚酞', 'C. 两者均可', 'D. 两者均不行'],
+        id: 'elec-q4',
+        question: '电解水实验证明了什么？',
+        options: ['A. 水是化合物', 'B. 水由氢氧元素组成', 'C. 分子在化学变化中可分', 'D. 以上都对'],
+        answer: 'D',
+        explanation: '电解水证明：水是化合物；水由氢、氧两种元素组成；化学反应中分子可分而原子不可分。'
+      },
+      {
+        id: 'elec-q5',
+        question: '若用铂电极电解水10分钟收集到20mL氢气，同时应收集到多少氧气？',
+        options: ['A. 40mL', 'B. 20mL', 'C. 10mL', 'D. 5mL'],
         answer: 'C',
-        explanation: '强酸强碱滴定等当点pH=7，甲基橙(3.1-4.4)和酚酞(8.2-10.0)的变色范围都在7附近，都可使用。'
-      },
-      {
-        id: 'acid-q4',
-        question: '滴定管读数时，视线应与哪处平齐？',
-        options: ['A. 液面上缘', 'B. 液面下缘', 'C. 液面凹液面最低处', 'D. 任意位置'],
-        answer: 'C',
-        explanation: '读数时应视线与凹液面最低处相平，以减小误差。'
-      },
-      {
-        id: 'acid-q5',
-        question: '若用NaOH滴定HCl，以酚酞为指示剂，终点颜色变化为？',
-        options: ['A. 无色→红色', 'B. 红色→无色', 'C. 黄色→蓝色', 'D. 无变化'],
-        answer: 'A',
-        explanation: '酚酞在碱性溶液中呈红色，在酸性或中性溶液中无色。滴定终点由无色变为淡红色。'
+        explanation: '氢气与氧气的体积比为2:1，故20mL氢气对应约10mL氧气。实际因溶解度差异可能略少于理论值。'
       }
     ]
   },
