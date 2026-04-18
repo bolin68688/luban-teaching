@@ -207,7 +207,11 @@ function CaseCard({ caseData, onClick, index }) {
 
 export default function HomePage({ onOpenCase, theme, onToggleTheme }) {
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
+    <div className="mortise-bg" style={{
+      minHeight: '100vh',
+      background: 'var(--bg-primary)',
+      backgroundBlendMode: 'overlay'
+    }}>
       {/* 导航栏 */}
       <header style={{
         padding: '18px 32px',
