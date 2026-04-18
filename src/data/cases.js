@@ -170,7 +170,7 @@ export const cases = [
         { type: 'slider', label: '碱浓度', min: 0.01, max: 0.1, default: 0.05, step: 0.01, unit: 'mol/L' },
         { type: 'slider', label: '初始体积', min: 10, max: 50, default: 25, step: 1, unit: 'mL' },
         { type: 'select', label: '指示剂', options: ['酚酞(8.2-10.0)', '甲基橙(3.1-4.4)', '石蕊(5.0-8.0)'], default: '酚酞(8.2-10.0)' },
-        { type: 'toggle', label: '显示滴定曲线', default: true }
+        { type: 'button', label: '滴定操作', options: ['开始滴定', '重置'] }
       ],
       displayParams: [
         { key: 'equivalencePoint', label: '等当点pH' },

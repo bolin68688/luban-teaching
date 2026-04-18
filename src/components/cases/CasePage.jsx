@@ -128,8 +128,15 @@ function XinfaPanel({ caseData }) {
   )
 }
 
-function KaiwuPanel({ caseData, simParams, onParamChange, displayValues }) {
+function KaiwuPanel({ caseData, simParams, onParamChange, displayValues, vizActions }) {
   const { kaiwu } = caseData
+
+  // 处理按钮操作（如滴定开始/重置）
+  const handleAction = (actionLabel) => {
+    if (vizActions && vizActions[actionLabel]) {
+      vizActions[actionLabel]()
+    }
+  }
 
   return (
     <div style={{ padding: '24px', height: '100%', overflowY: 'auto' }}>
@@ -154,69 +161,137 @@ function KaiwuPanel({ caseData, simParams, onParamChange, displayValues }) {
           交互控制
         </div>
         <div style={{ display: 'grid', gap: '16px' }}>
-          {kaiwu.controls.map((ctrl, i) => (
-            <div key={i}>
-              <label style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '6px'
-              }}>
-                <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                  {ctrl.label}
-                </span>
-                <span style={{
-                  fontSize: '13px',
-                  fontFamily: 'var(--font-mono)',
-                  color: 'var(--accent-gold)'
-                }}>
-                  {ctrl.type === 'slider' && simParams[ctrl.label] !== undefined
-                    ? `${simParams[ctrl.label]}${ctrl.unit || ''}`
-                    : ctrl.type === 'select'
-                    ? simParams[ctrl.label]
-                    : ''}
-                </span>
-              </label>
-              {ctrl.type === 'slider' && (
-                <input
-                  type="range"
-                  min={ctrl.min}
-                  max={ctrl.max}
-                  step={ctrl.step}
-                  value={simParams[ctrl.label] ?? ctrl.default}
-                  onChange={e => onParamChange(ctrl.label, parseFloat(e.target.value))}
-                  style={{
-                    width: '100%',
-                    height: '6px',
-                    appearance: 'none',
-                    background: 'var(--bg-primary)',
-                    borderRadius: '3px',
-                    outline: 'none',
-                    cursor: 'pointer'
-                  }}
-                />
-              )}
-              {ctrl.type === 'select' && (
-                <select
-                  value={simParams[ctrl.label] ?? ctrl.default}
-                  onChange={e => onParamChange(ctrl.label, e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '8px 12px',
-                    background: 'var(--bg-primary)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius-sm)',
-                    color: 'var(--text-primary)',
-                    fontSize: '13px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  {ctrl.options.map(opt => (
-                    <option key={opt} value={opt}>{opt}</option>
+          {kaiwu.controls.map((ctrl, i) => {
+            const currentValue = simParams[ctrl.label]
+            const isToggle = ctrl.type === 'toggle'
+            const isButton = ctrl.type === 'button'
+            const isSlider = ctrl.type === 'slider'
+            const isSelect = ctrl.type === 'select'
+
+            if (isButton) {
+              return (
+                <div key={i} style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
+                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{ctrl.label}</span>
+                  {(ctrl.options || []).map(opt => (
+                    <button
+                      key={opt}
+                      onClick={() => handleAction(opt)}
+                      style={{
+                        padding: '8px 16px',
+                        background: 'var(--accent-gold)',
+                        border: 'none',
+                        borderRadius: 'var(--radius-md)',
+                        color: 'var(--bg-primary)',
+                        fontSize: '13px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+                      onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+                    >
+                      {opt}
+                    </button>
                   ))}
-                </select>
-              )}
-            </div>
+                </div>
+              )
+            }
+
+            return (
+              <div key={i}>
+                {!isButton && (
+                  <label style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '6px'
+                  }}>
+                    <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                      {ctrl.label}
+                    </span>
+                    <span style={{
+                      fontSize: '13px',
+                      fontFamily: 'var(--font-mono)',
+                      color: 'var(--accent-gold)'
+                    }}>
+                      {isSlider && currentValue !== undefined ? `${currentValue}${ctrl.unit || ''}` : ''}
+                      {isSelect && currentValue !== undefined ? String(currentValue) : ''}
+                      {isToggle ? (currentValue !== false ? '开启' : '关闭') : ''}
+                    </span>
+                  </label>
+                )}
+                {isSlider && (
+                  <input
+                    type="range"
+                    min={ctrl.min}
+                    max={ctrl.max}
+                    step={ctrl.step}
+                    value={currentValue ?? ctrl.default}
+                    onChange={e => onParamChange(ctrl.label, parseFloat(e.target.value))}
+                    style={{
+                      width: '100%',
+                      height: '6px',
+                      appearance: 'none',
+                      background: 'var(--bg-primary)',
+                      borderRadius: '3px',
+                      outline: 'none',
+                      cursor: 'pointer'
+                    }}
+                  />
+                )}
+                {isSelect && (
+                  <select
+                    value={currentValue ?? ctrl.default}
+                    onChange={e => onParamChange(ctrl.label, e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      background: 'var(--bg-primary)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--radius-sm)',
+                      color: 'var(--text-primary)',
+                      fontSize: '13px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {(ctrl.options || []).map(opt => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                )}
+                {isToggle && (
+                  <label
+                    onClick={() => onParamChange(ctrl.label, currentValue === false || currentValue === undefined ? true : false)}
+                    style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    <span style={{
+                      width: '36px',
+                      height: '20px',
+                      background: currentValue !== false ? 'var(--accent-gold)' : '#333',
+                      borderRadius: '10px',
+                      position: 'relative',
+                      transition: 'background 0.2s',
+                      display: 'inline-block'
+                    }}>
+                      <span style={{
+                        width: '16px',
+                        height: '16px',
+                        background: '#fff',
+                        borderRadius: '50%',
+                        position: 'absolute',
+                        top: '2px',
+                        left: currentValue !== false ? '18px' : '2px',
+                        transition: 'left 0.2s'
+                      }} />
+                    </span>
+                    <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                      {currentValue !== false ? '已启用' : '未启用'}
+                    </span>
+                  </label>
+                )}
+              </div>
+            )
+          })}
           ))}
         </div>
       </div>
@@ -506,18 +581,21 @@ function WendaPanel({ caseData }) {
   )
 }
 
-function VisualizationComponent({ caseId, simParams, isFullscreen }) {
+// 根据案例ID选择可视化组件，传递外部参数控制
+function VisualizationComponent({ caseId, simParams, isFullscreen, vizActions }) {
+  const commonProps = { params: simParams }
+
   switch (caseId) {
     case 'wave-interference':
-      return <WaveInterferenceVisualization />
+      return <WaveInterferenceVisualization {...commonProps} />
     case 'solar-system':
-      return <SolarSystemVisualization />
+      return <SolarSystemVisualization {...commonProps} />
     case 'acid-base':
-      return <AcidBaseVisualization />
+      return <AcidBaseVisualization {...commonProps} actions={vizActions || {}} />
     case 'trigonometry':
-      return <TrigonometryVisualization />
+      return <TrigonometryVisualization {...commonProps} />
     default:
-      return <WaveInterferenceVisualization />
+      return <WaveInterferenceVisualization {...commonProps} />
   }
 }
 
@@ -526,6 +604,7 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
   const [panelState, setPanelState] = useState({ tab: 'xinfa', open: false })
   const [isFullscreen, setIsFullscreen] = useState(false)
   const containerRef = useRef(null)
+  const vizActions = useRef({}) // 用于传递操作给可视化组件（如滴定开始/重置）
 
   // 模拟参数状态
   const getInitialParams = (id) => {
@@ -774,6 +853,7 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
             caseId={caseId}
             simParams={simParams}
             isFullscreen={isFullscreen}
+            vizActions={vizActions.current}
           />
 
           {isFullscreen && (
@@ -901,6 +981,7 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
                   simParams={simParams}
                   onParamChange={handleParamChange}
                   displayValues={displayValues}
+                  vizActions={vizActions.current}
                 />
               )}
               {activeTab === 'wenda' && <WendaPanel caseData={caseData} />}
