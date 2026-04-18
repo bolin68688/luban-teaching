@@ -706,14 +706,20 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
     }
   }, [])
 
-  const togglePanel = useCallback((tabId) => {
-    if (activeTab === tabId && panelOpen) {
-      setPanelOpen(false)
-    } else {
-      setActiveTab(tabId)
-      setPanelOpen(true)
-    }
-  }, [activeTab, panelOpen])
+  // 面板切换 - 使用普通函数避免闭包问题
+  const togglePanel = (tabId) => {
+    setActiveTab(currentActive => {
+      if (currentActive === tabId) {
+        // 同一标签，切换面板开关
+        setPanelOpen(currentOpen => !currentOpen)
+        return currentActive
+      } else {
+        // 不同标签，切换并打开面板
+        setPanelOpen(true)
+        return tabId
+      }
+    })
+  }
 
   // 全屏变化监听
   useEffect(() => {
@@ -991,7 +997,9 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
           display: 'flex',
           justifyContent: 'center',
           gap: '8px',
-          flexShrink: 0
+          flexShrink: 0,
+          position: 'relative',
+          zIndex: 100
         }}>
           {TABS.map(tab => (
             <button

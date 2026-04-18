@@ -25,16 +25,16 @@ export default function SolarSystemVisualization() {
     showVelocity: false
   })
 
-  // 行星初始数据 - 8大行星
+  // 行星初始数据 - 8大行星（调整距离确保全部在太阳之外可见）
   const [planets, setPlanets] = useState([
-    { name: '水星', distance: 35, angle: 0, speed: 0.16, size: 3, color: SOLAR_COLORS.mercury },
-    { name: '金星', distance: 50, angle: 2.5, speed: 0.12, size: 5, color: SOLAR_COLORS.venus },
-    { name: '地球', distance: 65, angle: 5, speed: 0.10, size: 5.5, color: SOLAR_COLORS.earth },
-    { name: '火星', distance: 80, angle: 1.2, speed: 0.08, size: 4, color: SOLAR_COLORS.mars },
-    { name: '木星', distance: 105, angle: 3.5, speed: 0.04, size: 12, color: SOLAR_COLORS.jupiter },
-    { name: '土星', distance: 130, angle: 4.2, speed: 0.03, size: 10, color: SOLAR_COLORS.saturn },
-    { name: '天王星', distance: 155, angle: 1.8, speed: 0.02, size: 7, color: '#7FDBFF' },
-    { name: '海王星', distance: 175, angle: 3.0, speed: 0.015, size: 6.5, color: '#4169E1' }
+    { name: '水星', distance: 55, angle: 0, speed: 0.20, size: 3.5, color: SOLAR_COLORS.mercury },
+    { name: '金星', distance: 72, angle: 2.5, speed: 0.15, size: 5.5, color: SOLAR_COLORS.venus },
+    { name: '地球', distance: 90, angle: 5, speed: 0.12, size: 6, color: SOLAR_COLORS.earth },
+    { name: '火星', distance: 108, angle: 1.2, speed: 0.09, size: 4.5, color: SOLAR_COLORS.mars },
+    { name: '木星', distance: 135, angle: 3.5, speed: 0.05, size: 13, color: SOLAR_COLORS.jupiter },
+    { name: '土星', distance: 158, angle: 4.2, speed: 0.035, size: 11, color: SOLAR_COLORS.saturn },
+    { name: '天王星', distance: 180, angle: 1.8, speed: 0.025, size: 7.5, color: '#7FDBFF' },
+    { name: '海王星', distance: 200, angle: 3.0, speed: 0.018, size: 7, color: '#4169E1' }
   ])
 
   // 动画循环
@@ -58,8 +58,9 @@ export default function SolarSystemVisualization() {
     const centerX = width / 2
     const centerY = height / 2
 
-    // 适应画布的缩放因子
-    const scale = Math.min(width, height) / 400
+    // 适应画布的缩放因子 - 确保海王星(distance=200)在画布内
+    const maxOrbitRadius = 200 + 15 // 海王星距离 + 标签空间
+    const scale = Math.min(width, height) / (maxOrbitRadius * 2.4)
 
     let animationId
 
@@ -70,8 +71,8 @@ export default function SolarSystemVisualization() {
       // 绘制星空背景
       drawStars(ctx, width, height)
 
-      // 绘制太阳
-      const sunSize = 35 * params.sunMass * scale
+      // 绘制太阳 - 减小尺寸避免遮挡内行星
+      const sunSize = 18 * params.sunMass * scale
       const sunGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, sunSize * 1.5)
       sunGradient.addColorStop(0, '#fff')
       sunGradient.addColorStop(0.2, '#fffacd')
@@ -82,14 +83,15 @@ export default function SolarSystemVisualization() {
       ctx.arc(centerX, centerY, sunSize * 1.5, 0, Math.PI * 2)
       ctx.fill()
 
-      // 太阳光晕
-      for (let i = 0; i < 3; i++) {
-        const glowGradient = ctx.createRadialGradient(centerX, centerY, sunSize, centerX, centerY, sunSize * 2 + i * 10)
-        glowGradient.addColorStop(0, `rgba(255, 200, 50, ${0.2 - i * 0.05})`)
+      // 太阳光晕 - 减小范围
+      for (let i = 0; i < 2; i++) {
+        const glowRadius = sunSize * 1.8 + i * 8
+        const glowGradient = ctx.createRadialGradient(centerX, centerY, sunSize, centerX, centerY, glowRadius)
+        glowGradient.addColorStop(0, `rgba(255, 200, 50, ${0.15 - i * 0.05})`)
         glowGradient.addColorStop(1, 'rgba(255, 200, 50, 0)')
         ctx.fillStyle = glowGradient
         ctx.beginPath()
-        ctx.arc(centerX, centerY, sunSize * 2 + i * 10, 0, Math.PI * 2)
+        ctx.arc(centerX, centerY, glowRadius, 0, Math.PI * 2)
         ctx.fill()
       }
 
