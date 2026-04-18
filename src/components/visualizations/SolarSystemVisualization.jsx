@@ -198,7 +198,7 @@ export default function SolarSystemVisualization() {
           <ParamDisplay label="太阳质量" value={`${params.sunMass.toFixed(1)}M☉`} color={SOLAR_COLORS.sun} />
           <ParamDisplay label="引力强度" value={`${params.gravityStrength.toFixed(1)}G`} color={SOLAR_COLORS.text} />
           <ParamDisplay label="地球速度" value={earthSpeed} color={SOLAR_COLORS.earth} />
-          <ParamDisplay label="行星数量" value="6颗" color={SOLAR_COLORS.jupiter} />
+          <ParamDisplay label="行星数量" value="8颗" color={SOLAR_COLORS.jupiter} />
         </div>
 
         {/* 滑块 */}
