@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Waves, Zap, Triangle, Sun, Moon, ArrowRight, BookOpen, Crown, Github, ExternalLink, Gem, Sparkles, X } from 'lucide-react'
+import { Waves, Zap, Triangle, Sun, Moon, ArrowRight, BookOpen, Crown, Github, ExternalLink, Gem, Hammer, X } from 'lucide-react'
 import { cases } from '../../data/cases.js'
 
 const iconMap = {
@@ -504,12 +504,10 @@ export default function HomePage({ onOpenCase, onOpenDynamic, theme, onToggleThe
                 e.currentTarget.style.boxShadow = '0 4px 25px var(--accent-gold-glow)'
               }}
             >
-              <Sparkles size={18} /> 立即开物
+              <Hammer size={18} /> 立即开物
             </button>
-            <a
-              href="https://github.com/bolin68688/luban-teaching"
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => document.getElementById('cases')?.scrollIntoView({ behavior: 'smooth' })}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -521,7 +519,7 @@ export default function HomePage({ onOpenCase, onOpenDynamic, theme, onToggleThe
                 borderRadius: 'var(--radius-md)',
                 fontSize: '16px',
                 fontWeight: '600',
-                textDecoration: 'none',
+                cursor: 'pointer',
                 transition: 'all 0.3s var(--ease-out)'
               }}
               onMouseEnter={e => {
@@ -533,8 +531,8 @@ export default function HomePage({ onOpenCase, onOpenDynamic, theme, onToggleThe
                 e.currentTarget.style.transform = 'translateY(0)'
               }}
             >
-              <Github size={18} /> 鲁班精选
-            </a>
+              <Gem size={18} /> 鲁班精选
+            </button>
           </div>
         </div>
       </section>
@@ -864,7 +862,7 @@ npm run build`}
                 justifyContent: 'center',
                 margin: '0 auto 16px'
               }}>
-                <Sparkles size={26} color="var(--accent-gold)" />
+                <Hammer size={26} color="var(--accent-gold)" />
               </div>
               <h3 style={{
                 fontSize: '22px',
@@ -964,7 +962,7 @@ npm run build`}
                   gap: '8px'
                 }}
               >
-                <Sparkles size={16} /> 开始开物
+                <Hammer size={16} /> 开始开物
               </button>
             </div>
           </div>
