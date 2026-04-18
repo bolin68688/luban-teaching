@@ -1,4 +1,5 @@
-import { Waves, Zap, Triangle, Sun, Moon, ArrowRight, BookOpen, Crown, Github, ExternalLink, Gem } from 'lucide-react'
+import { useState } from 'react'
+import { Waves, Zap, Triangle, Sun, Moon, ArrowRight, BookOpen, Crown, Github, ExternalLink, Gem, Sparkles, X } from 'lucide-react'
 import { cases } from '../../data/cases.js'
 
 const iconMap = {
@@ -225,7 +226,23 @@ function CaseCard({ caseData, onClick, index }) {
   )
 }
 
-export default function HomePage({ onOpenCase, theme, onToggleTheme }) {
+export default function HomePage({ onOpenCase, onOpenDynamic, theme, onToggleTheme }) {
+  const [showModal, setShowModal] = useState(false)
+  const [topicInput, setTopicInput] = useState('')
+
+  const handleOpenDynamic = () => {
+    if (topicInput.trim()) {
+      onOpenDynamic(topicInput.trim())
+      setShowModal(false)
+      setTopicInput('')
+    }
+  }
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') handleOpenDynamic()
+    if (e.key === 'Escape') setShowModal(false)
+  }
+
   return (
     <div className="mortise-bg" style={{
       minHeight: '100vh',
@@ -460,8 +477,8 @@ export default function HomePage({ onOpenCase, theme, onToggleTheme }) {
 
           {/* 按钮 */}
           <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a
-              href="#cases"
+            <button
+              onClick={() => setShowModal(true)}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -472,7 +489,8 @@ export default function HomePage({ onOpenCase, theme, onToggleTheme }) {
                 borderRadius: 'var(--radius-md)',
                 fontSize: '16px',
                 fontWeight: '700',
-                textDecoration: 'none',
+                border: 'none',
+                cursor: 'pointer',
                 letterSpacing: '0.05em',
                 transition: 'all 0.3s var(--ease-out)',
                 boxShadow: '0 4px 25px var(--accent-gold-glow)'
@@ -486,8 +504,8 @@ export default function HomePage({ onOpenCase, theme, onToggleTheme }) {
                 e.currentTarget.style.boxShadow = '0 4px 25px var(--accent-gold-glow)'
               }}
             >
-              探索知识点 <ArrowRight size={18} />
-            </a>
+              <Sparkles size={18} /> 立即开物
+            </button>
             <a
               href="https://github.com/bolin68688/luban-teaching"
               target="_blank"
@@ -515,7 +533,7 @@ export default function HomePage({ onOpenCase, theme, onToggleTheme }) {
                 e.currentTarget.style.transform = 'translateY(0)'
               }}
             >
-              <Github size={18} /> 查看源码
+              <Github size={18} /> 鲁班精选
             </a>
           </div>
         </div>
@@ -781,6 +799,177 @@ npm run build`}
           Built with React + Three.js + GSAP · MIT License
         </p>
       </footer>
+
+      {/* 立即开物 Modal */}
+      {showModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.7)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            animation: 'fadeIn 0.3s ease'
+          }}
+          onClick={() => setShowModal(false)}
+        >
+          <div
+            style={{
+              width: '100%',
+              maxWidth: '480px',
+              background: 'var(--bg-card)',
+              border: '1.5px solid var(--border-gold)',
+              borderRadius: 'var(--radius-lg)',
+              padding: '36px 32px',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(212,175,55,0.08)',
+              position: 'relative',
+              animation: 'slideUp 0.3s var(--ease-out)'
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* 关闭按钮 */}
+            <button
+              onClick={() => setShowModal(false)}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                padding: '4px',
+                display: 'flex',
+                transition: 'color 0.2s'
+              }}
+              onMouseEnter={e => e.currentTarget.style.color = 'var(--accent-gold)'}
+              onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+            >
+              <X size={20} />
+            </button>
+
+            {/* 标题 */}
+            <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+              <div style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: 'var(--radius-md)',
+                background: 'linear-gradient(135deg, rgba(212,175,55,0.15) 0%, transparent 100%)',
+                border: '1.5px solid var(--border-gold)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px'
+              }}>
+                <Sparkles size={26} color="var(--accent-gold)" />
+              </div>
+              <h3 style={{
+                fontSize: '22px',
+                fontFamily: 'var(--font-display)',
+                fontWeight: '700',
+                color: 'var(--text-primary)',
+                letterSpacing: '0.1em',
+                marginBottom: '6px'
+              }}>
+                立即开物
+              </h3>
+              <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+                输入你想学习的知识点，鲁班为你开物成器
+              </p>
+            </div>
+
+            {/* 输入框 */}
+            <div style={{ marginBottom: '20px' }}>
+              <input
+                type="text"
+                value={topicInput}
+                onChange={e => setTopicInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="例如：牛顿第二定律、光合作用、勾股定理..."
+                autoFocus
+                style={{
+                  width: '100%',
+                  padding: '14px 18px',
+                  background: 'var(--bg-primary)',
+                  border: '1.5px solid var(--border)',
+                  borderRadius: 'var(--radius-md)',
+                  color: 'var(--text-primary)',
+                  fontSize: '15px',
+                  fontFamily: 'var(--font-sans)',
+                  outline: 'none',
+                  transition: 'border-color 0.2s, box-shadow 0.2s',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={e => {
+                  e.currentTarget.style.borderColor = 'var(--border-gold)'
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(212,175,55,0.1)'
+                }}
+                onBlur={e => {
+                  e.currentTarget.style.borderColor = 'var(--border)'
+                  e.currentTarget.style.boxShadow = 'none'
+                }}
+              />
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px', lineHeight: '1.5' }}>
+                支持物理、化学、数学、天文等K12学科知识点，系统将自动匹配最佳可视化方案。
+              </p>
+            </div>
+
+            {/* 操作按钮 */}
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={() => setShowModal(false)}
+                style={{
+                  flex: 1,
+                  padding: '12px 20px',
+                  background: 'transparent',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius-md)',
+                  color: 'var(--text-secondary)',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.borderColor = 'var(--border-gold)'
+                  e.currentTarget.style.color = 'var(--text-primary)'
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.borderColor = 'var(--border)'
+                  e.currentTarget.style.color = 'var(--text-secondary)'
+                }}
+              >
+                取消
+              </button>
+              <button
+                onClick={handleOpenDynamic}
+                disabled={!topicInput.trim()}
+                style={{
+                  flex: 2,
+                  padding: '12px 20px',
+                  background: topicInput.trim() ? 'var(--gold-gradient)' : 'var(--border)',
+                  border: 'none',
+                  borderRadius: 'var(--radius-md)',
+                  color: topicInput.trim() ? 'var(--bg-primary)' : 'var(--text-muted)',
+                  fontSize: '14px',
+                  fontWeight: '700',
+                  cursor: topicInput.trim() ? 'pointer' : 'not-allowed',
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+              >
+                <Sparkles size={16} /> 开始开物
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
