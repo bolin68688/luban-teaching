@@ -581,9 +581,9 @@ export default function HomePage({ onOpenCase, theme, onToggleTheme }) {
             <div style={{ width: '200px', height: '1px', background: 'linear-gradient(to right, var(--border-gold), transparent)' }} />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '28px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '28px', maxWidth: '900px', margin: '0 auto' }}>
             {cases.map((c, i) => (
-              <div key={c.id} style={{ animation: `slideUp 0.6s var(--ease-out) ${i * 0.1}s forwards`, opacity: 0 }}>
+              <div key={c.id} style={{ animation: `slideUp 0.6s var(--ease-out) ${i * 0.12}s forwards`, opacity: 0 }}>
                 <CaseCard caseData={c} onClick={onOpenCase} index={i} />
               </div>
             ))}
