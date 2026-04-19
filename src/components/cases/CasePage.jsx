@@ -292,7 +292,6 @@ function KaiwuPanel({ caseData, simParams, onParamChange, displayValues, vizActi
               </div>
             )
           })}
-          ))}
         </div>
       </div>
 

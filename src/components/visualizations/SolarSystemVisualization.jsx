@@ -37,6 +37,7 @@ const STARS = Array.from({ length: 200 }, (_, i) => ({
 
 export default function SolarSystemVisualization({ params = {}, actions = {} }) {
   const canvasRef = useRef(null)
+  const containerRef = useRef(null)
   const animRef = useRef(null)
 
   // 用 ref 存储参数，让动画循环实时读取而不触发重渲染
@@ -90,21 +91,25 @@ export default function SolarSystemVisualization({ params = {}, actions = {} }) 
 
   useEffect(() => {
     const canvas = canvasRef.current
-    if (!canvas) return
+    const container = containerRef.current
+    if (!canvas || !container) return
 
     const ctx = canvas.getContext('2d')
     const dpr = window.devicePixelRatio || 1
 
     const resize = () => {
-      const w = canvas.clientWidth
-      const h = canvas.clientHeight
+      const w = container.clientWidth
+      const h = container.clientHeight
       canvas.width = w * dpr
       canvas.height = h * dpr
+      canvas.style.width = w + 'px'
+      canvas.style.height = h + 'px'
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     }
 
     resize()
-    window.addEventListener('resize', resize)
+    const ro = new ResizeObserver(resize)
+    ro.observe(container)
 
     let time = 0
 
@@ -301,13 +306,13 @@ export default function SolarSystemVisualization({ params = {}, actions = {} }) 
     draw()
 
     return () => {
-      window.removeEventListener('resize', resize)
+      ro.disconnect()
       if (animRef.current) cancelAnimationFrame(animRef.current)
     }
   }, []) // 只挂载一次，通过ref实时读取参数变化
 
   return (
-    <div style={{
+    <div ref={containerRef} style={{
       width: '100%',
       height: '100%',
       background: COLORS.bg,

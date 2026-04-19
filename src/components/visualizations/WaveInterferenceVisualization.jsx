@@ -10,7 +10,8 @@ const WAVE_COLORS = {
 
 export default function WaveInterferenceVisualization({ params = {} }) {
   const canvasRef = useRef(null)
-  const animationRef = useRef(null)
+  const containerRef = useRef(null)
+  const sizeRef = useRef({ width: 0, height: 0 })
 
   const waveParams = {
     wavelength: params['波长'] ?? 1.5,
@@ -22,32 +23,45 @@ export default function WaveInterferenceVisualization({ params = {} }) {
 
   useEffect(() => {
     const canvas = canvasRef.current
-    if (!canvas) return
+    const container = containerRef.current
+    if (!canvas || !container) return
 
     const dpr = window.devicePixelRatio || 1
-    const displayWidth = canvas.clientWidth
-    const displayHeight = canvas.clientHeight
-    canvas.width = displayWidth * dpr
-    canvas.height = displayHeight * dpr
-    canvas.style.width = displayWidth + 'px'
-    canvas.style.height = displayHeight + 'px'
+    let ctx = canvas.getContext('2d')
 
-    const ctx = canvas.getContext('2d')
-    ctx.scale(dpr, dpr)
+    // Resize handling — triggered on mount + whenever container size changes
+    const resize = () => {
+      const displayWidth = container.clientWidth
+      const displayHeight = container.clientHeight
+      if (displayWidth === sizeRef.current.width && displayHeight === sizeRef.current.height) return
 
-    const width = displayWidth
-    const height = displayHeight
-    const centerY = displayHeight / 2
+      sizeRef.current = { width: displayWidth, height: displayHeight }
+      canvas.width = displayWidth * dpr
+      canvas.height = displayHeight * dpr
+      canvas.style.width = displayWidth + 'px'
+      canvas.style.height = displayHeight + 'px'
+      // Reset transform then re-apply scale after resize
+      ctx.setTransform(1, 0, 0, 1, 0, 0)
+      ctx.scale(dpr, dpr)
+    }
 
-    const leftX = width * 0.1
-    const rightX = width * 0.85
+    resize()
+
+    const ro = new ResizeObserver(resize)
+    ro.observe(container)
 
     let animationId
 
     const animate = () => {
+      const width = sizeRef.current.width
+      const height = sizeRef.current.height
+      const centerY = height / 2
+      const leftX = width * 0.1
+      const rightX = width * 0.85
+
       // 清空画布
       ctx.fillStyle = WAVE_COLORS.background
-      ctx.fillRect(0, 0, width, displayHeight)
+      ctx.fillRect(0, 0, width, height)
 
       const slitDistance = waveParams.slitDistance * 12
       const slitY1 = centerY - slitDistance
@@ -99,7 +113,7 @@ export default function WaveInterferenceVisualization({ params = {} }) {
       const numLines = 150
 
       for (let i = 0; i < numLines; i++) {
-        const y = (i / numLines) * displayHeight
+        const y = (i / numLines) * height
         const dist1 = Math.sqrt((rightX - leftX - 50) ** 2 + (y - slitY1) ** 2)
         const dist2 = Math.sqrt((rightX - leftX - 50) ** 2 + (y - slitY2) ** 2)
         const phaseDiff = k * (dist1 - dist2)
@@ -120,15 +134,15 @@ export default function WaveInterferenceVisualization({ params = {} }) {
 
       // 屏幕
       ctx.fillStyle = 'rgba(20, 20, 40, 0.9)'
-      ctx.fillRect(rightX - 15, 0, 20, displayHeight)
+      ctx.fillRect(rightX - 15, 0, 20, height)
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'
       ctx.lineWidth = 2
-      ctx.strokeRect(rightX - 15, 0, 20, displayHeight)
+      ctx.strokeRect(rightX - 15, 0, 20, height)
 
       // 屏幕干涉条纹
       const numFringes = 20
       for (let i = 0; i <= numFringes; i++) {
-        const fringeY = (i / numFringes) * displayHeight
+        const fringeY = (i / numFringes) * height
         const dist1 = Math.sqrt((rightX - leftX - 50) ** 2 + (fringeY - slitY1) ** 2)
         const dist2 = Math.sqrt((rightX - leftX - 50) ** 2 + (fringeY - slitY2) ** 2)
         const phaseDiff = k * (dist1 - dist2)
@@ -166,11 +180,14 @@ export default function WaveInterferenceVisualization({ params = {} }) {
 
     animate()
 
-    return () => cancelAnimationFrame(animationId)
+    return () => {
+      cancelAnimationFrame(animationId)
+      ro.disconnect()
+    }
   }, [waveParams.wavelength, waveParams.slitDistance, waveParams.screenDistance, waveParams.showConstructive, waveParams.showDestructive])
 
   return (
-    <div style={{
+    <div ref={containerRef} style={{
       width: '100%',
       height: '100%',
       background: WAVE_COLORS.background,
