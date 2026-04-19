@@ -1375,10 +1375,11 @@ export default function DynamicCasePage({ topic, onBack, theme, onToggleTheme })
       {/* 主内容 */}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden', position: 'relative' }}>
         <div style={{
-          flex: 1,
-          marginRight: panelOpen ? '35%' : '0',
-          transition: 'margin-right 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-          position: 'relative', background: 'var(--bg-secondary)', zIndex: 1
+          width: panelOpen ? '65%' : '100%',
+          transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          flexShrink: 0,
+          position: 'relative', background: 'var(--bg-secondary)', zIndex: 1,
+          overflow: 'hidden'
         }}>
           <TopicCanvas topic={topic} params={simParams} />
           {isFullscreen && (
@@ -1390,11 +1391,12 @@ export default function DynamicCasePage({ topic, onBack, theme, onToggleTheme })
           )}
         </div>
 
-        {/* 右侧面板 */}
+        {/* 右侧面板 - 固定35%宽度，transform滑入 */}
         <div style={{
-          position: 'absolute', top: 0, right: panelOpen ? 0 : '-35%', width: '35%', height: '100%',
+          position: 'absolute', top: 0, right: 0, width: '35%', height: '100%',
           background: 'var(--bg-card)', borderLeft: '1px solid var(--border)',
-          transition: 'right 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          transform: panelOpen ? 'translateX(0)' : 'translateX(100%)',
+          transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           zIndex: 10, boxShadow: panelOpen ? '-4px 0 20px rgba(0,0,0,0.3)' : 'none'
         }}>
           <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>

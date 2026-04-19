@@ -840,14 +840,15 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
         overflow: 'hidden',
         position: 'relative'
       }}>
-        {/* 可视化区域 - 面板打开时右侧留出35%空间 */}
+        {/* 可视化区域 - 面板打开时宽度收缩为65% */}
         <div style={{
-          flex: 1,
-          marginRight: panelOpen ? '35%' : '0',
-          transition: 'margin-right 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          width: panelOpen ? '65%' : '100%',
+          transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          flexShrink: 0,
           position: 'relative',
           background: 'var(--bg-secondary)',
-          zIndex: 1
+          zIndex: 1,
+          overflow: 'hidden'
         }}>
           <VisualizationComponent
             caseId={caseId}
@@ -887,16 +888,17 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
           )}
         </div>
 
-        {/* 右侧面板 - absolute定位，从右侧滑入 */}
+        {/* 右侧面板 - 固定35%宽度，transform滑入 */}
         <div style={{
           position: 'absolute',
           top: 0,
-          right: panelOpen ? 0 : '-35%',
+          right: 0,
           width: '35%',
           height: '100%',
           background: 'var(--bg-card)',
           borderLeft: '1px solid var(--border)',
-          transition: 'right 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          transform: panelOpen ? 'translateX(0)' : 'translateX(100%)',
+          transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           zIndex: 10,
           boxShadow: panelOpen ? '-4px 0 20px rgba(0,0,0,0.3)' : 'none'
         }}>
