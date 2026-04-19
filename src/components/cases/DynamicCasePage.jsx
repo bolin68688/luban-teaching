@@ -7,7 +7,114 @@ const TABS = [
   { id: 'wenda', label: '鲁班问答', icon: HelpCircle }
 ]
 
-/* ─── 学科配置 ─── */
+/* ═══════════════════════════════════════════════════════════
+   专门知识点配置 —— 输入匹配到这些关键词时，展示专门可视化
+   ═══════════════════════════════════════════════════════════ */
+const TOPIC_PRESETS = {
+  '牛顿第二定律': {
+    subject: 'physics',
+    label: '物理 · 力学',
+    color: '#4ECDC4',
+    theory: '牛顿第二定律：物体的加速度与所受合外力成正比，与质量成反比，方向与合外力方向相同。公式表达为 F = ma，其中 F 为合外力（N），m 为质量（kg），a 为加速度（m/s²）。',
+    luBanView: '鲁班推重器，知力大则动速、质重则行缓。以恒力推一物，其速递增而不止——此乃F=ma之理也。匠人知此，则举重若轻。',
+    scenarios: [
+      { name: '汽车加速', desc: '油门提供牵引力，F=ma决定加速性能' },
+      { name: '电梯升降', desc: '缆绳拉力与重力之差产生加速度' },
+      { name: '火箭发射', desc: '推力大于重力时产生向上加速度' },
+      { name: '滑雪下坡', desc: '重力分量提供沿斜面的加速度' }
+    ],
+    controls: [
+      { type: 'slider', label: '拉力F', min: 0, max: 100, default: 50, step: 5, unit: 'N' },
+      { type: 'slider', label: '质量m', min: 1, max: 20, default: 5, step: 1, unit: 'kg' },
+      { type: 'slider', label: '摩擦系数μ', min: 0, max: 1, default: 0.2, step: 0.05 },
+      { type: 'toggle', label: '显示受力分析', default: true },
+      { type: 'toggle', label: '显示v-t图像', default: true }
+    ],
+    displayParams: [
+      { key: 'acceleration', label: '加速度 a' },
+      { key: 'velocity', label: '速度 v' },
+      { key: 'displacement', label: '位移 x' },
+      { key: 'netForce', label: '合外力 F合' }
+    ],
+    questions: [
+      { question: '根据牛顿第二定律 F=ma，若质量不变，拉力加倍，则加速度如何变化？', options: ['A. 不变', 'B. 减半', 'C. 加倍', 'D. 变为4倍'], answer: 'C', explanation: '由 F=ma 可知，当质量m不变时，加速度a与外力F成正比。F加倍，a也加倍。' },
+      { question: '在光滑水平面上，用10N的力推一个2kg的物体，其加速度为？', options: ['A. 2 m/s²', 'B. 5 m/s²', 'C. 10 m/s²', 'D. 20 m/s²'], answer: 'B', explanation: 'a = F/m = 10N / 2kg = 5 m/s²。' },
+      { question: '关于牛顿第二定律，下列说法正确的是？', options: ['A. 加速度方向与速度方向一定相同', 'B. 加速度方向与合外力方向相同', 'C. 速度越大加速度越大', 'D. 力消失后物体立即停止'], answer: 'B', explanation: '牛顿第二定律指出加速度方向与合外力方向相同。力消失后物体以该时刻速度做匀速运动（惯性）。' },
+      { question: '一个物体在水平面上受拉力F和摩擦力f作用，若F < f，则物体？', options: ['A. 加速运动', 'B. 匀速运动', 'C. 减速运动或静止', 'D. 无法判断'], answer: 'C', explanation: '合外力 F合 = F - f < 0，加速度为负，物体将减速（若正在运动）或保持静止（若原本静止）。' },
+      { question: '质量为m的物体在光滑斜面上自由下滑，斜面倾角为θ，则加速度为？', options: ['A. g', 'B. g·sinθ', 'C. g·cosθ', 'D. g·tanθ'], answer: 'B', explanation: '重力沿斜面分量为 mg·sinθ，故 a = F/m = g·sinθ。' }
+    ]
+  },
+  '光合作用': {
+    subject: 'chemistry',
+    label: '生物 · 化学',
+    color: '#50C878',
+    theory: '光合作用是绿色植物利用光能将二氧化碳和水转化为有机物（葡萄糖）并释放氧气的过程。总反应式：6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂。分为光反应（类囊体膜）和暗反应（叶绿体基质）两个阶段。',
+    luBanView: '鲁班观草木，知日光为火、叶脉为器。以光为媒，化气为食——此造物之妙也。匠人造器，亦当效法自然，以最小之力成最大之功。',
+    scenarios: [
+      { name: '农业生产', desc: '大棚种植调控光照和CO₂提高产量' },
+      { name: '碳中和', desc: '植物吸收CO₂，是地球碳循环的关键' },
+      { name: '生物能源', desc: '藻类光合作用产氢、产油脂' },
+      { name: '太空生命支持', desc: '密闭舱内植物提供氧气和食物' }
+    ],
+    controls: [
+      { type: 'slider', label: '光照强度', min: 0, max: 100, default: 60, step: 5, unit: '%' },
+      { type: 'slider', label: 'CO₂浓度', min: 0.01, max: 0.1, default: 0.04, step: 0.005, unit: '%' },
+      { type: 'slider', label: '温度', min: 0, max: 50, default: 25, step: 1, unit: '°C' },
+      { type: 'toggle', label: '显示光反应', default: true },
+      { type: 'toggle', label: '显示暗反应', default: true }
+    ],
+    displayParams: [
+      { key: 'o2Rate', label: 'O₂释放速率' },
+      { key: 'glucoseRate', label: '葡萄糖合成速率' },
+      { key: 'lightEfficiency', label: '光能转化效率' },
+      { key: 'enzymeActivity', label: '酶活性' }
+    ],
+    questions: [
+      { question: '光合作用的产物是什么？', options: ['A. CO₂和H₂O', 'B. O₂和葡萄糖', 'C. 酒精和CO₂', 'D. 乳酸和ATP'], answer: 'B', explanation: '光合作用总反应：6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂，产物为葡萄糖(C₆H₁₂O₆)和氧气(O₂)。' },
+      { question: '光合作用中，光反应发生在叶绿体的哪个部位？', options: ['A. 基质', 'B. 类囊体薄膜', 'C. 外膜', 'D. 内膜'], answer: 'B', explanation: '光反应在类囊体薄膜上进行，利用光能将水分解产生O₂、ATP和NADPH；暗反应在基质中进行，利用ATP和NADPH固定CO₂合成有机物。' },
+      { question: '影响光合作用速率的环境因素不包括？', options: ['A. 光照强度', 'B. CO₂浓度', 'C. 温度', 'D. 土壤颜色'], answer: 'D', explanation: '影响光合作用的主要环境因素：光照强度、CO₂浓度、温度、水分、矿质元素。土壤颜色与光合作用无直接关系。' },
+      { question: '关于光反应和暗反应的关系，正确的是？', options: ['A. 光反应为暗反应提供ATP和NADPH', 'B. 暗反应为光反应提供光能', 'C. 两者互不相关', 'D. 暗反应必须在无光条件下进行'], answer: 'A', explanation: '光反应产生的ATP和NADPH为暗反应中CO₂的固定和还原提供能量和还原剂。暗反应有光无光均可进行，只是需要光反应产物。' },
+      { question: '若光照突然增强，短时间内C₃（三碳化合物）的含量如何变化？', options: ['A. 增加', 'B. 减少', 'C. 不变', 'D. 先增后减'], answer: 'B', explanation: '光照增强→光反应加快→ATP和NADPH增多→C₃还原加快→而CO₂固定速率暂时不变→C₃消耗加快而生成速率不变→C₃含量减少。' }
+    ]
+  },
+  '勾股定理': {
+    subject: 'math',
+    label: '数学 · 几何',
+    color: '#9B6BD4',
+    theory: '勾股定理：直角三角形中，两直角边的平方和等于斜边的平方。若直角边为a、b，斜边为c，则 a² + b² = c²。这是欧几里得几何中最基本、最重要的定理之一，已有超过400种证明方法。',
+    luBanView: '鲁班量方，知直角之弦。以勾三股四，必得弦五——此几何之根基也。匠人造屋架、设斜撑，皆赖此理以求尺寸之精确。',
+    scenarios: [
+      { name: '建筑测量', desc: '利用勾股定理测量不可直接测量的距离' },
+      { name: '导航系统', desc: '计算两点间直线距离（经度差、纬度差）' },
+      { name: '电子屏幕', desc: '计算对角线分辨率（如1920×1080的屏幕对角线）' },
+      { name: '楼梯设计', desc: '踏步高度和深度决定斜边长度' }
+    ],
+    controls: [
+      { type: 'slider', label: '直角边a', min: 3, max: 20, default: 3, step: 1, unit: '' },
+      { type: 'slider', label: '直角边b', min: 4, max: 20, default: 4, step: 1, unit: '' },
+      { type: 'toggle', label: '显示面积标注', default: true },
+      { type: 'toggle', label: '显示证明动画', default: false },
+      { type: 'toggle', label: '显示毕达哥拉斯树', default: false }
+    ],
+    displayParams: [
+      { key: 'hypotenuse', label: '斜边 c' },
+      { key: 'areaA', label: 'a² 面积' },
+      { key: 'areaB', label: 'b² 面积' },
+      { key: 'areaC', label: 'c² 面积' }
+    ],
+    questions: [
+      { question: '直角三角形的两条直角边分别为3和4，则斜边为？', options: ['A. 5', 'B. 6', 'C. 7', 'D. 25'], answer: 'A', explanation: 'c = √(a² + b²) = √(9 + 16) = √25 = 5。这是最著名的勾股数（3, 4, 5）。' },
+      { question: '下列哪组数可以作为直角三角形的三边长？', options: ['A. 1, 2, 3', 'B. 2, 3, 4', 'C. 5, 12, 13', 'D. 6, 7, 8'], answer: 'C', explanation: '5² + 12² = 25 + 144 = 169 = 13²。验证：1²+2²≠3², 2²+3²≠4², 6²+7²≠8²。' },
+      { question: '若直角三角形斜边为10，一条直角边为6，则另一条直角边为？', options: ['A. 4', 'B. 8', 'C. 16', 'D. √136'], answer: 'B', explanation: 'b = √(c² - a²) = √(100 - 36) = √64 = 8。' },
+      { question: '勾股定理的逆命题是什么？', options: ['A. 若a²+b²=c²，则三角形为直角三角形', 'B. 若三角形为直角三角形，则a²+b²=c²', 'C. 以上都对', 'D. 以上都不对'], answer: 'A', explanation: '勾股定理的逆命题：若三角形三边满足a²+b²=c²，则该三角形为直角三角形，c边所对角为直角。这是判定直角三角形的重要依据。' },
+      { question: '等腰直角三角形的直角边为a，则斜边为？', options: ['A. a', 'B. a√2', 'C. 2a', 'D. a²'], answer: 'B', explanation: 'c = √(a² + a²) = √(2a²) = a√2 ≈ 1.414a。这是等腰直角三角形的重要性质。' }
+    ]
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   通用回退配置 —— 未匹配到专门知识点时使用
+   ═══════════════════════════════════════════════════════════ */
 const SUBJECT_CONFIG = {
   physics: {
     label: '物理',
@@ -175,14 +282,576 @@ const SUBJECT_CONFIG = {
 function detectSubject(topic) {
   const t = topic.toLowerCase()
   if (/物理|力|运动|速度|加速度|能量|功|功率|电磁|光|声|波|热|量子|相对论|引力/.test(t)) return 'physics'
-  if (/化学|反应|分子|原子|元素|化合物|酸碱|电解|氧化|还原|催化|有机|无机/.test(t)) return 'chemistry'
-  if (/数学|函数|几何|代数|方程|积分|微分|概率|统计|数列|向量|矩阵|三角/.test(t)) return 'math'
+  if (/化学|反应|分子|原子|元素|化合物|酸碱|电解|氧化|还原|催化|有机|无机|光合/.test(t)) return 'chemistry'
+  if (/数学|函数|几何|代数|方程|积分|微分|概率|统计|数列|向量|矩阵|三角|勾股/.test(t)) return 'math'
   if (/天文|宇宙|太阳|行星|恒星|银河|黑洞|大爆炸|星系|卫星|轨道|引力/.test(t)) return 'astronomy'
   return 'general'
 }
 
-/* ─── Canvas 可视化 ─── */
-function DynamicCanvas({ subject, params }) {
+/* ─── 获取配置 ─── */
+function getConfig(topic) {
+  for (const [key, config] of Object.entries(TOPIC_PRESETS)) {
+    if (topic.includes(key)) return { ...config, isPreset: true, presetKey: key }
+  }
+  const subject = detectSubject(topic)
+  return { ...SUBJECT_CONFIG[subject], subject, isPreset: false }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Canvas 可视化 —— 按知识点分派专门绘制函数
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── 1. 牛顿第二定律 ─── */
+function NewtonCanvas({ params }) {
+  const canvasRef = useRef(null)
+  const animRef = useRef(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const dpr = window.devicePixelRatio || 1
+    const w = canvas.clientWidth
+    const h = canvas.clientHeight
+    canvas.width = w * dpr
+    canvas.height = h * dpr
+    const ctx = canvas.getContext('2d')
+    ctx.scale(dpr, dpr)
+
+    const F = params['拉力F'] || 50
+    const m = params['质量m'] || 5
+    const mu = params['摩擦系数μ'] || 0.2
+    const g = 9.8
+    const f = mu * m * g
+    const netF = Math.max(0, F - f)
+    const a = netF / m
+
+    let t = 0
+    let blockX = 80
+    const groundY = h * 0.45
+    const blockW = 60
+    const blockH = 40
+    const maxVHistory = 200
+    const vHistory = []
+
+    function drawArrow(x1, y1, x2, y2, color, label) {
+      const angle = Math.atan2(y2 - y1, x2 - x1)
+      const len = Math.sqrt((x2-x1)**2 + (y2-y1)**2)
+      ctx.beginPath()
+      ctx.moveTo(x1, y1)
+      ctx.lineTo(x2, y2)
+      ctx.strokeStyle = color
+      ctx.lineWidth = 2.5
+      ctx.stroke()
+      // 箭头
+      const headLen = 10
+      ctx.beginPath()
+      ctx.moveTo(x2, y2)
+      ctx.lineTo(x2 - headLen * Math.cos(angle - 0.4), y2 - headLen * Math.sin(angle - 0.4))
+      ctx.lineTo(x2 - headLen * Math.cos(angle + 0.4), y2 - headLen * Math.sin(angle + 0.4))
+      ctx.closePath()
+      ctx.fillStyle = color
+      ctx.fill()
+      // 标签
+      if (label) {
+        ctx.fillStyle = color
+        ctx.font = 'bold 13px var(--font-sans)'
+        ctx.textAlign = 'center'
+        ctx.fillText(label, (x1+x2)/2, y1 - 10)
+      }
+    }
+
+    function draw() {
+      t += 0.016
+      ctx.clearRect(0, 0, w, h)
+
+      // 背景
+      ctx.fillStyle = '#0D0D14'
+      ctx.fillRect(0, 0, w, h)
+
+      // 网格
+      ctx.strokeStyle = 'rgba(78,205,196,0.06)'
+      ctx.lineWidth = 0.5
+      for (let i = 0; i < w; i += 40) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, h); ctx.stroke() }
+      for (let i = 0; i < h; i += 40) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(w, i); ctx.stroke() }
+
+      // 地面
+      ctx.fillStyle = 'rgba(78,205,196,0.1)'
+      ctx.fillRect(0, groundY + blockH, w, 4)
+      ctx.strokeStyle = 'rgba(78,205,196,0.3)'
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.moveTo(0, groundY + blockH)
+      ctx.lineTo(w, groundY + blockH)
+      ctx.stroke()
+
+      // 木块运动
+      const v = a * t
+      blockX = 80 + v * t * 3
+      if (blockX > w - blockW - 20) { blockX = 80; t = 0; vHistory.length = 0 }
+
+      // 木块
+      ctx.fillStyle = 'rgba(78,205,196,0.15)'
+      ctx.strokeStyle = '#4ECDC4'
+      ctx.lineWidth = 2
+      ctx.fillRect(blockX, groundY, blockW, blockH)
+      ctx.strokeRect(blockX, groundY, blockW, blockH)
+      ctx.fillStyle = '#4ECDC4'
+      ctx.font = 'bold 12px var(--font-mono)'
+      ctx.textAlign = 'center'
+      ctx.fillText(`${m}kg`, blockX + blockW/2, groundY + blockH/2 + 4)
+
+      // 受力分析
+      if (params['显示受力分析'] !== false) {
+        const cx = blockX + blockW/2
+        const cy = groundY + blockH/2
+        // 拉力F
+        const fLen = Math.min(F * 1.5, 120)
+        drawArrow(cx, cy, cx + fLen, cy, '#4ECDC4', `F=${F}N`)
+        // 摩擦力f
+        const frLen = Math.min(f * 1.5, 100)
+        if (frLen > 5) drawArrow(cx, cy, cx - frLen, cy, '#DC5050', `f=${f.toFixed(1)}N`)
+        // 重力
+        drawArrow(cx, groundY + blockH + 5, cx, groundY + blockH + 35, '#9B6BD4', `G=${(m*g).toFixed(0)}N`)
+        // 支持力
+        drawArrow(cx, groundY - 5, cx, groundY - 35, '#E8C967', `N=${(m*g).toFixed(0)}N`)
+      }
+
+      // 公式
+      ctx.fillStyle = '#4ECDC4'
+      ctx.font = 'bold 16px var(--font-mono)'
+      ctx.textAlign = 'left'
+      ctx.fillText(`F = ma`, 20, 30)
+      ctx.font = '13px var(--font-mono)'
+      ctx.fillStyle = 'rgba(78,205,196,0.7)'
+      ctx.fillText(`a = (F-f)/m = ${a.toFixed(2)} m/s²`, 20, 52)
+      ctx.fillText(`v = at = ${(a*t).toFixed(2)} m/s`, 20, 72)
+      ctx.fillText(`f = μmg = ${f.toFixed(1)} N`, 20, 92)
+
+      // v-t 图像
+      if (params['显示v-t图像'] !== false) {
+        const chartX = w * 0.55
+        const chartY = h * 0.55
+        const chartW = w * 0.4
+        const chartH = h * 0.35
+
+        ctx.strokeStyle = 'rgba(78,205,196,0.2)'
+        ctx.lineWidth = 1
+        ctx.strokeRect(chartX, chartY, chartW, chartH)
+
+        ctx.fillStyle = 'rgba(78,205,196,0.15)'
+        ctx.font = 'bold 12px var(--font-sans)'
+        ctx.textAlign = 'left'
+        ctx.fillText('v-t 图像', chartX + 8, chartY + 20)
+
+        // 坐标轴
+        ctx.strokeStyle = 'rgba(78,205,196,0.3)'
+        ctx.beginPath()
+        ctx.moveTo(chartX + 30, chartY + chartH - 20)
+        ctx.lineTo(chartX + chartW - 10, chartY + chartH - 20)
+        ctx.moveTo(chartX + 30, chartY + chartH - 20)
+        ctx.lineTo(chartX + 30, chartY + 10)
+        ctx.stroke()
+
+        // v-t 曲线
+        vHistory.push({ t, v: a * t })
+        if (vHistory.length > maxVHistory) vHistory.shift()
+
+        ctx.beginPath()
+        ctx.strokeStyle = '#4ECDC4'
+        ctx.lineWidth = 2
+        vHistory.forEach((pt, i) => {
+          const px = chartX + 30 + (i / maxVHistory) * (chartW - 50)
+          const maxV = Math.max(10, a * 5)
+          const py = chartY + chartH - 20 - (pt.v / maxV) * (chartH - 40)
+          if (i === 0) ctx.moveTo(px, py)
+          else ctx.lineTo(px, py)
+        })
+        ctx.stroke()
+      }
+
+      animRef.current = requestAnimationFrame(draw)
+    }
+    draw()
+    return () => { if (animRef.current) cancelAnimationFrame(animRef.current) }
+  }, [params])
+
+  return <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />
+}
+
+/* ─── 2. 光合作用 ─── */
+function PhotosynthesisCanvas({ params }) {
+  const canvasRef = useRef(null)
+  const animRef = useRef(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const dpr = window.devicePixelRatio || 1
+    const w = canvas.clientWidth
+    const h = canvas.clientHeight
+    canvas.width = w * dpr
+    canvas.height = h * dpr
+    const ctx = canvas.getContext('2d')
+    ctx.scale(dpr, dpr)
+
+    const light = params['光照强度'] || 60
+    const co2 = params['CO₂浓度'] || 0.04
+    const temp = params['温度'] || 25
+    const showLight = params['显示光反应'] !== false
+    const showDark = params['显示暗反应'] !== false
+
+    let time = 0
+    let photons = []
+    let co2Mols = []
+    let o2Mols = []
+
+    function spawnParticle(arr, x, y, vx, vy, color, life) {
+      arr.push({ x, y, vx, vy, color, life, maxLife: life, radius: Math.random() * 2 + 1 })
+    }
+
+    function draw() {
+      time += 0.016
+      ctx.fillStyle = 'rgba(13,13,20,0.2)'
+      ctx.fillRect(0, 0, w, h)
+
+      const cx = w / 2
+      const cy = h / 2
+      const leafW = 140
+      const leafH = 90
+
+      // 太阳光
+      const sunX = cx
+      const sunY = 50
+      const sunGlow = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 50)
+      sunGlow.addColorStop(0, `rgba(232,201,103,${light/100*0.5})`)
+      sunGlow.addColorStop(1, 'transparent')
+      ctx.fillStyle = sunGlow
+      ctx.fillRect(0, 0, w, h)
+
+      // 太阳
+      ctx.beginPath()
+      ctx.arc(sunX, sunY, 20, 0, Math.PI * 2)
+      ctx.fillStyle = `rgba(232,201,103,${light/100*0.8+0.2})`
+      ctx.fill()
+      ctx.strokeStyle = '#E8C967'
+      ctx.lineWidth = 1.5
+      ctx.stroke()
+      ctx.fillStyle = '#E8C967'
+      ctx.font = '11px var(--font-sans)'
+      ctx.textAlign = 'center'
+      ctx.fillText('☀', sunX, sunY + 4)
+
+      // 光子
+      if (light > 0 && Math.random() < light / 200) {
+        spawnParticle(photons, sunX + (Math.random()-0.5)*30, sunY + 20, (Math.random()-0.5)*0.5, 1 + Math.random(), '#E8C967', 60)
+      }
+      photons = photons.filter(p => {
+        p.x += p.vx; p.y += p.vy; p.life--
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2)
+        ctx.fillStyle = `rgba(232,201,103,${p.life/p.maxLife})`
+        ctx.fill()
+        return p.life > 0 && p.y < cy + leafH/2
+      })
+
+      // 叶子
+      ctx.beginPath()
+      ctx.ellipse(cx, cy, leafW, leafH, 0, 0, Math.PI * 2)
+      ctx.fillStyle = 'rgba(80,200,120,0.12)'
+      ctx.fill()
+      ctx.strokeStyle = 'rgba(80,200,120,0.5)'
+      ctx.lineWidth = 2
+      ctx.stroke()
+
+      // 叶脉
+      ctx.strokeStyle = 'rgba(80,200,120,0.25)'
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.moveTo(cx - leafW + 20, cy)
+      ctx.lineTo(cx + leafW - 20, cy)
+      ctx.stroke()
+      for (let i = -3; i <= 3; i++) {
+        ctx.beginPath()
+        ctx.moveTo(cx + i * 20, cy - 10)
+        ctx.lineTo(cx + i * 25, cy + 10)
+        ctx.stroke()
+      }
+
+      // 光反应区
+      if (showLight) {
+        ctx.fillStyle = 'rgba(232,201,103,0.08)'
+        ctx.beginPath()
+        ctx.ellipse(cx - 40, cy - 20, 35, 25, 0, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.strokeStyle = 'rgba(232,201,103,0.3)'
+        ctx.lineWidth = 1
+        ctx.stroke()
+        ctx.fillStyle = '#E8C967'
+        ctx.font = '10px var(--font-sans)'
+        ctx.textAlign = 'center'
+        ctx.fillText('光反应', cx - 40, cy - 20)
+      }
+
+      // 暗反应区
+      if (showDark) {
+        ctx.fillStyle = 'rgba(80,200,120,0.08)'
+        ctx.beginPath()
+        ctx.ellipse(cx + 40, cy + 20, 35, 25, 0, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.strokeStyle = 'rgba(80,200,120,0.3)'
+        ctx.lineWidth = 1
+        ctx.stroke()
+        ctx.fillStyle = '#50C878'
+        ctx.font = '10px var(--font-sans)'
+        ctx.textAlign = 'center'
+        ctx.fillText('暗反应', cx + 40, cy + 20)
+      }
+
+      // CO2 输入
+      if (co2 > 0 && Math.random() < co2 * 10) {
+        spawnParticle(co2Mols, 20, cy + (Math.random()-0.5)*40, 1 + Math.random(), (Math.random()-0.5)*0.5, '#9B6BD4', 80)
+      }
+      co2Mols = co2Mols.filter(p => {
+        p.x += p.vx; p.y += p.vy; p.life--
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.radius + 1, 0, Math.PI*2)
+        ctx.fillStyle = `rgba(155,107,212,${p.life/p.maxLife*0.7})`
+        ctx.fill()
+        ctx.fillStyle = `rgba(155,107,212,${p.life/p.maxLife})`
+        ctx.font = '9px var(--font-mono)'
+        ctx.textAlign = 'center'
+        ctx.fillText('CO₂', p.x, p.y + 3)
+        return p.life > 0 && p.x < cx - 20
+      })
+
+      // O2 输出
+      const o2Rate = (light * co2 * 100 * Math.max(0, 1 - Math.abs(temp-25)/30))
+      if (o2Rate > 5 && Math.random() < o2Rate / 500) {
+        spawnParticle(o2Mols, cx + 60, cy - 20, 1 + Math.random(), -(0.5 + Math.random()), '#4ECDC4', 100)
+      }
+      o2Mols = o2Mols.filter(p => {
+        p.x += p.vx; p.y += p.vy; p.life--
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.radius + 1, 0, Math.PI*2)
+        ctx.fillStyle = `rgba(78,205,196,${p.life/p.maxLife*0.7})`
+        ctx.fill()
+        ctx.fillStyle = `rgba(78,205,196,${p.life/p.maxLife})`
+        ctx.font = '9px var(--font-mono)'
+        ctx.textAlign = 'center'
+        ctx.fillText('O₂', p.x, p.y + 3)
+        return p.life > 0 && p.x < w - 20
+      })
+
+      // H2O 输入
+      ctx.fillStyle = '#4A9FD4'
+      ctx.font = '11px var(--font-sans)'
+      ctx.textAlign = 'center'
+      ctx.fillText('H₂O ↑', cx, h - 30)
+      ctx.strokeStyle = 'rgba(74,159,212,0.3)'
+      ctx.beginPath()
+      ctx.moveTo(cx, h - 20)
+      ctx.lineTo(cx, cy + leafH)
+      ctx.stroke()
+
+      // 葡萄糖输出
+      ctx.fillStyle = '#D4AF37'
+      ctx.font = '11px var(--font-sans)'
+      ctx.textAlign = 'center'
+      ctx.fillText('C₆H₁₂O₆', cx + 100, cy + leafH + 25)
+
+      // 反应式
+      ctx.fillStyle = 'rgba(80,200,120,0.8)'
+      ctx.font = '12px var(--font-mono)'
+      ctx.textAlign = 'center'
+      ctx.fillText('6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂', cx, 30)
+
+      // 效率指示
+      const efficiency = (light * co2 * 100 * Math.max(0, 1 - Math.abs(temp-25)/30)).toFixed(1)
+      ctx.fillStyle = '#50C878'
+      ctx.font = '13px var(--font-mono)'
+      ctx.textAlign = 'left'
+      ctx.fillText(`光能转化效率: ${efficiency}%`, 20, h - 20)
+
+      animRef.current = requestAnimationFrame(draw)
+    }
+    draw()
+    return () => { if (animRef.current) cancelAnimationFrame(animRef.current) }
+  }, [params])
+
+  return <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />
+}
+
+/* ─── 3. 勾股定理 ─── */
+function PythagoreanCanvas({ params }) {
+  const canvasRef = useRef(null)
+  const animRef = useRef(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const dpr = window.devicePixelRatio || 1
+    const w = canvas.clientWidth
+    const h = canvas.clientHeight
+    canvas.width = w * dpr
+    canvas.height = h * dpr
+    const ctx = canvas.getContext('2d')
+    ctx.scale(dpr, dpr)
+
+    const a = params['直角边a'] || 3
+    const b = params['直角边b'] || 4
+    const c = Math.sqrt(a*a + b*b)
+    const showArea = params['显示面积标注'] !== false
+    const showProof = params['显示证明动画'] === true
+    const showTree = params['显示毕达哥拉斯树'] === true
+
+    let time = 0
+    const scale = Math.min(w, h) / 30
+
+    function draw() {
+      time += 0.016
+      ctx.clearRect(0, 0, w, h)
+      ctx.fillStyle = '#0D0D14'
+      ctx.fillRect(0, 0, w, h)
+
+      // 网格
+      ctx.strokeStyle = 'rgba(155,107,212,0.06)'
+      ctx.lineWidth = 0.5
+      for (let i = 0; i < w; i += 40) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, h); ctx.stroke() }
+      for (let i = 0; i < h; i += 40) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(w, i); ctx.stroke() }
+
+      const ox = w * 0.35
+      const oy = h * 0.55
+      const sa = a * scale
+      const sb = b * scale
+      const sc = c * scale
+
+      // 直角三角形
+      ctx.beginPath()
+      ctx.moveTo(ox, oy)
+      ctx.lineTo(ox + sa, oy)
+      ctx.lineTo(ox, oy - sb)
+      ctx.closePath()
+      ctx.fillStyle = 'rgba(155,107,212,0.12)'
+      ctx.fill()
+      ctx.strokeStyle = '#9B6BD4'
+      ctx.lineWidth = 2.5
+      ctx.stroke()
+
+      // 直角标记
+      ctx.strokeStyle = '#9B6BD4'
+      ctx.lineWidth = 1.5
+      ctx.beginPath()
+      ctx.moveTo(ox + 12, oy)
+      ctx.lineTo(ox + 12, oy - 12)
+      ctx.lineTo(ox, oy - 12)
+      ctx.stroke()
+
+      // 边标注
+      ctx.fillStyle = '#9B6BD4'
+      ctx.font = 'bold 14px var(--font-mono)'
+      ctx.textAlign = 'center'
+      ctx.fillText(`a=${a}`, ox + sa/2, oy + 22)
+      ctx.fillText(`b=${b}`, ox - 22, oy - sb/2)
+
+      // 斜边标注
+      const midX = (ox + sa + ox) / 2
+      const midY = (oy + oy - sb) / 2
+      ctx.fillStyle = '#E8C967'
+      ctx.font = 'bold 14px var(--font-mono)'
+      ctx.fillText(`c=${c.toFixed(2)}`, midX + 18, midY - 8)
+
+      // a² 正方形
+      ctx.strokeStyle = 'rgba(155,107,212,0.4)'
+      ctx.lineWidth = 1.5
+      ctx.strokeRect(ox, oy, sa, sa)
+      if (showArea) {
+        ctx.fillStyle = 'rgba(155,107,212,0.08)'
+        ctx.fillRect(ox, oy, sa, sa)
+        ctx.fillStyle = '#9B6BD4'
+        ctx.font = '12px var(--font-mono)'
+        ctx.fillText(`a²=${a*a}`, ox + sa/2, oy + sa/2 + 4)
+      }
+
+      // b² 正方形
+      ctx.strokeStyle = 'rgba(155,107,212,0.4)'
+      ctx.strokeRect(ox - sb, oy - sb, sb, sb)
+      if (showArea) {
+        ctx.fillStyle = 'rgba(155,107,212,0.08)'
+        ctx.fillRect(ox - sb, oy - sb, sb, sb)
+        ctx.fillStyle = '#9B6BD4'
+        ctx.font = '12px var(--font-mono)'
+        ctx.fillText(`b²=${b*b}`, ox - sb/2, oy - sb/2 + 4)
+      }
+
+      // c² 正方形
+      const angle = Math.atan2(-sb, sa)
+      ctx.save()
+      ctx.translate(ox + sa, oy)
+      ctx.rotate(angle)
+      ctx.strokeStyle = 'rgba(232,201,103,0.4)'
+      ctx.lineWidth = 1.5
+      ctx.strokeRect(0, 0, sc, sc)
+      if (showArea) {
+        ctx.fillStyle = 'rgba(232,201,103,0.08)'
+        ctx.fillRect(0, 0, sc, sc)
+        ctx.fillStyle = '#E8C967'
+        ctx.font = '12px var(--font-mono)'
+        ctx.fillText(`c²=${(c*c).toFixed(1)}`, sc/2, sc/2 + 4)
+      }
+      ctx.restore()
+
+      // 公式
+      ctx.fillStyle = '#E8C967'
+      ctx.font = 'bold 18px var(--font-mono)'
+      ctx.textAlign = 'center'
+      ctx.fillText(`a² + b² = c²`, w * 0.75, 40)
+      ctx.fillStyle = 'rgba(232,201,103,0.6)'
+      ctx.font = '14px var(--font-mono)'
+      ctx.fillText(`${a*a} + ${b*b} = ${(c*c).toFixed(1)} ✓`, w * 0.75, 65)
+
+      // 证明动画：把a²和b²切成块拼到c²
+      if (showProof) {
+        const progress = (Math.sin(time * 0.5) + 1) / 2
+        ctx.fillStyle = 'rgba(155,107,212,0.15)'
+        // 简化的面积相等现象
+        ctx.fillRect(w * 0.65, h * 0.35, 60 * progress, 60 * progress)
+        ctx.fillStyle = 'rgba(232,201,103,0.15)'
+        ctx.fillRect(w * 0.65 + 70, h * 0.35, 60 * progress, 60 * progress)
+        ctx.fillStyle = 'rgba(155,107,212,0.5)'
+        ctx.font = '11px var(--font-sans)'
+        ctx.fillText('面积相等演示', w * 0.75, h * 0.35 + 80)
+      }
+
+      // 毕达哥拉斯树
+      if (showTree) {
+        function drawBranch(x, y, len, angle, depth) {
+          if (depth <= 0) return
+          const x2 = x + len * Math.cos(angle)
+          const y2 = y + len * Math.sin(angle)
+          ctx.strokeStyle = `hsla(${270 + depth * 10}, 60%, 60%, ${0.3 + depth * 0.05})`
+          ctx.lineWidth = Math.max(0.5, depth * 0.5)
+          ctx.beginPath()
+          ctx.moveTo(x, y)
+          ctx.lineTo(x2, y2)
+          ctx.stroke()
+          const newLen = len * 0.7
+          drawBranch(x2, y2, newLen, angle - 0.5, depth - 1)
+          drawBranch(x2, y2, newLen, angle + 0.5, depth - 1)
+        }
+        drawBranch(w * 0.75, h * 0.85, 40, -Math.PI / 2, 6)
+      }
+
+      animRef.current = requestAnimationFrame(draw)
+    }
+    draw()
+    return () => { if (animRef.current) cancelAnimationFrame(animRef.current) }
+  }, [params])
+
+  return <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />
+}
+
+/* ─── 4. 通用回退 Canvas ─── */
+function GenericCanvas({ subject, params }) {
   const canvasRef = useRef(null)
   const animRef = useRef(null)
 
@@ -204,40 +873,31 @@ function DynamicCanvas({ subject, params }) {
     const showTrail = params['显示轨迹'] !== false
     const showField = params['显示引力场'] === true || params['显示场线'] === true
 
-    // 初始化粒子
     for (let i = 0; i < count; i++) {
       particles.push({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        vx: (Math.random() - 0.5) * speed * 2,
-        vy: (Math.random() - 0.5) * speed * 2,
-        radius: Math.random() * 2 + 1,
-        alpha: Math.random() * 0.5 + 0.3,
-        hue: subject === 'physics' ? 170 : subject === 'chemistry' ? 140 : subject === 'math' ? 270 : subject === 'astronomy' ? 45 : 45
+        x: Math.random() * w, y: Math.random() * h,
+        vx: (Math.random() - 0.5) * speed * 2, vy: (Math.random() - 0.5) * speed * 2,
+        radius: Math.random() * 2 + 1, alpha: Math.random() * 0.5 + 0.3,
+        hue: subject === 'physics' ? 170 : subject === 'chemistry' ? 140 : subject === 'math' ? 270 : 45
       })
     }
 
     let time = 0
     function draw() {
       time += 0.016
-      ctx.fillStyle = showTrail ? 'rgba(13,13,20,0.15)' : 'var(--bg-secondary)'
+      ctx.fillStyle = showTrail ? 'rgba(13,13,20,0.15)' : '#0D0D14'
       ctx.fillRect(0, 0, w, h)
 
-      const cx = w / 2
-      const cy = h / 2
+      const cx = w / 2, cy = h / 2
 
-      // 引力场线
       if (showField) {
         ctx.strokeStyle = 'rgba(212,175,55,0.04)'
         ctx.lineWidth = 1
         for (let r = 30; r < Math.min(w, h) / 2; r += 40) {
-          ctx.beginPath()
-          ctx.arc(cx, cy, r, 0, Math.PI * 2)
-          ctx.stroke()
+          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke()
         }
       }
 
-      // 中心发光体
       const glowSize = 20 + Math.sin(time * 2) * 5
       const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowSize * 4)
       const centerColor = subject === 'physics' ? 'rgba(78,205,196,' : subject === 'chemistry' ? 'rgba(80,200,120,' : subject === 'math' ? 'rgba(155,107,212,' : 'rgba(212,175,55,'
@@ -247,71 +907,60 @@ function DynamicCanvas({ subject, params }) {
       ctx.fillStyle = glow
       ctx.fillRect(0, 0, w, h)
 
-      // 绘制粒子
       particles.forEach((p, i) => {
-        // 物理/天文：向中心引力
         if ((subject === 'physics' || subject === 'astronomy' || subject === 'general') && gravity > 0) {
-          const dx = cx - p.x
-          const dy = cy - p.y
+          const dx = cx - p.x, dy = cy - p.y
           const dist = Math.sqrt(dx * dx + dy * dy) + 1
           p.vx += (dx / dist) * gravity * 0.02
           p.vy += (dy / dist) * gravity * 0.02
         }
-        // 化学：布朗运动
-        if (subject === 'chemistry') {
-          p.vx += (Math.random() - 0.5) * 0.1
-          p.vy += (Math.random() - 0.5) * 0.1
-        }
-        // 数学：正弦波动
-        if (subject === 'math') {
-          p.vy += Math.sin(time * 2 + p.x * 0.01) * 0.05
-        }
+        if (subject === 'chemistry') { p.vx += (Math.random() - 0.5) * 0.1; p.vy += (Math.random() - 0.5) * 0.1 }
+        if (subject === 'math') { p.vy += Math.sin(time * 2 + p.x * 0.01) * 0.05 }
 
-        p.x += p.vx
-        p.y += p.vy
-
-        // 边界反弹
+        p.x += p.vx; p.y += p.vy
         if (p.x < 0 || p.x > w) p.vx *= -1
         if (p.y < 0 || p.y > h) p.vy *= -1
         p.x = Math.max(0, Math.min(w, p.x))
         p.y = Math.max(0, Math.min(h, p.y))
 
-        // 绘制
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
         ctx.fillStyle = `hsla(${p.hue}, 70%, 60%, ${p.alpha})`
         ctx.fill()
 
-        // 连接线（近距离）
         for (let j = i + 1; j < particles.length; j++) {
           const q = particles[j]
-          const dx = p.x - q.x
-          const dy = p.y - q.y
+          const dx = p.x - q.x, dy = p.y - q.y
           const d = Math.sqrt(dx * dx + dy * dy)
           if (d < 80) {
-            ctx.beginPath()
-            ctx.moveTo(p.x, p.y)
-            ctx.lineTo(q.x, q.y)
+            ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y)
             ctx.strokeStyle = `hsla(${p.hue}, 50%, 50%, ${0.08 * (1 - d / 80)})`
-            ctx.lineWidth = 0.5
-            ctx.stroke()
+            ctx.lineWidth = 0.5; ctx.stroke()
           }
         }
       })
-
       animRef.current = requestAnimationFrame(draw)
     }
     draw()
-
-    return () => {
-      if (animRef.current) cancelAnimationFrame(animRef.current)
-    }
+    return () => { if (animRef.current) cancelAnimationFrame(animRef.current) }
   }, [subject, params])
 
   return <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />
 }
 
-/* ─── 面板组件 ─── */
+/* ─── Canvas 路由 ─── */
+function TopicCanvas({ topic, params }) {
+  if (topic.includes('牛顿第二定律')) return <NewtonCanvas params={params} />
+  if (topic.includes('光合作用')) return <PhotosynthesisCanvas params={params} />
+  if (topic.includes('勾股定理')) return <PythagoreanCanvas params={params} />
+  const subject = detectSubject(topic)
+  return <GenericCanvas subject={subject} params={params} />
+}
+
+/* ═══════════════════════════════════════════════════════════
+   面板组件
+   ═══════════════════════════════════════════════════════════ */
+
 function XinfaPanel({ config, topic }) {
   return (
     <div style={{ padding: '24px', height: '100%', overflowY: 'auto' }}>
@@ -522,10 +1171,13 @@ function WendaPanel({ config }) {
   )
 }
 
-/* ─── 主组件 ─── */
+/* ═══════════════════════════════════════════════════════════
+   主组件
+   ═══════════════════════════════════════════════════════════ */
 export default function DynamicCasePage({ topic, onBack, theme, onToggleTheme }) {
-  const subject = detectSubject(topic)
-  const config = SUBJECT_CONFIG[subject]
+  const config = getConfig(topic)
+  const subject = config.subject || detectSubject(topic)
+  const isPreset = config.isPreset
 
   const [panelState, setPanelState] = useState({ tab: 'xinfa', open: true })
   const [simParams, setSimParams] = useState(() => {
@@ -533,27 +1185,45 @@ export default function DynamicCasePage({ topic, onBack, theme, onToggleTheme })
     config.controls.forEach(c => { defaults[c.label] = c.default })
     return defaults
   })
-  const [displayValues, setDisplayValues] = useState({
-    particleCount: config.controls.find(c => c.label === '粒子数量')?.default || 150,
-    avgSpeed: (config.controls.find(c => c.label === '运动速度')?.default || 1).toFixed(2),
-    kineticEnergy: '2.45',
-    collisionCount: '128',
-    reactionRate: '0.85',
-    conversionRate: '72%',
-    productYield: '68%',
-    activationEnergy: '125 kJ/mol',
-    sinValue: '0.707',
-    cosValue: '0.707',
-    period: '2π',
-    frequency: '1.00',
-    orbitalPeriod: '365天',
-    orbitalSpeed: '29.8 km/s',
-    gravity: '9.8 m/s²',
-    escapeVelocity: '11.2 km/s',
-    activeCount: 150,
-    avgEnergy: '1.85',
-    entropy: '3.42',
-    interactionCount: '256'
+  const [displayValues, setDisplayValues] = useState(() => {
+    // 根据预设或通用初始化显示值
+    const vals = {}
+    config.displayParams.forEach(p => { vals[p.key] = '--' })
+    // 牛顿第二定律初始值
+    if (topic.includes('牛顿第二定律')) {
+      const F = 50, m = 5, mu = 0.2
+      const f = mu * m * 9.8
+      const netF = Math.max(0, F - f)
+      const a = netF / m
+      vals.acceleration = a.toFixed(2) + ' m/s²'
+      vals.velocity = '0.00 m/s'
+      vals.displacement = '0.00 m'
+      vals.netForce = netF.toFixed(1) + ' N'
+    }
+    // 光合作用初始值
+    if (topic.includes('光合作用')) {
+      vals.o2Rate = '12.5 μmol/m²/s'
+      vals.glucoseRate = '2.1 mg/h'
+      vals.lightEfficiency = '3.2%'
+      vals.enzymeActivity = '85%'
+    }
+    // 勾股定理初始值
+    if (topic.includes('勾股定理')) {
+      const a = 3, b = 4
+      const c = Math.sqrt(a*a + b*b)
+      vals.hypotenuse = c.toFixed(2)
+      vals.areaA = (a*a).toString()
+      vals.areaB = (b*b).toString()
+      vals.areaC = (c*c).toFixed(1)
+    }
+    // 通用初始值
+    if (!isPreset) {
+      vals.particleCount = config.controls.find(c => c.label === '粒子数量')?.default || 150
+      vals.avgSpeed = (config.controls.find(c => c.label === '运动速度')?.default || 1).toFixed(2)
+      vals.kineticEnergy = '2.45'
+      vals.collisionCount = '128'
+    }
+    return vals
   })
   const [isFullscreen, setIsFullscreen] = useState(false)
   const containerRef = useRef(null)
@@ -561,7 +1231,52 @@ export default function DynamicCasePage({ topic, onBack, theme, onToggleTheme })
   const handleParamChange = useCallback((key, value) => {
     setSimParams(prev => {
       const next = { ...prev, [key]: value }
-      // 更新显示值
+
+      // 牛顿第二定律实时计算
+      if (topic.includes('牛顿第二定律')) {
+        const F = key === '拉力F' ? value : next['拉力F']
+        const m = key === '质量m' ? value : next['质量m']
+        const mu = key === '摩擦系数μ' ? value : next['摩擦系数μ']
+        const f = (mu || 0) * (m || 1) * 9.8
+        const netF = Math.max(0, (F || 0) - f)
+        const a = netF / (m || 1)
+        setDisplayValues(d => ({
+          ...d,
+          acceleration: a.toFixed(2) + ' m/s²',
+          netForce: netF.toFixed(1) + ' N'
+        }))
+      }
+
+      // 勾股定理实时计算
+      if (topic.includes('勾股定理')) {
+        const a = key === '直角边a' ? value : next['直角边a']
+        const b = key === '直角边b' ? value : next['直角边b']
+        const c = Math.sqrt(a*a + b*b)
+        setDisplayValues(d => ({
+          ...d,
+          hypotenuse: c.toFixed(2),
+          areaA: (a*a).toString(),
+          areaB: (b*b).toString(),
+          areaC: (c*c).toFixed(1)
+        }))
+      }
+
+      // 光合作用
+      if (topic.includes('光合作用')) {
+        const light = key === '光照强度' ? value : next['光照强度']
+        const co2 = key === 'CO₂浓度' ? value : next['CO₂浓度']
+        const temp = key === '温度' ? value : next['温度']
+        const eff = Math.max(0, (light || 0) * (co2 || 0.001) * 100 * Math.max(0, 1 - Math.abs((temp || 25) - 25) / 30))
+        setDisplayValues(d => ({
+          ...d,
+          lightEfficiency: eff.toFixed(1) + '%',
+          o2Rate: (eff * 0.8).toFixed(1) + ' μmol/m²/s',
+          glucoseRate: (eff * 0.15).toFixed(2) + ' mg/h',
+          enzymeActivity: Math.min(100, Math.max(0, 100 - Math.abs((temp || 25) - 37) * 3)).toFixed(0) + '%'
+        }))
+      }
+
+      // 通用
       if (key === '粒子数量') setDisplayValues(d => ({ ...d, particleCount: value, activeCount: value }))
       if (key === '运动速度') setDisplayValues(d => ({ ...d, avgSpeed: value.toFixed(2) }))
       if (key === '引力强度') setDisplayValues(d => ({ ...d, gravity: (value * 19.6).toFixed(1) + ' m/s²' }))
@@ -572,9 +1287,10 @@ export default function DynamicCasePage({ topic, onBack, theme, onToggleTheme })
         const rad = value * Math.PI / 180
         setDisplayValues(d => ({ ...d, sinValue: Math.sin(rad).toFixed(3), cosValue: Math.cos(rad).toFixed(3) }))
       }
+
       return next
     })
-  }, [])
+  }, [topic])
 
   const handleTabClick = useCallback((tabId) => {
     setPanelState(prev => ({
@@ -636,7 +1352,7 @@ export default function DynamicCasePage({ topic, onBack, theme, onToggleTheme })
               {topic}
             </h1>
             <span style={{ fontSize: '12px', color: 'var(--text-muted)', background: 'var(--highlight)', padding: '2px 8px', borderRadius: '4px' }}>
-              {config.label} · 动态生成
+              {config.label} · {isPreset ? '专门可视化' : '动态生成'}
             </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -664,7 +1380,7 @@ export default function DynamicCasePage({ topic, onBack, theme, onToggleTheme })
           transition: 'margin-right 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           position: 'relative', background: 'var(--bg-secondary)', zIndex: 1
         }}>
-          <DynamicCanvas subject={subject} params={simParams} />
+          <TopicCanvas topic={topic} params={simParams} />
           {isFullscreen && (
             <button onClick={toggleFullscreen} style={{
               position: 'absolute', bottom: '20px', right: '20px', padding: '8px 16px',
