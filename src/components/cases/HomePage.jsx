@@ -1,730 +1,1249 @@
-import { useState, useEffect, useRef } from 'react'
-import {
-  Waves, Zap, Triangle, Sun, ArrowRight,
-  Github, Sparkles, ChevronDown, Compass
-} from 'lucide-react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { cases } from '../../data/cases.js'
+import '../../styles/theme.css'
 
-const iconMap = {
-  waves: Waves,
-  sun: Sun,
-  bolt: Zap,
-  triangle: Triangle
+/* ============================================================
+   鲁班教学大师 v5.0 — TNKR风格主页
+   ============================================================ */
+
+/* ── 图标组件 ── */
+const Icons = {
+  waves: () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M2 12c2-3 4-3 6 0s4 3 6 0 4-3 6 0 4 3 6 0"/>
+      <path d="M2 16c2-3 4-3 6 0s4 3 6 0 4-3 6 0 4 3 6 0"/>
+    </svg>
+  ),
+  sun: () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <circle cx="12" cy="12" r="4"/>
+      <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/>
+    </svg>
+  ),
+  bolt: () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M13 2L4 14h7l-2 8 9-12h-7l2-8z"/>
+    </svg>
+  ),
+  triangle: () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M12 3L3 20h18L12 3z"/>
+      <path d="M12 8v8m-3-4h6" opacity="0.5"/>
+    </svg>
+  ),
+  arrowRight: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M5 12h14M12 5l7 7-7 7"/>
+    </svg>
+  ),
+  chevronDown: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M6 9l6 6 6-6"/>
+    </svg>
+  ),
+  menu: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M3 12h18M3 6h18M3 18h18"/>
+    </svg>
+  ),
+  close: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M18 6L6 18M6 6l12 12"/>
+    </svg>
+  ),
+  cube: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M21 16V8l-9-5-9 5v8l9 5 9-5z"/>
+      <path d="M3 8l9 5 9-5" opacity="0.4"/>
+      <path d="M12 13V22" opacity="0.4"/>
+    </svg>
+  ),
+  compass: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/>
+    </svg>
+  ),
 }
 
 const subjectColors = {
-  'wave-interference': { bg: '#EBF4FA', accent: '#3B6E8F', icon: '#3B6E8F' },
-  'solar-system': { bg: '#FDF3E7', accent: '#B07D4A', icon: '#B07D4A' },
-  'electrolysis': { bg: '#E8F5EE', accent: '#2D8B6B', icon: '#2D8B6B' },
-  'trigonometry': { bg: '#F0EBF5', accent: '#6B4F8C', icon: '#6B4F8C' }
+  '物理 · 光学':   'var(--subject-physics)',
+  '天文 · 动力学': 'var(--subject-astronomy)',
+  '化学 · 电化学': 'var(--subject-chemistry)',
+  '数学 · 三角学': 'var(--subject-math)',
 }
 
-/* ═══════════════════════════════════════════════════════════
-   旋转几何装饰
-   ═══════════════════════════════════════════════════════════ */
-function RotatingGeometry() {
+/* ── 滚动显现 Hook ── */
+function useReveal(threshold = 0.15) {
+  const ref = useRef(null)
+  const [revealed, setRevealed] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setRevealed(true); observer.disconnect() } },
+      { threshold }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [threshold])
+
+  return [ref, revealed]
+}
+
+/* ── 计数器组件 ── */
+function Counter({ end, suffix = '', duration = 2000 }) {
+  const [count, setCount] = useState(0)
+  const [ref, revealed] = useReveal(0.3)
+  const hasAnimated = useRef(false)
+
+  useEffect(() => {
+    if (!revealed || hasAnimated.current) return
+    hasAnimated.current = true
+    const startTime = Date.now()
+    const animate = () => {
+      const elapsed = Date.now() - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setCount(Math.floor(eased * end))
+      if (progress < 1) requestAnimationFrame(animate)
+    }
+    requestAnimationFrame(animate)
+  }, [revealed, end, duration])
+
   return (
-    <svg width="320" height="320" viewBox="0 0 200 200" style={{ opacity: 0.12 }}>
-      <defs>
-        <linearGradient id="geoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#1E3A2F" />
-          <stop offset="100%" stopColor="#3D7A62" />
-        </linearGradient>
-      </defs>
-      <g style={{ animation: 'rotateSlow 60s linear infinite', transformOrigin: '100px 100px' }}>
-        <circle cx="100" cy="100" r="80" fill="none" stroke="url(#geoGrad)" strokeWidth="0.5" />
-        <circle cx="100" cy="100" r="55" fill="none" stroke="url(#geoGrad)" strokeWidth="0.5" />
-        <circle cx="100" cy="100" r="30" fill="none" stroke="url(#geoGrad)" strokeWidth="0.5" />
-        <polygon points="100,30 170,140 30,140" fill="none" stroke="url(#geoGrad)" strokeWidth="0.5" />
-        <polygon points="100,170 30,60 170,60" fill="none" stroke="url(#geoGrad)" strokeWidth="0.5" />
-        <line x1="100" y1="20" x2="100" y2="180" stroke="url(#geoGrad)" strokeWidth="0.3" />
-        <line x1="20" y1="100" x2="180" y2="100" stroke="url(#geoGrad)" strokeWidth="0.3" />
-        <line x1="43" y1="43" x2="157" y2="157" stroke="url(#geoGrad)" strokeWidth="0.3" />
-        <line x1="157" y1="43" x2="43" y2="157" stroke="url(#geoGrad)" strokeWidth="0.3" />
-      </g>
-      <g style={{ animation: 'rotateSlow 40s linear infinite reverse', transformOrigin: '100px 100px' }}>
-        <circle cx="100" cy="100" r="68" fill="none" stroke="url(#geoGrad)" strokeWidth="0.3" strokeDasharray="4 4" />
-      </g>
-    </svg>
+    <span ref={ref} style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, color: 'var(--accent)' }}>
+      {count}{suffix}
+    </span>
   )
 }
 
-/* ═══════════════════════════════════════════════════════════
-   细线分隔
-   ═══════════════════════════════════════════════════════════ */
-function ThinLine({ delay = 0 }) {
+/* ── 3D 榫卯结构 ── */
+function Sunmao3D() {
   return (
     <div style={{
-      width: '60px',
-      height: '1px',
-      background: 'var(--accent)',
-      opacity: 0.3,
-      animation: `drawLine 1.2s var(--ease-out) ${delay}s forwards`,
-      transformOrigin: 'left'
-    }} />
-  )
-}
-
-/* ═══════════════════════════════════════════════════════════
-   案例大卡片 — 左右交替布局
-   ═══════════════════════════════════════════════════════════ */
-function BigCaseCard({ caseData, onClick, index }) {
-  const Icon = iconMap[caseData.icon] || Waves
-  const colors = subjectColors[caseData.id] || subjectColors['electrolysis']
-  const isEven = index % 2 === 0
-
-  return (
-    <div
-      className="animate-slide-up"
-      style={{
-        animationDelay: `${index * 0.15}s`,
-        display: 'grid',
-        gridTemplateColumns: isEven ? '1fr 1.2fr' : '1.2fr 1fr',
-        gap: 0,
-        background: 'var(--bg-card)',
-        borderRadius: 'var(--radius-lg)',
-        overflow: 'hidden',
-        boxShadow: 'var(--shadow-md)',
-        transition: 'all 0.5s var(--ease-out)',
-        cursor: 'pointer',
-        minHeight: '380px'
-      }}
-      onClick={() => onClick(caseData.id)}
-      onMouseEnter={e => {
-        e.currentTarget.style.transform = 'translateY(-4px)'
-        e.currentTarget.style.boxShadow = 'var(--shadow-lg)'
-      }}
-      onMouseLeave={e => {
-        e.currentTarget.style.transform = 'translateY(0)'
-        e.currentTarget.style.boxShadow = 'var(--shadow-md)'
-      }}
-    >
-      {/* 左侧/右侧色块区域 */}
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      perspective: '1000px',
+    }}>
       <div style={{
-        background: colors.bg,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '48px',
-        gap: '20px',
-        order: isEven ? 1 : 2
+        width: 200,
+        height: 200,
+        position: 'relative',
+        transformStyle: 'preserve-3d',
+        animation: 'sunmao-rotate 12s linear infinite',
       }}>
+        {/* 榫 — 凸出块 */}
         <div style={{
-          width: '80px',
-          height: '80px',
-          borderRadius: '50%',
-          background: 'rgba(255,255,255,0.8)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.06)'
+          position: 'absolute',
+          width: 80,
+          height: 40,
+          background: 'linear-gradient(135deg, rgba(201,169,110,0.25) 0%, rgba(201,169,110,0.08) 100%)',
+          border: '1px solid rgba(201,169,110,0.35)',
+          top: '50%',
+          left: '10%',
+          transform: 'translateY(-50%) translateZ(20px)',
+          boxShadow: '0 0 20px rgba(201,169,110,0.1)',
         }}>
-          <Icon size={36} color={colors.icon} />
-        </div>
-        <div style={{
-          fontSize: '13px',
-          fontWeight: '500',
-          color: colors.accent,
-          letterSpacing: '0.1em',
-          padding: '4px 14px',
-          background: 'rgba(255,255,255,0.6)',
-          borderRadius: '20px'
-        }}>
-          {caseData.subject}
-        </div>
-      </div>
-
-      {/* 文字区域 */}
-      <div style={{
-        padding: '48px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        gap: '20px',
-        order: isEven ? 2 : 1
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <span style={{
-            fontSize: '11px',
-            color: 'var(--text-muted)',
+            position: 'absolute',
+            top: -18,
+            left: 0,
             fontFamily: 'var(--font-mono)',
-            letterSpacing: '0.1em'
-          }}>
-            0{index + 1}
-          </span>
-          <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
-          <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{caseData.grade}</span>
+            fontSize: '0.55rem',
+            color: 'var(--accent)',
+            opacity: 0.6,
+            letterSpacing: '0.1em',
+          }}>TENON</span>
         </div>
-
-        <h3 style={{
-          fontSize: 'clamp(24px, 3vw, 32px)',
-          fontFamily: 'var(--font-display)',
-          fontWeight: '600',
-          color: 'var(--text-primary)',
-          letterSpacing: '0.06em',
-          lineHeight: 1.3
-        }}>
-          {caseData.title}
-        </h3>
-
-        <p style={{
-          fontSize: '15px',
-          color: 'var(--text-secondary)',
-          lineHeight: 1.8,
-          maxWidth: '360px'
-        }}>
-          {caseData.description}
-        </p>
-
+        {/* 卯 — 凹槽块 */}
         <div style={{
-          fontSize: '14px',
-          fontFamily: 'var(--font-display)',
-          fontStyle: 'italic',
-          color: colors.accent,
-          opacity: 0.7,
-          lineHeight: 1.7,
-          paddingLeft: '16px',
-          borderLeft: `2px solid ${colors.accent}30`
+          position: 'absolute',
+          width: 100,
+          height: 60,
+          background: 'linear-gradient(135deg, rgba(139,119,86,0.2) 0%, rgba(139,119,86,0.06) 100%)',
+          border: '1px solid rgba(201,169,110,0.25)',
+          top: '50%',
+          right: '10%',
+          transform: 'translateY(-50%) translateZ(-10px)',
         }}>
-          "{caseData.tagline}"
+          <div style={{
+            position: 'absolute',
+            width: 80,
+            height: 40,
+            background: 'var(--bg-primary)',
+            top: '50%',
+            left: '10%',
+            transform: 'translateY(-50%)',
+            border: '1px dashed rgba(201,169,110,0.2)',
+          }}/>
+          <span style={{
+            position: 'absolute',
+            bottom: -18,
+            right: 0,
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.55rem',
+            color: 'var(--accent)',
+            opacity: 0.6,
+            letterSpacing: '0.1em',
+          }}>MORTISE</span>
         </div>
-
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          marginTop: '8px',
-          color: colors.accent,
-          fontSize: '14px',
-          fontWeight: '500',
-          transition: 'gap 0.3s'
-        }} className="case-arrow">
-          开始探索 <ArrowRight size={16} />
-        </div>
+        {/* 连接线 */}
+        <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
+          viewBox="0 0 200 200">
+          <line x1="50" y1="100" x2="150" y2="100" stroke="rgba(201,169,110,0.15)" strokeWidth="0.5" strokeDasharray="4 4"/>
+          <circle cx="100" cy="100" r="60" fill="none" stroke="rgba(201,169,110,0.08)" strokeWidth="0.5"/>
+          <circle cx="100" cy="100" r="85" fill="none" stroke="rgba(201,169,110,0.05)" strokeWidth="0.5"/>
+        </svg>
+        {/* 坐标轴标注 */}
+        <span style={{
+          position: 'absolute', bottom: -30, left: '50%', transform: 'translateX(-50%)',
+          fontFamily: 'var(--font-mono)', fontSize: '0.5rem', color: 'var(--text-muted)', letterSpacing: '0.15em',
+        }}>X-AXIS // SUNMAO JOINT</span>
       </div>
     </div>
   )
 }
 
-/* ═══════════════════════════════════════════════════════════
-   主页
-   ═══════════════════════════════════════════════════════════ */
-export default function HomePage({ onOpenCase, onOpenDynamic }) {
-  const [topicInput, setTopicInput] = useState('')
-  const [scrollY, setScrollY] = useState(0)
-  const heroRef = useRef(null)
+/* ── 扫描线叠加 ── */
+function ScanlineOverlay() {
+  return (
+    <div style={{
+      position: 'fixed',
+      inset: 0,
+      pointerEvents: 'none',
+      zIndex: 9999,
+      overflow: 'hidden',
+    }}>
+      <div style={{
+        position: 'absolute',
+        width: '100%',
+        height: '2px',
+        background: 'linear-gradient(90deg, transparent, rgba(201,169,110,0.08), transparent)',
+        animation: 'scanline 6s linear infinite',
+      }}/>
+    </div>
+  )
+}
+
+/* ── 粒子网格背景 ── */
+function ParticleGrid() {
+  const canvasRef = useRef(null)
 
   useEffect(() => {
-    const onScroll = () => setScrollY(window.scrollY)
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    let w, h, particles = [], raf
+
+    const resize = () => {
+      w = canvas.width = canvas.offsetWidth * window.devicePixelRatio
+      h = canvas.height = canvas.offsetHeight * window.devicePixelRatio
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio)
+      initParticles()
+    }
+
+    const initParticles = () => {
+      particles = []
+      const cw = canvas.offsetWidth, ch = canvas.offsetHeight
+      const spacing = 60
+      for (let x = 0; x < cw; x += spacing) {
+        for (let y = 0; y < ch; y += spacing) {
+          particles.push({
+            x, y,
+            ox: x, oy: y,
+            vx: 0, vy: 0,
+            size: Math.random() * 1.5 + 0.5,
+            alpha: Math.random() * 0.3 + 0.1,
+          })
+        }
+      }
+    }
+
+    let mouse = { x: -1000, y: -1000 }
+    const onMove = (e) => {
+      const rect = canvas.getBoundingClientRect()
+      mouse.x = e.clientX - rect.left
+      mouse.y = e.clientY - rect.top
+    }
+    const onLeave = () => { mouse.x = -1000; mouse.y = -1000 }
+
+    canvas.addEventListener('mousemove', onMove)
+    canvas.addEventListener('mouseleave', onLeave)
+
+    const draw = () => {
+      const cw = canvas.offsetWidth, ch = canvas.offsetHeight
+      ctx.clearRect(0, 0, cw, ch)
+
+      // 连线
+      ctx.strokeStyle = 'rgba(201, 169, 110, 0.04)'
+      ctx.lineWidth = 0.5
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x
+          const dy = particles[i].y - particles[j].y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          if (dist < 100) {
+            ctx.globalAlpha = (1 - dist / 100) * 0.15
+            ctx.beginPath()
+            ctx.moveTo(particles[i].x, particles[i].y)
+            ctx.lineTo(particles[j].x, particles[j].y)
+            ctx.stroke()
+          }
+        }
+      }
+
+      // 点
+      for (const p of particles) {
+        const dx = mouse.x - p.x
+        const dy = mouse.y - p.y
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        const force = dist < 150 ? (150 - dist) / 150 * 3 : 0
+        p.vx += (p.ox - p.x) * 0.02 + (dx / dist || 0) * force * 0.1
+        p.vy += (p.oy - p.y) * 0.02 + (dy / dist || 0) * force * 0.1
+        p.vx *= 0.92
+        p.vy *= 0.92
+        p.x += p.vx
+        p.y += p.vy
+
+        ctx.globalAlpha = p.alpha * (1 + (dist < 150 ? (150 - dist) / 150 * 2 : 0))
+        ctx.fillStyle = 'rgba(201, 169, 110, 0.6)'
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+        ctx.fill()
+      }
+      ctx.globalAlpha = 1
+      raf = requestAnimationFrame(draw)
+    }
+
+    resize()
+    draw()
+    window.addEventListener('resize', resize)
+
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('resize', resize)
+      canvas.removeEventListener('mousemove', onMove)
+      canvas.removeEventListener('mouseleave', onLeave)
+    }
+  }, [])
+
+  return (
+    <canvas ref={canvasRef} style={{
+      position: 'absolute',
+      inset: 0,
+      width: '100%',
+      height: '100%',
+      pointerEvents: 'auto',
+    }}/>
+  )
+}
+
+/* ============================================================
+   主页
+   ============================================================ */
+export default function HomePage({ onOpenCase, onOpenDynamic }) {
+  const [scrolled, setScrolled] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [topicInput, setTopicInput] = useState('')
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
-      <style>{`
-        .case-arrow { transition: gap 0.3s; }
-        .big-case-card:hover .case-arrow { gap: 14px !important; }
-      `}</style>
+  const handleDynamic = useCallback(() => {
+    const t = topicInput.trim()
+    if (t) onOpenDynamic(t)
+  }, [topicInput, onOpenDynamic])
 
-      {/* ═══════════════════ 极简导航 ═══════════════════ */}
-      <nav style={{
+  const scrollTo = (id) => {
+    const el = document.getElementById(id)
+    if (el) el.scrollIntoView({ behavior: 'smooth' })
+    setMobileMenuOpen(false)
+  }
+
+  /* 滚动显现 */
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) entry.target.classList.add('revealed')
+        })
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+    )
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale').forEach(el => observer.observe(el))
+    return () => observer.disconnect()
+  }, [])
+
+  const [heroRef, heroRevealed] = useReveal(0.1)
+  const [statsRef, statsRevealed] = useReveal(0.2)
+  const [casesRef, casesRevealed] = useReveal(0.1)
+  const [sunmaoRef, sunmaoRevealed] = useReveal(0.2)
+
+  return (
+    <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', position: 'relative' }}>
+      <ScanlineOverlay />
+
+      {/* ═══════════════════════════════════════
+          导航栏 — 玻璃拟态
+          ═══════════════════════════════════════ */}
+      <nav className="glass-strong" style={{
         position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        padding: '20px 40px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        top: 0, left: 0, right: 0,
         zIndex: 100,
-        transition: 'all 0.4s var(--ease-smooth)',
-        background: scrollY > 50 ? 'rgba(247,245,240,0.9)' : 'transparent',
-        backdropFilter: scrollY > 50 ? 'blur(12px)' : 'none'
+        height: 64,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 clamp(1.2rem, 4vw, 3rem)',
+        transition: 'all 0.4s ease',
+        borderBottom: scrolled ? '1px solid var(--border-subtle)' : '1px solid transparent',
       }}>
-        <div style={{
-          fontSize: '16px',
-          fontFamily: 'var(--font-display)',
-          fontWeight: '600',
-          color: 'var(--accent)',
-          letterSpacing: '0.12em'
-        }}>
-          鲁班开物
+        {/* Logo */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <div style={{
+            width: 32, height: 32,
+            border: '1.5px solid var(--accent)',
+            borderRadius: 'var(--radius-sm)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--accent)', fontWeight: 600 }}>LB</span>
+          </div>
+          <div>
+            <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>鲁班开物</div>
+            <div style={{ fontSize: '0.55rem', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', letterSpacing: '0.15em' }}>LUBAN TEACHING</div>
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: '28px', alignItems: 'center' }}>
-          <a href="#cases" style={{
-            fontSize: '13px',
-            color: 'var(--text-secondary)',
-            textDecoration: 'none',
-            letterSpacing: '0.06em',
-            transition: 'color 0.3s'
-          }}
-            onMouseEnter={e => e.currentTarget.style.color = 'var(--accent)'}
-            onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
-          >
-            探索
-          </a>
-          <a href="#about" style={{
-            fontSize: '13px',
-            color: 'var(--text-secondary)',
-            textDecoration: 'none',
-            letterSpacing: '0.06em',
-            transition: 'color 0.3s'
-          }}
-            onMouseEnter={e => e.currentTarget.style.color = 'var(--accent)'}
-            onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
-          >
-            关于
-          </a>
-          <a href="https://github.com/bolin68688/luban-teaching" target="_blank" rel="noopener noreferrer"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontSize: '13px',
-              color: 'var(--text-muted)',
-              textDecoration: 'none',
-              transition: 'color 0.3s'
-            }}
-            onMouseEnter={e => e.currentTarget.style.color = 'var(--accent)'}
-            onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
-          >
-            <Github size={14} />
-          </a>
+
+        {/* Desktop Nav */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }} className="desktop-nav">
+          {[
+            { label: '案例', id: 'cases-section' },
+            { label: '榫卯', id: 'sunmao-section' },
+            { label: '开物', id: 'explore-section' },
+          ].map(item => (
+            <button key={item.id} className="btn-ghost" onClick={() => scrollTo(item.id)}>
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        {/* CTA */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button className="btn btn-primary" style={{ padding: '0.6rem 1.4rem', fontSize: '0.8rem' }} onClick={() => scrollTo('explore-section')}>
+            开始探索
+          </button>
+          <button style={{ display: 'none', background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer' }} className="mobile-menu-btn" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            {mobileMenuOpen ? <Icons.close /> : <Icons.menu />}
+          </button>
         </div>
       </nav>
 
-      {/* ═══════════════════ Hero ═══════════════════ */}
+      <style>{`
+        @media (min-width: 769px) {
+          .desktop-nav { display: flex !important; }
+          .mobile-menu-btn { display: none !important; }
+        }
+        @media (max-width: 768px) {
+          .desktop-nav { display: none !important; }
+          .mobile-menu-btn { display: block !important; }
+        }
+      `}</style>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="glass-strong" style={{
+          position: 'fixed', top: 64, left: 0, right: 0,
+          zIndex: 99, padding: '1.5rem',
+          borderBottom: '1px solid var(--border-subtle)',
+        }}>
+          {[
+            { label: '案例', id: 'cases-section' },
+            { label: '榫卯', id: 'sunmao-section' },
+            { label: '开物', id: 'explore-section' },
+          ].map(item => (
+            <button key={item.id} className="btn-ghost" style={{ display: 'block', width: '100%', marginBottom: 4, textAlign: 'left' }} onClick={() => scrollTo(item.id)}>
+              {item.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════
+          HERO 区域
+          ═══════════════════════════════════════ */}
       <section ref={heroRef} style={{
+        position: 'relative',
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
-        position: 'relative',
-        padding: '120px 40px 80px',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        paddingTop: 64,
       }}>
-        {/* 背景几何 */}
+        {/* 粒子网格背景 */}
+        <ParticleGrid />
+
+        {/* 径向光晕 */}
         <div style={{
           position: 'absolute',
-          right: '-40px',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          pointerEvents: 'none'
-        }}>
-          <RotatingGeometry />
-        </div>
-
-        {/* 左侧小竖线装饰 */}
+          top: '20%', right: '10%',
+          width: 500, height: 500,
+          background: 'radial-gradient(circle, rgba(201,169,110,0.06) 0%, transparent 70%)',
+          borderRadius: '50%',
+          pointerEvents: 'none',
+        }}/>
         <div style={{
           position: 'absolute',
-          left: '40px',
-          top: '30%',
-          width: '1px',
-          height: '120px',
-          background: 'linear-gradient(180deg, transparent, var(--accent-pale), transparent)'
-        }} />
+          bottom: '10%', left: '5%',
+          width: 400, height: 400,
+          background: 'radial-gradient(circle, rgba(61,139,122,0.04) 0%, transparent 70%)',
+          borderRadius: '50%',
+          pointerEvents: 'none',
+        }}/>
+
+        {/* 网格底纹 */}
+        <div className="grid-bg" style={{ position: 'absolute', inset: 0, opacity: 0.5, pointerEvents: 'none' }}/>
 
         <div style={{
-          maxWidth: '720px',
-          textAlign: 'center',
+          maxWidth: 1200,
+          margin: '0 auto',
+          padding: '0 clamp(1.5rem, 5vw, 4rem)',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '4rem',
+          alignItems: 'center',
+          width: '100%',
           position: 'relative',
-          zIndex: 2
-        }}>
-          <div className="animate-fade-in" style={{
-            fontSize: '12px',
-            color: 'var(--text-muted)',
-            letterSpacing: '0.3em',
-            marginBottom: '32px',
-            fontWeight: '500'
-          }}>
-            K12 理科可视化教学
+          zIndex: 2,
+        }} className="hero-grid">
+          {/* 左侧：文案 */}
+          <div style={{ maxWidth: 560 }}>
+            {/* 工程标签 */}
+            <div className={heroRevealed ? 'animate-fadeInUp delay-1' : ''} style={{
+              display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32,
+            }}>
+              <div style={{ width: 24, height: 1, background: 'var(--accent)', opacity: 0.5 }}/>
+              <span className="mono-label">K12 SCIENCE VISUALIZATION</span>
+            </div>
+
+            {/* 主标题 */}
+            <h1 className={heroRevealed ? 'animate-fadeInUp delay-2' : ''} style={{
+              fontSize: 'clamp(2.5rem, 5.5vw, 4.5rem)',
+              fontWeight: 800,
+              lineHeight: 1.08,
+              letterSpacing: '-0.03em',
+              color: 'var(--text-primary)',
+              marginBottom: 24,
+            }}>
+              <span className="glow-text">以器载道</span>
+              <br/>
+              <span style={{ color: 'var(--accent)' }}>以物明理</span>
+            </h1>
+
+            {/* 副标题 */}
+            <p className={heroRevealed ? 'animate-fadeInUp delay-3' : ''} style={{
+              fontSize: 'clamp(1rem, 1.3vw, 1.15rem)',
+              color: 'var(--text-secondary)',
+              lineHeight: 1.7,
+              maxWidth: 480,
+              marginBottom: 40,
+            }}>
+              融合中国传统榫卯工艺智慧与现代科学可视化技术，为K12教育打造沉浸式交互学习体验。
+            </p>
+
+            {/* 按钮组 */}
+            <div className={heroRevealed ? 'animate-fadeInUp delay-4' : ''} style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+              <button className="btn btn-primary" onClick={() => scrollTo('cases-section')}>
+                探索案例 <Icons.arrowRight />
+              </button>
+              <button className="btn btn-secondary" onClick={() => scrollTo('sunmao-section')}>
+                了解榫卯 <Icons.cube />
+              </button>
+            </div>
+
+            {/* 工程标注 */}
+            <div className={heroRevealed ? 'animate-fadeIn delay-6' : ''} style={{
+              marginTop: 60,
+              display: 'flex',
+              gap: 32,
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.65rem',
+              color: 'var(--text-muted)',
+              letterSpacing: '0.1em',
+            }}>
+              <div>
+                <div style={{ color: 'var(--accent)', fontSize: '0.75rem', fontWeight: 600, marginBottom: 4 }}>004</div>
+                <div>可视化案例</div>
+              </div>
+              <div style={{ width: 1, background: 'var(--border-subtle)' }}/>
+              <div>
+                <div style={{ color: 'var(--accent)', fontSize: '0.75rem', fontWeight: 600, marginBottom: 4 }}>04</div>
+                <div>核心学科</div>
+              </div>
+              <div style={{ width: 1, background: 'var(--border-subtle)' }}/>
+              <div>
+                <div style={{ color: 'var(--accent)', fontSize: '0.75rem', fontWeight: 600, marginBottom: 4 }}>INFINITY</div>
+                <div>动态生成</div>
+              </div>
+            </div>
           </div>
 
-          <h1 className="animate-slide-up" style={{
-            fontSize: 'clamp(48px, 10vw, 96px)',
-            fontFamily: 'var(--font-display)',
-            fontWeight: '400',
-            lineHeight: 1.1,
-            letterSpacing: '0.08em',
-            color: 'var(--accent)',
-            marginBottom: '8px'
-          }}>
-            以器载道
-          </h1>
-          <h1 className="animate-slide-up" style={{
-            fontSize: 'clamp(48px, 10vw, 96px)',
-            fontFamily: 'var(--font-display)',
-            fontWeight: '400',
-            lineHeight: 1.1,
-            letterSpacing: '0.08em',
-            color: 'var(--text-primary)',
-            marginBottom: '40px',
-            animationDelay: '0.15s'
-          }}>
-            以物明理
-          </h1>
-
-          <ThinLine delay={0.5} style={{ margin: '0 auto 32px' }} />
-
-          <p className="animate-slide-up" style={{
-            fontSize: '16px',
-            color: 'var(--text-secondary)',
-            lineHeight: 2,
-            maxWidth: '440px',
-            margin: '0 auto 48px',
-            letterSpacing: '0.04em',
-            animationDelay: '0.3s'
-          }}>
-            萃取春秋末期顶尖工匠鲁班的科学思想
-            <br />
-            让物理、化学、数学、天文知识
-            <br />
-            看得见、摸得着、用得上
-          </p>
-
-          <div className="animate-slide-up" style={{
+          {/* 右侧：3D榫卯 */}
+          <div className={heroRevealed ? 'animate-scaleIn delay-3' : ''} style={{
             display: 'flex',
-            gap: '16px',
+            alignItems: 'center',
             justifyContent: 'center',
-            animationDelay: '0.45s'
+            position: 'relative',
+            minHeight: 400,
           }}>
-            <button
-              onClick={() => document.getElementById('cases')?.scrollIntoView({ behavior: 'smooth' })}
-              style={{
-                padding: '14px 36px',
-                background: 'var(--accent)',
-                color: 'var(--text-light)',
-                border: 'none',
-                borderRadius: 'var(--radius-sm)',
-                fontSize: '14px',
-                fontWeight: '500',
-                letterSpacing: '0.08em',
-                cursor: 'pointer',
-                transition: 'all 0.3s var(--ease-out)',
-                fontFamily: 'var(--font-sans)'
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.background = 'var(--accent-light)'
-                e.currentTarget.style.transform = 'translateY(-2px)'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.background = 'var(--accent)'
-                e.currentTarget.style.transform = 'translateY(0)'
-              }}
-            >
-              探索案例
-            </button>
-            <button
-              onClick={() => document.getElementById('explore')?.scrollIntoView({ behavior: 'smooth' })}
-              style={{
-                padding: '14px 36px',
-                background: 'transparent',
-                color: 'var(--accent)',
-                border: '1px solid var(--border-accent)',
-                borderRadius: 'var(--radius-sm)',
-                fontSize: '14px',
-                fontWeight: '500',
-                letterSpacing: '0.06em',
-                cursor: 'pointer',
-                transition: 'all 0.3s var(--ease-out)',
-                fontFamily: 'var(--font-sans)'
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.background = 'var(--accent-glow)'
-                e.currentTarget.style.borderColor = 'var(--accent)'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.background = 'transparent'
-                e.currentTarget.style.borderColor = 'var(--border-accent)'
-              }}
-            >
-              自由开物
-            </button>
+            <Sunmao3D />
+            {/* 旋转提示 */}
+            <div style={{
+              position: 'absolute',
+              bottom: -20,
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.55rem',
+              color: 'var(--text-muted)',
+              letterSpacing: '0.15em',
+              animation: 'breathe 3s ease infinite',
+            }}>
+              [ AUTOROTATE // 12s/cycle ]
+            </div>
           </div>
         </div>
 
         {/* 底部滚动提示 */}
-        <div className="animate-float" style={{
+        <div style={{
           position: 'absolute',
-          bottom: '40px',
+          bottom: 40,
           left: '50%',
           transform: 'translateX(-50%)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '8px',
-          opacity: 0.3
-        }}>
-          <ChevronDown size={20} color="var(--accent)" />
+          gap: 8,
+          animation: 'float 3s ease infinite',
+          cursor: 'pointer',
+        }} onClick={() => scrollTo('stats-section')}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '0.2em' }}>SCROLL</span>
+          <Icons.chevronDown />
         </div>
+
+        {/* 底部渐变 */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0, left: 0, right: 0,
+          height: 200,
+          background: 'linear-gradient(to bottom, transparent, var(--bg-primary))',
+          pointerEvents: 'none',
+        }}/>
       </section>
 
-      {/* ═══════════════════ 理念引言 ═══════════════════ */}
-      <section id="about" style={{
-        background: 'var(--accent)',
-        padding: '100px 40px',
+      <style>{`
+        @media (max-width: 900px) {
+          .hero-grid { grid-template-columns: 1fr !important; gap: 2rem !important; }
+        }
+      `}</style>
+
+      {/* ═══════════════════════════════════════
+          数据/理念区 — Impact Metrics风格
+          ═══════════════════════════════════════ */}
+      <section id="stats-section" ref={statsRef} style={{
         position: 'relative',
-        overflow: 'hidden'
+        padding: 'var(--space-4xl) 0',
+        background: 'var(--bg-void)',
+        borderTop: '1px solid var(--border-subtle)',
+        borderBottom: '1px solid var(--border-subtle)',
       }}>
-        {/* 背景装饰圆 */}
         <div style={{
-          position: 'absolute',
-          right: '-100px',
-          top: '-100px',
-          width: '400px',
-          height: '400px',
-          borderRadius: '50%',
-          border: '1px solid rgba(255,255,255,0.05)'
-        }} />
-        <div style={{
-          position: 'absolute',
-          left: '-60px',
-          bottom: '-60px',
-          width: '250px',
-          height: '250px',
-          borderRadius: '50%',
-          border: '1px solid rgba(255,255,255,0.05)'
-        }} />
-
-        <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 1 }}>
-          <div className="animate-slide-up">
-            <Compass size={28} color="rgba(255,255,255,0.3)" style={{ marginBottom: '24px' }} />
+          maxWidth: 1200,
+          margin: '0 auto',
+          padding: '0 clamp(1.5rem, 5vw, 4rem)',
+        }}>
+          {/* 顶部工程标签 */}
+          <div className={`reveal ${statsRevealed ? 'revealed' : ''}`} style={{
+            display: 'flex', alignItems: 'center', gap: 12, marginBottom: 48,
+          }}>
+            <div style={{ width: 24, height: 1, background: 'var(--accent)', opacity: 0.5 }}/>
+            <span className="mono-label">IMPACT METRICS // 影响力数据</span>
           </div>
-          <h2 className="animate-slide-up" style={{
-            fontSize: 'clamp(22px, 4vw, 34px)',
-            fontFamily: 'var(--font-display)',
-            fontWeight: '400',
-            color: 'rgba(255,255,255,0.95)',
-            lineHeight: 1.8,
-            letterSpacing: '0.08em',
-            marginBottom: '20px',
-            animationDelay: '0.1s'
-          }}>
-            "工欲善其事，必先利其器"
-          </h2>
-          <p className="animate-slide-up" style={{
-            fontSize: '14px',
-            color: 'rgba(255,255,255,0.5)',
-            letterSpacing: '0.15em',
-            marginBottom: '32px',
-            animationDelay: '0.2s'
-          }}>
-            —— 《论语 · 卫灵公》
-          </p>
-          <p className="animate-slide-up" style={{
-            fontSize: '16px',
-            color: 'rgba(255,255,255,0.7)',
-            lineHeight: 2,
-            maxWidth: '520px',
-            margin: '0 auto',
-            animationDelay: '0.3s'
-          }}>
-            每一个抽象的知识点，都值得被赋予一把"器"
-            <br />
-            让物理的光波触手可及，让化学的反应一目了然
-          </p>
-        </div>
-      </section>
 
-      {/* ═══════════════════ 案例展示 ═══════════════════ */}
-      <section id="cases" style={{
-        padding: '120px 40px',
-        background: 'var(--bg-secondary)'
-      }}>
-        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-          {/* 标题区 */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-end',
-            marginBottom: '64px',
-            flexWrap: 'wrap',
-            gap: '20px'
-          }}>
-            <div>
-              <div className="animate-slide-up" style={{
-                fontSize: '12px',
-                color: 'var(--text-muted)',
-                letterSpacing: '0.2em',
-                marginBottom: '12px',
-                fontWeight: '500'
-              }}>
-                精选案例
-              </div>
-              <h2 className="animate-slide-up" style={{
-                fontSize: 'clamp(28px, 4vw, 40px)',
-                fontFamily: 'var(--font-display)',
-                fontWeight: '600',
-                color: 'var(--text-primary)',
-                letterSpacing: '0.06em',
-                lineHeight: 1.2,
-                animationDelay: '0.1s'
-              }}>
-                四大领域
-                <br />
-                <span style={{ color: 'var(--accent)' }}>等你探索</span>
-              </h2>
-            </div>
-            <p className="animate-slide-up" style={{
-              fontSize: '15px',
-              color: 'var(--text-secondary)',
-              lineHeight: 1.8,
-              maxWidth: '280px',
-              animationDelay: '0.2s'
+          {/* 大引言 */}
+          <div className={`reveal ${statsRevealed ? 'revealed' : ''}`} style={{ marginBottom: 64 }}>
+            <h2 style={{
+              fontSize: 'clamp(1.8rem, 3.5vw, 3rem)',
+              fontWeight: 700,
+              lineHeight: 1.2,
+              letterSpacing: '-0.02em',
+              color: 'var(--text-primary)',
+              maxWidth: 700,
             }}>
-              从波的干涉到太阳系运行，从电解水到三角函数，每一个案例都是精心设计的交互体验
+              工欲善其事，<span style={{ color: 'var(--accent)' }}>必先利其器</span>
+            </h2>
+            <p style={{
+              fontSize: '1rem',
+              color: 'var(--text-secondary)',
+              maxWidth: 520,
+              marginTop: 16,
+              lineHeight: 1.7,
+            }}>
+              两千多年前，鲁班以精湛技艺开创了中华工匠精神的先河。今天，我们用数字技术延续这份对精确与美的追求。
             </p>
           </div>
 
-          {/* 大卡片列表 */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-            {cases.map((c, i) => (
-              <BigCaseCard key={c.id} caseData={c} onClick={onOpenCase} index={i} />
+          {/* 计数器网格 */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: 1,
+            background: 'var(--border-subtle)',
+            borderRadius: 'var(--radius-lg)',
+            overflow: 'hidden',
+          }} className="stats-grid">
+            {[
+              { value: 4, suffix: '', label: '可视化案例', sub: '覆盖物理/化学/天文/数学' },
+              { value: 20, suffix: '+', label: '交互控件', sub: '滑块/开关/按钮/选择器' },
+              { value: 100, suffix: '%', label: '动态生成', sub: '任意知识点即时可视化' },
+              { value: 0, suffix: 'ms', label: '响应延迟', sub: '本地渲染实时交互' },
+            ].map((stat, i) => (
+              <div key={i} className={`reveal stagger-${i + 1} ${statsRevealed ? 'revealed' : ''}`} style={{
+                background: 'var(--bg-secondary)',
+                padding: 'clamp(1.5rem, 3vw, 2.5rem)',
+                textAlign: 'center',
+              }}>
+                <div style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 'clamp(2rem, 4vw, 3rem)',
+                  fontWeight: 700,
+                  color: 'var(--accent)',
+                  lineHeight: 1,
+                  marginBottom: 12,
+                }}>
+                  {stat.value === 0 ? (
+                    <span style={{ color: 'var(--turquoise)' }}>&lt;1ms</span>
+                  ) : (
+                    <Counter end={stat.value} suffix={stat.suffix} />
+                  )}
+                </div>
+                <div style={{
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  marginBottom: 6,
+                }}>{stat.label}</div>
+                <div style={{
+                  fontSize: '0.7rem',
+                  color: 'var(--text-muted)',
+                  fontFamily: 'var(--font-mono)',
+                  letterSpacing: '0.05em',
+                }}>{stat.sub}</div>
+              </div>
             ))}
           </div>
         </div>
+
+        <style>{`
+          @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: 1fr 1fr !important; }
+          }
+        `}</style>
       </section>
 
-      {/* ═══════════════════ 自由探索 ═══════════════════ */}
-      <section id="explore" style={{
-        padding: '120px 40px',
-        background: 'var(--bg-primary)',
-        position: 'relative'
+      {/* ═══════════════════════════════════════
+          案例区 — 4列能力卡片（TNKR风格）
+          ═══════════════════════════════════════ */}
+      <section id="cases-section" ref={casesRef} style={{
+        position: 'relative',
+        padding: 'var(--space-4xl) 0',
       }}>
         <div style={{
-          maxWidth: '640px',
+          maxWidth: 1200,
           margin: '0 auto',
-          textAlign: 'center'
+          padding: '0 clamp(1.5rem, 5vw, 4rem)',
         }}>
-          <div className="animate-slide-up">
-            <Sparkles size={24} color="var(--accent-pale)" style={{ marginBottom: '20px' }} />
+          {/* 头部 */}
+          <div className={`reveal ${casesRevealed ? 'revealed' : ''}`} style={{ marginBottom: 64 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+              <div style={{ width: 24, height: 1, background: 'var(--accent)', opacity: 0.5 }}/>
+              <span className="mono-label">CASE STUDIES // 精选案例</span>
+            </div>
+            <h2 style={{
+              fontSize: 'clamp(1.8rem, 3.5vw, 3rem)',
+              fontWeight: 700,
+              lineHeight: 1.2,
+              letterSpacing: '-0.02em',
+              color: 'var(--text-primary)',
+            }}>
+              四大领域，<span style={{ color: 'var(--accent)' }}>等你探索</span>
+            </h2>
+            <p style={{
+              fontSize: '1rem',
+              color: 'var(--text-secondary)',
+              maxWidth: 480,
+              marginTop: 12,
+              lineHeight: 1.7,
+            }}>
+              从光的干涉到行星运行，从电解水到三角函数——每个案例都是一次完整的科学探索之旅。
+            </p>
           </div>
-          <h2 className="animate-slide-up" style={{
-            fontSize: 'clamp(24px, 3.5vw, 36px)',
-            fontFamily: 'var(--font-display)',
-            fontWeight: '600',
-            color: 'var(--text-primary)',
-            letterSpacing: '0.06em',
-            marginBottom: '16px',
-            animationDelay: '0.1s'
-          }}>
-            探索任意知识点
-          </h2>
-          <p className="animate-slide-up" style={{
-            fontSize: '15px',
-            color: 'var(--text-secondary)',
-            marginBottom: '40px',
-            lineHeight: 1.8,
-            animationDelay: '0.2s'
-          }}>
-            输入你想学习的知识点，AI 将为你生成专属的可视化教学
-          </p>
 
-          <div className="animate-slide-up" style={{
+          {/* 案例卡片网格 */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '1px',
+            background: 'var(--border-subtle)',
+            borderRadius: 'var(--radius-lg)',
+            overflow: 'hidden',
+            border: '1px solid var(--border-subtle)',
+          }} className="cases-grid">
+            {cases.map((c, i) => {
+              const color = subjectColors[c.subject] || 'var(--accent)'
+              const IconComp = Icons[c.icon] || Icons.cube
+              return (
+                <div
+                  key={c.id}
+                  className={`reveal stagger-${i + 1} ${casesRevealed ? 'revealed' : ''}`}
+                  onClick={() => onOpenCase(c.id)}
+                  style={{
+                    background: 'var(--bg-secondary)',
+                    padding: 'clamp(1.5rem, 2.5vw, 2.5rem)',
+                    cursor: 'pointer',
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    minHeight: 320,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'var(--bg-elevated)'
+                    e.currentTarget.style.transform = 'translateY(-4px)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'var(--bg-secondary)'
+                    e.currentTarget.style.transform = 'translateY(0)'
+                  }}
+                >
+                  {/* 顶部彩色线 */}
+                  <div style={{
+                    position: 'absolute',
+                    top: 0, left: 0, right: 0,
+                    height: 2,
+                    background: color,
+                    opacity: 0.6,
+                  }}/>
+
+                  {/* 学科标签 */}
+                  <div style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.6rem',
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase',
+                    color: color,
+                    opacity: 0.8,
+                    marginBottom: 20,
+                  }}>
+                    {c.subject.replace(' · ', ' // ')}
+                  </div>
+
+                  {/* 图标 */}
+                  <div style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 'var(--radius-sm)',
+                    border: `1px solid ${color}30`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: color,
+                    marginBottom: 20,
+                  }}>
+                    <IconComp />
+                  </div>
+
+                  {/* 标题 */}
+                  <h3 style={{
+                    fontSize: '1.25rem',
+                    fontWeight: 700,
+                    color: 'var(--text-primary)',
+                    marginBottom: 10,
+                    lineHeight: 1.3,
+                  }}>{c.title}</h3>
+
+                  {/* 年级标签 */}
+                  <div style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.6rem',
+                    color: 'var(--text-muted)',
+                    letterSpacing: '0.1em',
+                    marginBottom: 14,
+                  }}>
+                    GRADE: {c.grade}
+                  </div>
+
+                  {/* 描述 */}
+                  <p style={{
+                    fontSize: '0.85rem',
+                    color: 'var(--text-secondary)',
+                    lineHeight: 1.6,
+                    flex: 1,
+                  }}>{c.description}</p>
+
+                  {/* 底部箭头 */}
+                  <div style={{
+                    marginTop: 20,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    color: color,
+                    transition: 'gap 0.3s',
+                  }} className="case-arrow">
+                    进入案例 <Icons.arrowRight />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        <style>{`
+          .cases-grid > div:hover .case-arrow { gap: 14px !important; }
+          @media (max-width: 1024px) {
+            .cases-grid { grid-template-columns: 1fr 1fr !important; }
+          }
+          @media (max-width: 560px) {
+            .cases-grid { grid-template-columns: 1fr !important; }
+          }
+        `}</style>
+      </section>
+
+      {/* ═══════════════════════════════════════
+          榫卯展示区 — 3D分解 + 工程标注
+          ═══════════════════════════════════════ */}
+      <section id="sunmao-section" ref={sunmaoRef} style={{
+        position: 'relative',
+        padding: 'var(--space-4xl) 0',
+        background: 'var(--bg-void)',
+        borderTop: '1px solid var(--border-subtle)',
+        overflow: 'hidden',
+      }}>
+        {/* 背景光晕 */}
+        <div style={{
+          position: 'absolute',
+          top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 800, height: 800,
+          background: 'radial-gradient(circle, rgba(201,169,110,0.04) 0%, transparent 60%)',
+          borderRadius: '50%',
+          pointerEvents: 'none',
+        }}/>
+
+        <div style={{
+          maxWidth: 1200,
+          margin: '0 auto',
+          padding: '0 clamp(1.5rem, 5vw, 4rem)',
+          position: 'relative',
+          zIndex: 2,
+        }}>
+          {/* 头部 */}
+          <div className={`reveal ${sunmaoRevealed ? 'revealed' : ''}`} style={{ marginBottom: 64, textAlign: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 24 }}>
+              <div style={{ width: 24, height: 1, background: 'var(--accent)', opacity: 0.5 }}/>
+              <span className="mono-label">SUNMAO // 榫卯结构</span>
+              <div style={{ width: 24, height: 1, background: 'var(--accent)', opacity: 0.5 }}/>
+            </div>
+            <h2 style={{
+              fontSize: 'clamp(1.8rem, 3.5vw, 3rem)',
+              fontWeight: 700,
+              lineHeight: 1.2,
+              letterSpacing: '-0.02em',
+              color: 'var(--text-primary)',
+            }}>
+              凹凸相合，<span style={{ color: 'var(--accent)' }}>浑然天成</span>
+            </h2>
+            <p style={{
+              fontSize: '1rem',
+              color: 'var(--text-secondary)',
+              maxWidth: 520,
+              margin: '16px auto 0',
+              lineHeight: 1.7,
+            }}>
+              榫卯是中国传统木作的灵魂。凸为榫，凹为卯，凹凸相扣，天衣无缝——不借一钉一胶，却可历千年而不朽。
+            </p>
+          </div>
+
+          {/* 3D展示 + 说明 */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '4rem',
+            alignItems: 'center',
+          }} className="sunmao-grid">
+            {/* 左侧：3D */}
+            <div className={`reveal-left ${sunmaoRevealed ? 'revealed' : ''}`} style={{
+              minHeight: 400,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative',
+            }}>
+              {/* 外框 */}
+              <div style={{
+                position: 'absolute',
+                inset: 20,
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-lg)',
+              }}>
+                {/* 四角工程标注 */}
+                <span style={{
+                  position: 'absolute', top: -8, left: 12,
+                  fontFamily: 'var(--font-mono)', fontSize: '0.5rem',
+                  color: 'var(--text-muted)', background: 'var(--bg-void)', padding: '0 4px',
+                  letterSpacing: '0.1em',
+                }}>A-01</span>
+                <span style={{
+                  position: 'absolute', top: -8, right: 12,
+                  fontFamily: 'var(--font-mono)', fontSize: '0.5rem',
+                  color: 'var(--text-muted)', background: 'var(--bg-void)', padding: '0 4px',
+                  letterSpacing: '0.1em',
+                }}>A-02</span>
+                <span style={{
+                  position: 'absolute', bottom: -8, left: 12,
+                  fontFamily: 'var(--font-mono)', fontSize: '0.5rem',
+                  color: 'var(--text-muted)', background: 'var(--bg-void)', padding: '0 4px',
+                  letterSpacing: '0.1em',
+                }}>B-01</span>
+                <span style={{
+                  position: 'absolute', bottom: -8, right: 12,
+                  fontFamily: 'var(--font-mono)', fontSize: '0.5rem',
+                  color: 'var(--text-muted)', background: 'var(--bg-void)', padding: '0 4px',
+                  letterSpacing: '0.1em',
+                }}>B-02</span>
+              </div>
+
+              <Sunmao3D />
+            </div>
+
+            {/* 右侧：榫卯类型 */}
+            <div className={`reveal-right ${sunmaoRevealed ? 'revealed' : ''}`}>
+              {[
+                { name: '燕尾榫', en: 'DOVETAIL JOINT', desc: '榫头呈梯形，如燕尾般相互咬合，抗拉强度极高，常用于箱体结构。' },
+                { name: '直角榫', en: 'BUTT JOINT', desc: '最基本的榫卯形式，榫头垂直插入卯眼，简洁牢固，广泛用于框架连接。' },
+                { name: '攒边打槽', en: 'FLOATING PANEL', desc: '将薄板嵌于边框槽内，留伸缩缝，应对木材涨缩，常用于桌面、柜门。' },
+                { name: '粽角榫', en: 'MITERED TENON', desc: '三个构件于角部相交，外形如粽子棱角，用于桌案腿足与面框连接。' },
+              ].map((item, i) => (
+                <div key={i} style={{
+                  padding: '1.5rem 0',
+                  borderBottom: i < 3 ? '1px solid var(--border-subtle)' : 'none',
+                  transition: 'all 0.3s',
+                  cursor: 'default',
+                }} className="sunmao-item">
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 8 }}>
+                    <span style={{
+                      fontSize: '1.1rem',
+                      fontWeight: 700,
+                      color: 'var(--text-primary)',
+                    }}>{item.name}</span>
+                    <span style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '0.6rem',
+                      color: 'var(--accent)',
+                      opacity: 0.6,
+                      letterSpacing: '0.1em',
+                    }}>{item.en}</span>
+                  </div>
+                  <p style={{
+                    fontSize: '0.85rem',
+                    color: 'var(--text-secondary)',
+                    lineHeight: 1.6,
+                  }}>{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <style>{`
+          @media (max-width: 900px) {
+            .sunmao-grid { grid-template-columns: 1fr !important; gap: 2rem !important; }
+          }
+          .sunmao-item:hover { padding-left: 8px !important; }
+          .sunmao-item:hover span:first-child { color: var(--accent) !important; }
+        `}</style>
+      </section>
+
+      {/* ═══════════════════════════════════════
+          探索区 — 输入框 + CTA
+          ═══════════════════════════════════════ */}
+      <section id="explore-section" style={{
+        position: 'relative',
+        padding: 'var(--space-4xl) 0',
+      }}>
+        <div style={{
+          maxWidth: 700,
+          margin: '0 auto',
+          padding: '0 clamp(1.5rem, 5vw, 4rem)',
+          textAlign: 'center',
+        }}>
+          <div className="reveal">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 24 }}>
+              <div style={{ width: 24, height: 1, background: 'var(--accent)', opacity: 0.5 }}/>
+              <span className="mono-label">GENERATE // 动态开物</span>
+              <div style={{ width: 24, height: 1, background: 'var(--accent)', opacity: 0.5 }}/>
+            </div>
+            <h2 style={{
+              fontSize: 'clamp(1.8rem, 3.5vw, 3rem)',
+              fontWeight: 700,
+              lineHeight: 1.2,
+              letterSpacing: '-0.02em',
+              color: 'var(--text-primary)',
+              marginBottom: 16,
+            }}>
+              输入任意知识点，<span style={{ color: 'var(--accent)' }}>即时可视化</span>
+            </h2>
+            <p style={{
+              fontSize: '1rem',
+              color: 'var(--text-secondary)',
+              marginBottom: 40,
+              lineHeight: 1.7,
+            }}>
+              不限于预设案例——输入任何 K12 科学概念，AI 将为你生成交互式可视化演示。
+            </p>
+          </div>
+
+          {/* 输入框 */}
+          <div className="reveal stagger-2" style={{
             display: 'flex',
-            gap: '12px',
-            maxWidth: '480px',
+            gap: 12,
+            maxWidth: 560,
             margin: '0 auto',
-            animationDelay: '0.3s'
           }}>
             <input
               type="text"
-              placeholder="例如：勾股定理、牛顿定律..."
               value={topicInput}
-              onChange={e => setTopicInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && topicInput.trim() && onOpenDynamic(topicInput.trim())}
+              onChange={(e) => setTopicInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleDynamic()}
+              placeholder="例如：牛顿第二定律、酸碱中和..."
               style={{
                 flex: 1,
-                padding: '16px 24px',
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius-md)',
+                padding: '0.9rem 1.2rem',
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-sm)',
                 color: 'var(--text-primary)',
-                fontSize: '15px',
+                fontSize: '0.9rem',
+                fontFamily: 'var(--font-display)',
                 outline: 'none',
                 transition: 'all 0.3s',
-                fontFamily: 'var(--font-sans)',
-                boxShadow: 'var(--shadow-sm)'
               }}
-              onFocus={e => {
-                e.currentTarget.style.borderColor = 'var(--border-accent)'
-                e.currentTarget.style.boxShadow = 'var(--shadow-md)'
+              onFocus={(e) => {
+                e.target.style.borderColor = 'var(--accent)'
+                e.target.style.boxShadow = '0 0 0 3px var(--accent-dim)'
               }}
-              onBlur={e => {
-                e.currentTarget.style.borderColor = 'var(--border)'
-                e.currentTarget.style.boxShadow = 'var(--shadow-sm)'
+              onBlur={(e) => {
+                e.target.style.borderColor = 'var(--border-subtle)'
+                e.target.style.boxShadow = 'none'
               }}
             />
-            <button
-              onClick={() => topicInput.trim() && onOpenDynamic(topicInput.trim())}
-              style={{
-                padding: '16px 28px',
-                background: 'var(--accent)',
-                border: 'none',
-                borderRadius: 'var(--radius-md)',
-                color: '#fff',
-                fontSize: '15px',
-                fontWeight: '500',
-                cursor: 'pointer',
-                transition: 'all 0.3s',
-                whiteSpace: 'nowrap',
-                letterSpacing: '0.06em'
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.background = 'var(--accent-light)'
-                e.currentTarget.style.transform = 'translateY(-1px)'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.background = 'var(--accent)'
-                e.currentTarget.style.transform = 'translateY(0)'
-              }}
-            >
+            <button className="btn btn-primary" onClick={handleDynamic}>
               开物
             </button>
           </div>
+
+          {/* 快捷标签 */}
+          <div className="reveal stagger-3" style={{
+            display: 'flex',
+            gap: 10,
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            marginTop: 24,
+          }}>
+            {['自由落体', '光合作用', '电磁感应', '遗传定律'].map(tag => (
+              <button
+                key={tag}
+                onClick={() => { setTopicInput(tag); onOpenDynamic(tag) }}
+                style={{
+                  padding: '0.4rem 0.9rem',
+                  background: 'transparent',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-full)',
+                  color: 'var(--text-muted)',
+                  fontSize: '0.8rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.25s',
+                  fontFamily: 'var(--font-display)',
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.borderColor = 'var(--accent)'
+                  e.target.style.color = 'var(--accent)'
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.borderColor = 'var(--border-subtle)'
+                  e.target.style.color = 'var(--text-muted)'
+                }}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
         </div>
+
+        <style>{`
+          @media (max-width: 560px) {
+            .explore-input-wrap { flex-direction: column !important; }
+          }
+        `}</style>
       </section>
 
-      {/* ═══════════════════ 页脚 ═══════════════════ */}
+      {/* ═══════════════════════════════════════
+          页脚 — 极简工程风
+          ═══════════════════════════════════════ */}
       <footer style={{
-        padding: '48px 40px',
-        borderTop: '1px solid var(--border)',
-        background: 'var(--bg-primary)'
+        borderTop: '1px solid var(--border-subtle)',
+        padding: 'var(--space-xl) 0',
+        background: 'var(--bg-void)',
       }}>
         <div style={{
-          maxWidth: '1000px',
+          maxWidth: 1200,
           margin: '0 auto',
+          padding: '0 clamp(1.5rem, 5vw, 4rem)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
-          gap: '16px'
+          gap: 16,
         }}>
-          <div style={{
-            fontSize: '14px',
-            fontFamily: 'var(--font-display)',
-            color: 'var(--text-muted)',
-            letterSpacing: '0.08em'
-          }}>
-            鲁班开物
-          </div>
-          <div style={{
-            display: 'flex',
-            gap: '24px',
-            alignItems: 'center'
-          }}>
-            <a href="https://github.com/bolin68688/luban-teaching" target="_blank" rel="noopener noreferrer"
-              style={{ color: 'var(--text-muted)', fontSize: '13px', textDecoration: 'none', transition: 'color 0.3s' }}
-              onMouseEnter={e => e.currentTarget.style.color = 'var(--accent)'}
-              onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
-            >
-              GitHub
-            </a>
-            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-              开源 · 免费 · K12理科可视化
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{
+              width: 24, height: 24,
+              border: '1px solid var(--accent)',
+              borderRadius: 4,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.5rem', color: 'var(--accent)', fontWeight: 600 }}>LB</span>
+            </div>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+              鲁班开物 · K12 Science Visualization
             </span>
+          </div>
+
+          <div style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.6rem',
+            color: 'var(--text-muted)',
+            letterSpacing: '0.1em',
+          }}>
+            V5.0 // BUILT WITH REACT + CANVAS
           </div>
         </div>
       </footer>
