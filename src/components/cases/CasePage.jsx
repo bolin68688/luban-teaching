@@ -12,30 +12,54 @@ const TABS = [
   { id: 'wenda', label: '鲁班问答', icon: HelpCircle }
 ]
 
+/* ═══════════════════════════════════════════════════════════
+   印章装饰
+   ═══════════════════════════════════════════════════════════ */
+function SealStamp({ text, color = 'var(--accent)', size = 36 }) {
+  return (
+    <div style={{
+      width: size, height: size,
+      border: `1.5px solid ${color}`,
+      borderRadius: 3,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontFamily: 'var(--font-display)',
+      fontSize: size * 0.32, color,
+      opacity: 0.6, writingMode: 'vertical-rl',
+      textOrientation: 'upright', letterSpacing: '0.1em',
+      lineHeight: 1, flexShrink: 0
+    }}>
+      {text}
+    </div>
+  )
+}
+
 function XinfaPanel({ caseData }) {
   const { xinfa } = caseData
   return (
     <div style={{ padding: '24px', height: '100%', overflowY: 'auto' }}>
-      <h3 style={{
-        fontSize: '22px',
-        fontFamily: 'var(--font-serif)',
-        color: 'var(--accent-gold)',
-        marginBottom: '16px',
-        fontWeight: '600'
-      }}>
-        鲁班心法
-      </h3>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+        <SealStamp text="心法" size={32} />
+        <h3 style={{
+          fontSize: '20px',
+          fontFamily: 'var(--font-display)',
+          color: 'var(--text-primary)',
+          fontWeight: '600',
+          letterSpacing: '0.04em'
+        }}>
+          鲁班心法
+        </h3>
+      </div>
 
       <div style={{
         background: 'var(--bg-primary)',
-        border: '1px solid var(--border-gold)',
+        border: '1px solid var(--border-accent)',
         borderRadius: 'var(--radius-md)',
         padding: '16px',
         marginBottom: '20px'
       }}>
         <div style={{
-          fontSize: '12px',
-          color: 'var(--accent-gold)',
+          fontSize: '11px',
+          color: 'var(--accent)',
           textTransform: 'uppercase',
           letterSpacing: '0.1em',
           marginBottom: '8px'
@@ -43,7 +67,7 @@ function XinfaPanel({ caseData }) {
           核心理论
         </div>
         <div style={{
-          fontSize: '18px',
+          fontSize: '17px',
           fontFamily: 'var(--font-mono)',
           color: 'var(--text-primary)',
           fontWeight: '500'
@@ -60,8 +84,8 @@ function XinfaPanel({ caseData }) {
         marginBottom: '20px'
       }}>
         <div style={{
-          fontSize: '12px',
-          color: 'var(--accent-gold)',
+          fontSize: '11px',
+          color: 'var(--accent)',
           textTransform: 'uppercase',
           letterSpacing: '0.1em',
           marginBottom: '8px'
@@ -70,9 +94,9 @@ function XinfaPanel({ caseData }) {
         </div>
         <div style={{
           fontSize: '15px',
-          fontFamily: 'var(--font-serif)',
+          fontFamily: 'var(--font-display)',
           color: 'var(--text-secondary)',
-          lineHeight: '1.7',
+          lineHeight: '1.8',
           fontStyle: 'italic'
         }}>
           "{xinfa.luBanView}"
@@ -81,15 +105,15 @@ function XinfaPanel({ caseData }) {
 
       <div>
         <div style={{
-          fontSize: '12px',
-          color: 'var(--accent-gold)',
+          fontSize: '11px',
+          color: 'var(--accent)',
           textTransform: 'uppercase',
           letterSpacing: '0.1em',
           marginBottom: '12px'
         }}>
           生活场景
         </div>
-        <div style={{ display: 'grid', gap: '12px' }}>
+        <div style={{ display: 'grid', gap: '10px' }}>
           {xinfa.scenarios.map((s, i) => (
             <div
               key={i}
@@ -101,7 +125,7 @@ function XinfaPanel({ caseData }) {
                 transition: 'all 0.2s'
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.borderColor = 'var(--border-gold)'
+                e.currentTarget.style.borderColor = 'var(--border-accent)'
                 e.currentTarget.style.transform = 'translateX(4px)'
               }}
               onMouseLeave={e => {
@@ -131,7 +155,6 @@ function XinfaPanel({ caseData }) {
 function KaiwuPanel({ caseData, simParams, onParamChange, displayValues, vizActions }) {
   const { kaiwu } = caseData
 
-  // 处理按钮操作（如滴定开始/重置）
   const handleAction = (actionLabel) => {
     if (vizActions && vizActions[actionLabel]) {
       vizActions[actionLabel]()
@@ -140,19 +163,22 @@ function KaiwuPanel({ caseData, simParams, onParamChange, displayValues, vizActi
 
   return (
     <div style={{ padding: '24px', height: '100%', overflowY: 'auto' }}>
-      <h3 style={{
-        fontSize: '22px',
-        fontFamily: 'var(--font-serif)',
-        color: 'var(--accent-gold)',
-        marginBottom: '16px',
-        fontWeight: '600'
-      }}>
-        鲁班开物
-      </h3>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+        <SealStamp text="开物" size={32} />
+        <h3 style={{
+          fontSize: '20px',
+          fontFamily: 'var(--font-display)',
+          color: 'var(--text-primary)',
+          fontWeight: '600',
+          letterSpacing: '0.04em'
+        }}>
+          鲁班开物
+        </h3>
+      </div>
 
       <div style={{ marginBottom: '24px' }}>
         <div style={{
-          fontSize: '12px',
+          fontSize: '11px',
           color: 'var(--text-muted)',
           textTransform: 'uppercase',
           letterSpacing: '0.1em',
@@ -178,17 +204,17 @@ function KaiwuPanel({ caseData, simParams, onParamChange, displayValues, vizActi
                       onClick={() => handleAction(opt)}
                       style={{
                         padding: '8px 16px',
-                        background: 'var(--accent-gold)',
+                        background: 'var(--accent)',
                         border: 'none',
                         borderRadius: 'var(--radius-md)',
-                        color: 'var(--bg-primary)',
+                        color: '#fff',
                         fontSize: '13px',
                         fontWeight: '500',
                         cursor: 'pointer',
                         transition: 'all 0.2s'
                       }}
-                      onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
-                      onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+                      onMouseEnter={e => e.currentTarget.style.background = 'var(--accent-light)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'var(--accent)'}
                     >
                       {opt}
                     </button>
@@ -212,7 +238,7 @@ function KaiwuPanel({ caseData, simParams, onParamChange, displayValues, vizActi
                     <span style={{
                       fontSize: '13px',
                       fontFamily: 'var(--font-mono)',
-                      color: 'var(--accent-gold)'
+                      color: 'var(--accent)'
                     }}>
                       {isSlider && currentValue !== undefined ? `${currentValue}${ctrl.unit || ''}` : ''}
                       {isSelect && currentValue !== undefined ? String(currentValue) : ''}
@@ -267,7 +293,7 @@ function KaiwuPanel({ caseData, simParams, onParamChange, displayValues, vizActi
                     <span style={{
                       width: '36px',
                       height: '20px',
-                      background: currentValue !== false ? 'var(--accent-gold)' : '#333',
+                      background: currentValue !== false ? 'var(--accent)' : '#333',
                       borderRadius: '10px',
                       position: 'relative',
                       transition: 'background 0.2s',
@@ -297,7 +323,7 @@ function KaiwuPanel({ caseData, simParams, onParamChange, displayValues, vizActi
 
       <div>
         <div style={{
-          fontSize: '12px',
+          fontSize: '11px',
           color: 'var(--text-muted)',
           textTransform: 'uppercase',
           letterSpacing: '0.1em',
@@ -307,7 +333,7 @@ function KaiwuPanel({ caseData, simParams, onParamChange, displayValues, vizActi
         </div>
         <div style={{
           background: 'var(--bg-primary)',
-          border: '1px solid var(--border-gold)',
+          border: '1px solid var(--border-accent)',
           borderRadius: 'var(--radius-md)',
           padding: '16px',
           display: 'grid',
@@ -372,15 +398,18 @@ function WendaPanel({ caseData }) {
 
   return (
     <div style={{ padding: '24px', height: '100%', overflowY: 'auto' }}>
-      <h3 style={{
-        fontSize: '22px',
-        fontFamily: 'var(--font-serif)',
-        color: 'var(--accent-gold)',
-        marginBottom: '16px',
-        fontWeight: '600'
-      }}>
-        鲁班问答
-      </h3>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+        <SealStamp text="问答" size={32} />
+        <h3 style={{
+          fontSize: '20px',
+          fontFamily: 'var(--font-display)',
+          color: 'var(--text-primary)',
+          fontWeight: '600',
+          letterSpacing: '0.04em'
+        }}>
+          鲁班问答
+        </h3>
+      </div>
 
       <div style={{
         display: 'flex',
@@ -395,14 +424,14 @@ function WendaPanel({ caseData }) {
               height: '4px',
               borderRadius: '2px',
               background: i < currentQ
-                ? 'var(--accent-gold)'
+                ? 'var(--accent)'
                 : i === currentQ
-                ? answered
-                  ? isCorrect
-                    ? 'var(--accent-gold)'
-                    : 'var(--accent-red)'
+                  ? answered
+                    ? isCorrect
+                      ? 'var(--accent)'
+                      : 'var(--accent-red)'
+                    : 'var(--border)'
                   : 'var(--border)'
-                : 'var(--border)'
             }}
           />
         ))}
@@ -436,17 +465,17 @@ function WendaPanel({ caseData }) {
 
           if (answered) {
             if (isCorrectOpt) {
-              bg = 'rgba(201, 162, 39, 0.15)'
-              border = 'var(--accent-gold)'
-              color = 'var(--accent-gold)'
+              bg = 'rgba(91, 138, 114, 0.12)'
+              border = 'var(--accent)'
+              color = 'var(--accent)'
             } else if (isSelected && !isCorrectOpt) {
-              bg = 'rgba(233, 69, 96, 0.15)'
+              bg = 'rgba(196, 92, 72, 0.12)'
               border = 'var(--accent-red)'
               color = 'var(--accent-red)'
             }
           } else if (isSelected) {
             bg = 'var(--highlight)'
-            border = 'var(--border-gold)'
+            border = 'var(--border-accent)'
           }
 
           return (
@@ -470,7 +499,7 @@ function WendaPanel({ caseData }) {
               }}
               onMouseEnter={e => {
                 if (!answered) {
-                  e.currentTarget.style.borderColor = 'var(--border-gold)'
+                  e.currentTarget.style.borderColor = 'var(--border-accent)'
                   e.currentTarget.style.background = 'var(--highlight)'
                 }
               }}
@@ -486,21 +515,22 @@ function WendaPanel({ caseData }) {
                 height: '24px',
                 borderRadius: '50%',
                 background: answered && isCorrectOpt
-                  ? 'var(--accent-gold)'
+                  ? 'var(--accent)'
                   : answered && isSelected && !isCorrectOpt
-                  ? 'var(--accent-red)'
-                  : 'transparent',
+                    ? 'var(--accent-red)'
+                    : 'transparent',
                 border: answered && isCorrectOpt
-                  ? 'var(--accent-gold)'
+                  ? 'var(--accent)'
                   : answered && isSelected && !isCorrectOpt
-                  ? 'var(--accent-red)'
-                  : '1px solid var(--text-muted)',
+                    ? 'var(--accent-red)'
+                    : '1px solid var(--text-muted)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: '12px',
                 fontWeight: '600',
-                flexShrink: 0
+                flexShrink: 0,
+                color: answered && (isCorrectOpt || (isSelected && !isCorrectOpt)) ? '#fff' : 'var(--text-muted)'
               }}>
                 {opt.charAt(0)}
               </span>
@@ -513,9 +543,9 @@ function WendaPanel({ caseData }) {
       {answered && (
         <div style={{
           background: isCorrect
-            ? 'rgba(201, 162, 39, 0.08)'
-            : 'rgba(233, 69, 96, 0.08)',
-          border: `1px solid ${isCorrect ? 'var(--border-gold)' : 'var(--accent-red)'}`,
+            ? 'rgba(91, 138, 114, 0.06)'
+            : 'rgba(196, 92, 72, 0.06)',
+          border: `1px solid ${isCorrect ? 'var(--border-accent)' : 'var(--accent-red)'}`,
           borderRadius: 'var(--radius-md)',
           padding: '16px',
           marginBottom: '20px'
@@ -523,7 +553,7 @@ function WendaPanel({ caseData }) {
           <div style={{
             fontSize: '14px',
             fontWeight: '600',
-            color: isCorrect ? 'var(--accent-gold)' : 'var(--accent-red)',
+            color: isCorrect ? 'var(--accent)' : 'var(--accent-red)',
             marginBottom: '8px'
           }}>
             {isCorrect ? '回答正确!' : '回答错误'}
@@ -545,14 +575,17 @@ function WendaPanel({ caseData }) {
             style={{
               flex: 1,
               padding: '12px',
-              background: 'var(--accent-gold)',
+              background: 'var(--accent)',
               border: 'none',
               borderRadius: 'var(--radius-md)',
-              color: 'var(--bg-primary)',
+              color: '#fff',
               fontSize: '14px',
               fontWeight: '600',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              transition: 'all 0.2s'
             }}
+            onMouseEnter={e => e.currentTarget.style.background = 'var(--accent-light)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'var(--accent)'}
           >
             下一题
           </button>
@@ -564,12 +597,21 @@ function WendaPanel({ caseData }) {
               flex: 1,
               padding: '12px',
               background: 'var(--bg-card)',
-              border: '1px solid var(--border-gold)',
+              border: '1px solid var(--border-accent)',
               borderRadius: 'var(--radius-md)',
-              color: 'var(--accent-gold)',
+              color: 'var(--accent)',
               fontSize: '14px',
               fontWeight: '600',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'var(--highlight)'
+              e.currentTarget.style.borderColor = 'var(--accent)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'var(--bg-card)'
+              e.currentTarget.style.borderColor = 'var(--border-accent)'
             }}
           >
             重新开始
@@ -580,7 +622,6 @@ function WendaPanel({ caseData }) {
   )
 }
 
-// 根据案例ID选择可视化组件，传递外部参数控制
 function VisualizationComponent({ caseId, simParams, isFullscreen, vizActions }) {
   const commonProps = { params: simParams }
 
@@ -603,9 +644,8 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
   const [panelState, setPanelState] = useState({ tab: 'xinfa', open: false })
   const [isFullscreen, setIsFullscreen] = useState(false)
   const containerRef = useRef(null)
-  const vizActions = useRef({}) // 用于传递操作给可视化组件（如滴定开始/重置）
+  const vizActions = useRef({})
 
-  // 模拟参数状态
   const getInitialParams = (id) => {
     switch (id) {
       case 'wave-interference':
@@ -679,14 +719,11 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
     }
   }, [])
 
-  // ★ 核心修复：面板切换使用单一state对象，避免嵌套setState
   const handleTabClick = useCallback((tabId) => {
     setPanelState(prev => {
       if (prev.tab === tabId && prev.open) {
-        // 点击同一标签 → 关闭面板
         return { ...prev, open: false }
       } else {
-        // 点击不同标签 → 切换并打开面板
         return { tab: tabId, open: true }
       }
     })
@@ -696,7 +733,6 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
     setPanelState(prev => ({ ...prev, open: false }))
   }, [])
 
-  // 全屏变化监听
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement)
@@ -765,9 +801,10 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
             <div style={{ width: '1px', height: '20px', background: 'var(--border)' }} />
             <h1 style={{
               fontSize: '18px',
-              fontFamily: 'var(--font-serif)',
+              fontFamily: 'var(--font-display)',
               color: 'var(--text-primary)',
-              fontWeight: '600'
+              fontWeight: '600',
+              letterSpacing: '0.04em'
             }}>
               {caseData.title}
             </h1>
@@ -796,8 +833,8 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
                 transition: 'all 0.2s'
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.borderColor = 'var(--border-gold)'
-                e.currentTarget.style.color = 'var(--accent-gold)'
+                e.currentTarget.style.borderColor = 'var(--border-accent)'
+                e.currentTarget.style.color = 'var(--accent)'
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.borderColor = 'var(--border)'
@@ -819,8 +856,8 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
                 transition: 'all 0.2s'
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.borderColor = 'var(--border-gold)'
-                e.currentTarget.style.color = 'var(--accent-gold)'
+                e.currentTarget.style.borderColor = 'var(--border-accent)'
+                e.currentTarget.style.color = 'var(--accent)'
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.borderColor = 'var(--border)'
@@ -840,7 +877,7 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
         overflow: 'hidden',
         position: 'relative'
       }}>
-        {/* 可视化区域 - 面板打开时宽度收缩为65% */}
+        {/* 可视化区域 */}
         <div style={{
           width: panelOpen ? '65%' : '100%',
           transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -875,8 +912,8 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
                 transition: 'all 0.2s'
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.borderColor = 'var(--border-gold)'
-                e.currentTarget.style.color = 'var(--accent-gold)'
+                e.currentTarget.style.borderColor = 'var(--border-accent)'
+                e.currentTarget.style.color = 'var(--accent)'
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.borderColor = 'var(--border)'
@@ -888,7 +925,7 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
           )}
         </div>
 
-        {/* 右侧面板 - 固定35%宽度，transform滑入 */}
+        {/* 右侧面板 */}
         <div style={{
           position: 'absolute',
           top: 0,
@@ -931,9 +968,9 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
                         gap: '6px',
                         padding: '8px 16px',
                         background: isActive ? 'var(--highlight)' : 'transparent',
-                        border: isActive ? '1px solid var(--border-gold)' : '1px solid transparent',
+                        border: isActive ? '1px solid var(--border-accent)' : '1px solid transparent',
                         borderRadius: 'var(--radius-md)',
-                        color: isActive ? 'var(--accent-gold)' : 'var(--text-secondary)',
+                        color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
                         cursor: 'pointer',
                         fontSize: '13px',
                         fontWeight: '500',
@@ -991,7 +1028,7 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
         </div>
       </div>
 
-      {/* ★ 底部标签栏 - 简洁按钮，确保可点击 */}
+      {/* 底部标签栏 */}
       {!isFullscreen && (
         <div style={{
           padding: '12px 20px',
@@ -1017,9 +1054,9 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
                   gap: '6px',
                   padding: '10px 24px',
                   background: isActive ? 'var(--highlight)' : 'var(--bg-card)',
-                  border: isActive ? '1px solid var(--border-gold)' : '1px solid var(--border)',
+                  border: isActive ? '1px solid var(--border-accent)' : '1px solid var(--border)',
                   borderRadius: 'var(--radius-md)',
-                  color: isActive ? 'var(--accent-gold)' : 'var(--text-secondary)',
+                  color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
                   cursor: 'pointer',
                   fontSize: '14px',
                   fontWeight: '500',
@@ -1028,8 +1065,8 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
                   zIndex: 101
                 }}
                 onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = 'var(--border-gold)'
-                  e.currentTarget.style.color = 'var(--accent-gold)'
+                  e.currentTarget.style.borderColor = 'var(--border-accent)'
+                  e.currentTarget.style.color = 'var(--accent)'
                 }}
                 onMouseLeave={e => {
                   if (!isActive) {
