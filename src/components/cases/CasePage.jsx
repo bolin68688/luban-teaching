@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { ArrowLeft, Maximize2, Minimize2, Sun, Moon, X, BookOpen, Sliders, HelpCircle } from 'lucide-react'
+import { ArrowLeft, Maximize2, Minimize2, X, BookOpen, Sliders, HelpCircle } from 'lucide-react'
 import { getCaseById } from '../../data/cases.js'
 import WaveInterferenceVisualization from '../visualizations/WaveInterferenceVisualization.jsx'
 import SolarSystemVisualization from '../visualizations/SolarSystemVisualization.jsx'
@@ -7,70 +7,42 @@ import ElectrolysisVisualization from '../visualizations/ElectrolysisVisualizati
 import TrigonometryVisualization from '../visualizations/TrigonometryVisualization.jsx'
 
 const TABS = [
-  { id: 'xinfa', label: '鲁班心法', icon: BookOpen },
-  { id: 'kaiwu', label: '鲁班开物', icon: Sliders },
-  { id: 'wenda', label: '鲁班问答', icon: HelpCircle }
+  { id: 'xinfa', label: '心法', icon: BookOpen },
+  { id: 'kaiwu', label: '开物', icon: Sliders },
+  { id: 'wenda', label: '问答', icon: HelpCircle }
 ]
 
-/* ═══════════════════════════════════════════════════════════
-   印章装饰
-   ═══════════════════════════════════════════════════════════ */
-function SealStamp({ text, color = 'var(--accent)', size = 36 }) {
-  return (
-    <div style={{
-      width: size, height: size,
-      border: `1.5px solid ${color}`,
-      borderRadius: 3,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontFamily: 'var(--font-display)',
-      fontSize: size * 0.32, color,
-      opacity: 0.6, writingMode: 'vertical-rl',
-      textOrientation: 'upright', letterSpacing: '0.1em',
-      lineHeight: 1, flexShrink: 0
-    }}>
-      {text}
-    </div>
-  )
+const subjectColors = {
+  'wave-interference': { bg: '#EBF4FA', accent: '#3B6E8F', text: '物理 · 光学' },
+  'solar-system': { bg: '#FDF3E7', accent: '#B07D4A', text: '天文 · 动力学' },
+  'electrolysis': { bg: '#E8F5EE', accent: '#2D8B6B', text: '化学 · 电化学' },
+  'trigonometry': { bg: '#F0EBF5', accent: '#6B4F8C', text: '数学 · 三角学' }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   鲁班心法
+   ═══════════════════════════════════════════════════════════ */
 function XinfaPanel({ caseData }) {
   const { xinfa } = caseData
-  return (
-    <div style={{ padding: '24px', height: '100%', overflowY: 'auto' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-        <SealStamp text="心法" size={32} />
-        <h3 style={{
-          fontSize: '20px',
-          fontFamily: 'var(--font-display)',
-          color: 'var(--text-primary)',
-          fontWeight: '600',
-          letterSpacing: '0.04em'
-        }}>
-          鲁班心法
-        </h3>
-      </div>
+  const colors = subjectColors[caseData.id] || subjectColors['electrolysis']
 
+  return (
+    <div style={{ padding: '28px', height: '100%', overflowY: 'auto' }}>
       <div style={{
-        background: 'var(--bg-primary)',
-        border: '1px solid var(--border-accent)',
+        background: colors.bg,
         borderRadius: 'var(--radius-md)',
-        padding: '16px',
-        marginBottom: '20px'
+        padding: '20px',
+        marginBottom: '24px'
       }}>
-        <div style={{
-          fontSize: '11px',
-          color: 'var(--accent)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.1em',
-          marginBottom: '8px'
-        }}>
+        <div style={{ fontSize: '11px', color: colors.accent, letterSpacing: '0.1em', marginBottom: '8px', fontWeight: '500' }}>
           核心理论
         </div>
         <div style={{
-          fontSize: '17px',
+          fontSize: '18px',
           fontFamily: 'var(--font-mono)',
           color: 'var(--text-primary)',
-          fontWeight: '500'
+          fontWeight: '500',
+          lineHeight: 1.5
         }}>
           {xinfa.theory}
         </div>
@@ -80,23 +52,17 @@ function XinfaPanel({ caseData }) {
         background: 'var(--bg-primary)',
         border: '1px solid var(--border)',
         borderRadius: 'var(--radius-md)',
-        padding: '16px',
-        marginBottom: '20px'
+        padding: '20px',
+        marginBottom: '24px'
       }}>
-        <div style={{
-          fontSize: '11px',
-          color: 'var(--accent)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.1em',
-          marginBottom: '8px'
-        }}>
+        <div style={{ fontSize: '11px', color: 'var(--text-muted)', letterSpacing: '0.1em', marginBottom: '10px', fontWeight: '500' }}>
           鲁班视角
         </div>
         <div style={{
           fontSize: '15px',
           fontFamily: 'var(--font-display)',
           color: 'var(--text-secondary)',
-          lineHeight: '1.8',
+          lineHeight: 1.9,
           fontStyle: 'italic'
         }}>
           "{xinfa.luBanView}"
@@ -104,28 +70,21 @@ function XinfaPanel({ caseData }) {
       </div>
 
       <div>
-        <div style={{
-          fontSize: '11px',
-          color: 'var(--accent)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.1em',
-          marginBottom: '12px'
-        }}>
+        <div style={{ fontSize: '11px', color: 'var(--text-muted)', letterSpacing: '0.1em', marginBottom: '14px', fontWeight: '500' }}>
           生活场景
         </div>
-        <div style={{ display: 'grid', gap: '10px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {xinfa.scenarios.map((s, i) => (
-            <div
-              key={i}
-              style={{
-                background: 'var(--bg-primary)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius-md)',
-                padding: '12px 16px',
-                transition: 'all 0.2s'
-              }}
+            <div key={i} style={{
+              background: 'var(--bg-primary)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-sm)',
+              padding: '14px 18px',
+              transition: 'all 0.25s',
+              cursor: 'default'
+            }}
               onMouseEnter={e => {
-                e.currentTarget.style.borderColor = 'var(--border-accent)'
+                e.currentTarget.style.borderColor = colors.accent + '30'
                 e.currentTarget.style.transform = 'translateX(4px)'
               }}
               onMouseLeave={e => {
@@ -133,15 +92,10 @@ function XinfaPanel({ caseData }) {
                 e.currentTarget.style.transform = 'translateX(0)'
               }}
             >
-              <div style={{
-                fontSize: '14px',
-                fontWeight: '600',
-                color: 'var(--text-primary)',
-                marginBottom: '4px'
-              }}>
+              <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '4px' }}>
                 {s.name}
               </div>
-              <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+              <div style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                 {s.desc}
               </div>
             </div>
@@ -152,72 +106,44 @@ function XinfaPanel({ caseData }) {
   )
 }
 
+/* ═══════════════════════════════════════════════════════════
+   鲁班开物
+   ═══════════════════════════════════════════════════════════ */
 function KaiwuPanel({ caseData, simParams, onParamChange, displayValues, vizActions }) {
   const { kaiwu } = caseData
+  const colors = subjectColors[caseData.id] || subjectColors['electrolysis']
 
-  const handleAction = (actionLabel) => {
-    if (vizActions && vizActions[actionLabel]) {
-      vizActions[actionLabel]()
-    }
+  const handleAction = (label) => {
+    if (vizActions && vizActions[label]) vizActions[label]()
   }
 
   return (
-    <div style={{ padding: '24px', height: '100%', overflowY: 'auto' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-        <SealStamp text="开物" size={32} />
-        <h3 style={{
-          fontSize: '20px',
-          fontFamily: 'var(--font-display)',
-          color: 'var(--text-primary)',
-          fontWeight: '600',
-          letterSpacing: '0.04em'
-        }}>
-          鲁班开物
-        </h3>
-      </div>
-
-      <div style={{ marginBottom: '24px' }}>
-        <div style={{
-          fontSize: '11px',
-          color: 'var(--text-muted)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.1em',
-          marginBottom: '12px'
-        }}>
+    <div style={{ padding: '28px', height: '100%', overflowY: 'auto' }}>
+      <div style={{ marginBottom: '28px' }}>
+        <div style={{ fontSize: '11px', color: 'var(--text-muted)', letterSpacing: '0.1em', marginBottom: '14px', fontWeight: '500' }}>
           交互控制
         </div>
-        <div style={{ display: 'grid', gap: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
           {kaiwu.controls.map((ctrl, i) => {
-            const currentValue = simParams[ctrl.label]
-            const isToggle = ctrl.type === 'toggle'
-            const isButton = ctrl.type === 'button'
+            const val = simParams[ctrl.label]
+            const isBtn = ctrl.type === 'button'
             const isSlider = ctrl.type === 'slider'
             const isSelect = ctrl.type === 'select'
+            const isToggle = ctrl.type === 'toggle'
 
-            if (isButton) {
+            if (isBtn) {
               return (
                 <div key={i} style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
-                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{ctrl.label}</span>
+                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)', minWidth: '60px' }}>{ctrl.label}</span>
                   {(ctrl.options || []).map(opt => (
-                    <button
-                      key={opt}
-                      onClick={() => handleAction(opt)}
-                      style={{
-                        padding: '8px 16px',
-                        background: 'var(--accent)',
-                        border: 'none',
-                        borderRadius: 'var(--radius-md)',
-                        color: '#fff',
-                        fontSize: '13px',
-                        fontWeight: '500',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'var(--accent-light)'}
-                      onMouseLeave={e => e.currentTarget.style.background = 'var(--accent)'}
-                    >
-                      {opt}
-                    </button>
+                    <button key={opt} onClick={() => handleAction(opt)} style={{
+                      padding: '8px 16px', background: colors.accent, border: 'none',
+                      borderRadius: 'var(--radius-sm)', color: '#fff', fontSize: '13px',
+                      fontWeight: '500', cursor: 'pointer', transition: 'opacity 0.2s'
+                    }}
+                      onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+                      onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+                    >{opt}</button>
                   ))}
                 </div>
               )
@@ -225,94 +151,47 @@ function KaiwuPanel({ caseData, simParams, onParamChange, displayValues, vizActi
 
             return (
               <div key={i}>
-                {!isButton && (
-                  <label style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '6px'
-                  }}>
-                    <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                      {ctrl.label}
-                    </span>
-                    <span style={{
-                      fontSize: '13px',
-                      fontFamily: 'var(--font-mono)',
-                      color: 'var(--accent)'
-                    }}>
-                      {isSlider && currentValue !== undefined ? `${currentValue}${ctrl.unit || ''}` : ''}
-                      {isSelect && currentValue !== undefined ? String(currentValue) : ''}
-                      {isToggle ? (currentValue !== false ? '开启' : '关闭') : ''}
-                    </span>
-                  </label>
-                )}
+                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{ctrl.label}</span>
+                  <span style={{ fontSize: '13px', fontFamily: 'var(--font-mono)', color: colors.accent, fontWeight: '500' }}>
+                    {isSlider && val !== undefined ? `${val}${ctrl.unit || ''}` : ''}
+                    {isSelect && val !== undefined ? String(val) : ''}
+                    {isToggle ? (val !== false ? '开启' : '关闭') : ''}
+                  </span>
+                </label>
                 {isSlider && (
-                  <input
-                    type="range"
-                    min={ctrl.min}
-                    max={ctrl.max}
-                    step={ctrl.step}
-                    value={currentValue ?? ctrl.default}
+                  <input type="range" min={ctrl.min} max={ctrl.max} step={ctrl.step}
+                    value={val ?? ctrl.default}
                     onChange={e => onParamChange(ctrl.label, parseFloat(e.target.value))}
                     style={{
-                      width: '100%',
-                      height: '6px',
-                      appearance: 'none',
-                      background: 'var(--bg-primary)',
-                      borderRadius: '3px',
-                      outline: 'none',
-                      cursor: 'pointer'
+                      width: '100%', height: '6px', appearance: 'none',
+                      background: 'var(--bg-primary)', borderRadius: '3px', outline: 'none', cursor: 'pointer'
                     }}
                   />
                 )}
                 {isSelect && (
-                  <select
-                    value={currentValue ?? ctrl.default}
-                    onChange={e => onParamChange(ctrl.label, e.target.value)}
+                  <select value={val ?? ctrl.default} onChange={e => onParamChange(ctrl.label, e.target.value)}
                     style={{
-                      width: '100%',
-                      padding: '8px 12px',
-                      background: 'var(--bg-primary)',
-                      border: '1px solid var(--border)',
-                      borderRadius: 'var(--radius-sm)',
-                      color: 'var(--text-primary)',
-                      fontSize: '13px',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {(ctrl.options || []).map(opt => (
-                      <option key={opt} value={opt}>{opt}</option>
-                    ))}
+                      width: '100%', padding: '8px 12px', background: 'var(--bg-primary)',
+                      border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)',
+                      color: 'var(--text-primary)', fontSize: '13px', cursor: 'pointer'
+                    }}>
+                    {(ctrl.options || []).map(opt => <option key={opt} value={opt}>{opt}</option>)}
                   </select>
                 )}
                 {isToggle && (
-                  <label
-                    onClick={() => onParamChange(ctrl.label, currentValue === false || currentValue === undefined ? true : false)}
-                    style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-                  >
+                  <label onClick={() => onParamChange(ctrl.label, val === false || val === undefined ? true : false)}
+                    style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{
-                      width: '36px',
-                      height: '20px',
-                      background: currentValue !== false ? 'var(--accent)' : '#333',
-                      borderRadius: '10px',
-                      position: 'relative',
-                      transition: 'background 0.2s',
-                      display: 'inline-block'
+                      width: '38px', height: '20px', background: val !== false ? colors.accent : '#ddd',
+                      borderRadius: '10px', position: 'relative', transition: 'background 0.2s', display: 'inline-block'
                     }}>
                       <span style={{
-                        width: '16px',
-                        height: '16px',
-                        background: '#fff',
-                        borderRadius: '50%',
-                        position: 'absolute',
-                        top: '2px',
-                        left: currentValue !== false ? '18px' : '2px',
-                        transition: 'left 0.2s'
+                        width: '16px', height: '16px', background: '#fff', borderRadius: '50%',
+                        position: 'absolute', top: '2px', left: val !== false ? '20px' : '2px', transition: 'left 0.2s'
                       }} />
                     </span>
-                    <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                      {currentValue !== false ? '已启用' : '未启用'}
-                    </span>
+                    <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{val !== false ? '已启用' : '未启用'}</span>
                   </label>
                 )}
               </div>
@@ -322,41 +201,23 @@ function KaiwuPanel({ caseData, simParams, onParamChange, displayValues, vizActi
       </div>
 
       <div>
-        <div style={{
-          fontSize: '11px',
-          color: 'var(--text-muted)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.1em',
-          marginBottom: '12px'
-        }}>
+        <div style={{ fontSize: '11px', color: 'var(--text-muted)', letterSpacing: '0.1em', marginBottom: '14px', fontWeight: '500' }}>
           实时数据
         </div>
         <div style={{
           background: 'var(--bg-primary)',
-          border: '1px solid var(--border-accent)',
+          border: `1px solid ${colors.accent}20`,
           borderRadius: 'var(--radius-md)',
-          padding: '16px',
-          display: 'grid',
+          padding: '18px',
+          display: 'flex',
+          flexDirection: 'column',
           gap: '12px'
         }}>
           {kaiwu.displayParams.map((param, i) => (
-            <div key={i} style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                {param.label}
-              </span>
-              <span style={{
-                fontSize: '14px',
-                fontFamily: 'var(--font-mono)',
-                color: 'var(--text-primary)',
-                fontWeight: '500'
-              }}>
-                {displayValues[param.key] !== undefined
-                  ? String(displayValues[param.key])
-                  : '--'}
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{param.label}</span>
+              <span style={{ fontSize: '14px', fontFamily: 'var(--font-mono)', color: 'var(--text-primary)', fontWeight: '500' }}>
+                {displayValues[param.key] !== undefined ? String(displayValues[param.key]) : '--'}
               </span>
             </div>
           ))}
@@ -366,13 +227,18 @@ function KaiwuPanel({ caseData, simParams, onParamChange, displayValues, vizActi
   )
 }
 
+/* ═══════════════════════════════════════════════════════════
+   鲁班问答
+   ═══════════════════════════════════════════════════════════ */
 function WendaPanel({ caseData }) {
   const { wenda } = caseData
+  const colors = subjectColors[caseData.id] || subjectColors['electrolysis']
   const [currentQ, setCurrentQ] = useState(0)
   const [selected, setSelected] = useState(null)
   const [answered, setAnswered] = useState(false)
 
   const q = wenda[currentQ]
+  const isCorrect = selected && selected.startsWith(q.answer)
 
   const handleSelect = (opt) => {
     if (answered) return
@@ -394,143 +260,62 @@ function WendaPanel({ caseData }) {
     setAnswered(false)
   }
 
-  const isCorrect = selected && selected.startsWith(q.answer)
-
   return (
-    <div style={{ padding: '24px', height: '100%', overflowY: 'auto' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-        <SealStamp text="问答" size={32} />
-        <h3 style={{
-          fontSize: '20px',
-          fontFamily: 'var(--font-display)',
-          color: 'var(--text-primary)',
-          fontWeight: '600',
-          letterSpacing: '0.04em'
-        }}>
-          鲁班问答
-        </h3>
-      </div>
-
-      <div style={{
-        display: 'flex',
-        gap: '6px',
-        marginBottom: '20px'
-      }}>
+    <div style={{ padding: '28px', height: '100%', overflowY: 'auto' }}>
+      {/* 进度条 */}
+      <div style={{ display: 'flex', gap: '6px', marginBottom: '24px' }}>
         {wenda.map((_, i) => (
-          <div
-            key={i}
-            style={{
-              flex: 1,
-              height: '4px',
-              borderRadius: '2px',
-              background: i < currentQ
-                ? 'var(--accent)'
-                : i === currentQ
-                  ? answered
-                    ? isCorrect
-                      ? 'var(--accent)'
-                      : 'var(--accent-red)'
-                    : 'var(--border)'
-                  : 'var(--border)'
-            }}
-          />
+          <div key={i} style={{
+            flex: 1, height: '3px', borderRadius: '2px',
+            background: i < currentQ ? colors.accent
+              : i === currentQ ? (answered ? (isCorrect ? colors.accent : '#C45C48') : 'var(--border)')
+                : 'var(--border)',
+            transition: 'background 0.3s'
+          }} />
         ))}
       </div>
 
-      <div style={{
-        fontSize: '13px',
-        color: 'var(--text-muted)',
-        marginBottom: '12px'
-      }}>
+      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px', fontFamily: 'var(--font-mono)' }}>
         第 {currentQ + 1} / {wenda.length} 题
       </div>
 
-      <div style={{
-        fontSize: '16px',
-        color: 'var(--text-primary)',
-        marginBottom: '20px',
-        lineHeight: '1.6',
-        fontWeight: '500'
-      }}>
+      <div style={{ fontSize: '16px', color: 'var(--text-primary)', marginBottom: '24px', lineHeight: 1.7, fontWeight: '500' }}>
         {q.question}
       </div>
 
-      <div style={{ display: 'grid', gap: '10px', marginBottom: '20px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
         {q.options.map((opt, i) => {
-          const isSelected = selected === opt
+          const isSel = selected === opt
           const isCorrectOpt = opt.startsWith(q.answer)
           let bg = 'var(--bg-primary)'
           let border = 'var(--border)'
           let color = 'var(--text-primary)'
 
           if (answered) {
-            if (isCorrectOpt) {
-              bg = 'rgba(91, 138, 114, 0.12)'
-              border = 'var(--accent)'
-              color = 'var(--accent)'
-            } else if (isSelected && !isCorrectOpt) {
-              bg = 'rgba(196, 92, 72, 0.12)'
-              border = 'var(--accent-red)'
-              color = 'var(--accent-red)'
-            }
-          } else if (isSelected) {
-            bg = 'var(--highlight)'
-            border = 'var(--border-accent)'
+            if (isCorrectOpt) { bg = colors.bg; border = colors.accent + '50'; color = colors.accent }
+            else if (isSel && !isCorrectOpt) { bg = '#FDE8E8'; border = '#C45C4850'; color = '#C45C48' }
+          } else if (isSel) {
+            bg = colors.bg; border = colors.accent + '40'
           }
 
           return (
-            <button
-              key={i}
-              onClick={() => handleSelect(opt)}
-              disabled={answered}
+            <button key={i} onClick={() => handleSelect(opt)} disabled={answered}
               style={{
-                padding: '12px 16px',
-                background: bg,
-                border: `1px solid ${border}`,
-                borderRadius: 'var(--radius-md)',
-                color,
-                fontSize: '14px',
-                textAlign: 'left',
-                cursor: answered ? 'default' : 'pointer',
-                transition: 'all 0.2s',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px'
+                padding: '14px 18px', background: bg, border: `1px solid ${border}`,
+                borderRadius: 'var(--radius-sm)', color, fontSize: '14px', textAlign: 'left',
+                cursor: answered ? 'default' : 'pointer', transition: 'all 0.2s',
+                display: 'flex', alignItems: 'center', gap: '12px'
               }}
-              onMouseEnter={e => {
-                if (!answered) {
-                  e.currentTarget.style.borderColor = 'var(--border-accent)'
-                  e.currentTarget.style.background = 'var(--highlight)'
-                }
-              }}
-              onMouseLeave={e => {
-                if (!answered && !isSelected) {
-                  e.currentTarget.style.borderColor = 'var(--border)'
-                  e.currentTarget.style.background = 'var(--bg-primary)'
-                }
-              }}
+              onMouseEnter={e => { if (!answered) { e.currentTarget.style.borderColor = colors.accent + '40'; e.currentTarget.style.background = colors.bg } }}
+              onMouseLeave={e => { if (!answered && !isSel) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--bg-primary)' } }}
             >
               <span style={{
-                width: '24px',
-                height: '24px',
-                borderRadius: '50%',
-                background: answered && isCorrectOpt
-                  ? 'var(--accent)'
-                  : answered && isSelected && !isCorrectOpt
-                    ? 'var(--accent-red)'
-                    : 'transparent',
-                border: answered && isCorrectOpt
-                  ? 'var(--accent)'
-                  : answered && isSelected && !isCorrectOpt
-                    ? 'var(--accent-red)'
-                    : '1px solid var(--text-muted)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '12px',
-                fontWeight: '600',
-                flexShrink: 0,
-                color: answered && (isCorrectOpt || (isSelected && !isCorrectOpt)) ? '#fff' : 'var(--text-muted)'
+                width: '26px', height: '26px', borderRadius: '50%',
+                background: answered && isCorrectOpt ? colors.accent : answered && isSel && !isCorrectOpt ? '#C45C48' : 'transparent',
+                border: answered && isCorrectOpt ? `1px solid ${colors.accent}` : answered && isSel && !isCorrectOpt ? '1px solid #C45C48' : '1px solid var(--text-muted)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '12px', fontWeight: '600', flexShrink: 0,
+                color: answered && (isCorrectOpt || (isSel && !isCorrectOpt)) ? '#fff' : 'var(--text-muted)'
               }}>
                 {opt.charAt(0)}
               </span>
@@ -542,27 +327,14 @@ function WendaPanel({ caseData }) {
 
       {answered && (
         <div style={{
-          background: isCorrect
-            ? 'rgba(91, 138, 114, 0.06)'
-            : 'rgba(196, 92, 72, 0.06)',
-          border: `1px solid ${isCorrect ? 'var(--border-accent)' : 'var(--accent-red)'}`,
-          borderRadius: 'var(--radius-md)',
-          padding: '16px',
-          marginBottom: '20px'
+          background: isCorrect ? colors.bg : '#FDE8E8',
+          border: `1px solid ${isCorrect ? colors.accent + '30' : '#C45C4830'}`,
+          borderRadius: 'var(--radius-sm)', padding: '18px', marginBottom: '20px'
         }}>
-          <div style={{
-            fontSize: '14px',
-            fontWeight: '600',
-            color: isCorrect ? 'var(--accent)' : 'var(--accent-red)',
-            marginBottom: '8px'
-          }}>
-            {isCorrect ? '回答正确!' : '回答错误'}
+          <div style={{ fontSize: '14px', fontWeight: '600', color: isCorrect ? colors.accent : '#C45C48', marginBottom: '8px' }}>
+            {isCorrect ? '回答正确' : '回答错误'}
           </div>
-          <div style={{
-            fontSize: '14px',
-            color: 'var(--text-secondary)',
-            lineHeight: '1.6'
-          }}>
+          <div style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.7 }}>
             {q.explanation}
           </div>
         </div>
@@ -570,52 +342,24 @@ function WendaPanel({ caseData }) {
 
       <div style={{ display: 'flex', gap: '12px' }}>
         {currentQ < wenda.length - 1 && answered && (
-          <button
-            onClick={nextQ}
-            style={{
-              flex: 1,
-              padding: '12px',
-              background: 'var(--accent)',
-              border: 'none',
-              borderRadius: 'var(--radius-md)',
-              color: '#fff',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = 'var(--accent-light)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'var(--accent)'}
-          >
-            下一题
-          </button>
+          <button onClick={nextQ} style={{
+            flex: 1, padding: '12px', background: colors.accent, border: 'none',
+            borderRadius: 'var(--radius-sm)', color: '#fff', fontSize: '14px',
+            fontWeight: '600', cursor: 'pointer', transition: 'opacity 0.2s'
+          }}
+            onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+            onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+          >下一题</button>
         )}
         {currentQ === wenda.length - 1 && answered && (
-          <button
-            onClick={reset}
-            style={{
-              flex: 1,
-              padding: '12px',
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-accent)',
-              borderRadius: 'var(--radius-md)',
-              color: 'var(--accent)',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.background = 'var(--highlight)'
-              e.currentTarget.style.borderColor = 'var(--accent)'
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.background = 'var(--bg-card)'
-              e.currentTarget.style.borderColor = 'var(--border-accent)'
-            }}
-          >
-            重新开始
-          </button>
+          <button onClick={reset} style={{
+            flex: 1, padding: '12px', background: 'var(--bg-primary)', border: `1px solid ${colors.accent}40`,
+            borderRadius: 'var(--radius-sm)', color: colors.accent, fontSize: '14px',
+            fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s'
+          }}
+            onMouseEnter={e => { e.currentTarget.style.background = colors.bg }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'var(--bg-primary)' }}
+          >重新开始</button>
         )}
       </div>
     </div>
@@ -624,40 +368,30 @@ function WendaPanel({ caseData }) {
 
 function VisualizationComponent({ caseId, simParams, isFullscreen, vizActions }) {
   const commonProps = { params: simParams }
-
   switch (caseId) {
-    case 'wave-interference':
-      return <WaveInterferenceVisualization {...commonProps} />
-    case 'solar-system':
-      return <SolarSystemVisualization {...commonProps} actions={vizActions || {}} />
-    case 'electrolysis':
-      return <ElectrolysisVisualization {...commonProps} actions={vizActions || {}} />
-    case 'trigonometry':
-      return <TrigonometryVisualization {...commonProps} />
-    default:
-      return <WaveInterferenceVisualization {...commonProps} />
+    case 'wave-interference': return <WaveInterferenceVisualization {...commonProps} />
+    case 'solar-system': return <SolarSystemVisualization {...commonProps} actions={vizActions || {}} />
+    case 'electrolysis': return <ElectrolysisVisualization {...commonProps} actions={vizActions || {}} />
+    case 'trigonometry': return <TrigonometryVisualization {...commonProps} />
+    default: return <WaveInterferenceVisualization {...commonProps} />
   }
 }
 
-export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
+export default function CasePage({ caseId, onBack }) {
   const caseData = getCaseById(caseId)
   const [panelState, setPanelState] = useState({ tab: 'xinfa', open: false })
   const [isFullscreen, setIsFullscreen] = useState(false)
   const containerRef = useRef(null)
   const vizActions = useRef({})
+  const colors = subjectColors[caseId] || subjectColors['electrolysis']
 
   const getInitialParams = (id) => {
     switch (id) {
-      case 'wave-interference':
-        return { '波长': 1.5, '双缝间距': 4, '屏幕距离': 10, '显示加强区': true, '显示相消区': true }
-      case 'solar-system':
-        return { '太阳质量': 1, '初始速度': 1, '引力强度': 1, '显示轨道': true, '速度矢量': false }
-      case 'electrolysis':
-        return { '电压': 6, '电解质浓度': 15, '电解质类型': 'Na₂SO₄(中性)', '显示分子式': true, '显示电子流向': false }
-      case 'trigonometry':
-        return { '角度θ': 45, '振幅A': 1, '频率ω': 1, '相位φ': 0, '正弦': true, '余弦': true, '正切': false }
-      default:
-        return {}
+      case 'wave-interference': return { '波长': 1.5, '双缝间距': 4, '屏幕距离': 10, '显示加强区': true, '显示相消区': true }
+      case 'solar-system': return { '太阳质量': 1, '初始速度': 1, '引力强度': 1, '显示轨道': true, '速度矢量': false }
+      case 'electrolysis': return { '电压': 6, '电解质浓度': 15, '电解质类型': 'Na₂SO₄(中性)', '显示分子式': true, '显示电子流向': false }
+      case 'trigonometry': return { '角度θ': 45, '振幅A': 1, '频率ω': 1, '相位φ': 0, '正弦': true, '余弦': true, '正切': false }
+      default: return {}
     }
   }
 
@@ -665,16 +399,11 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
 
   const getInitialDisplayValues = (id) => {
     switch (id) {
-      case 'wave-interference':
-        return { fringeSpacing: '0.75 px', maxOrder: '5', constructiveCount: '6', destructiveCount: '5' }
-      case 'solar-system':
-        return { orbitalPeriod: '125.6s', orbitalSpeed: '5.0', eccentricity: '0.00', energy: '-0.5 J' }
-      case 'electrolysis':
-        return { h2Volume: '0.0 mL', o2Volume: '0.0 mL', ratio: '--', current: '0.00 A' }
-      case 'trigonometry':
-        return { sinValue: '0.707', cosValue: '0.707', tanValue: '1.000', unitCirclePoint: '(0.71, 0.71)' }
-      default:
-        return {}
+      case 'wave-interference': return { fringeSpacing: '0.75 px', maxOrder: '5', constructiveCount: '6', destructiveCount: '5' }
+      case 'solar-system': return { orbitalPeriod: '125.6s', orbitalSpeed: '5.0', eccentricity: '0.00', energy: '-0.5 J' }
+      case 'electrolysis': return { h2Volume: '0.0 mL', o2Volume: '0.0 mL', ratio: '--', current: '0.00 A' }
+      case 'trigonometry': return { sinValue: '0.707', cosValue: '0.707', tanValue: '1.000', unitCirclePoint: '(0.71, 0.71)' }
+      default: return {}
     }
   }
 
@@ -682,30 +411,18 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
 
   const handleParamChange = useCallback((label, value) => {
     setSimParams(prev => ({ ...prev, [label]: value }))
-
     if (caseId === 'wave-interference') {
-      const wavelength = label === '波长' ? value : simParams['波长']
-      const slitDistance = label === '双缝间距' ? value : simParams['双缝间距']
-      const screenDistance = label === '屏幕距离' ? value : simParams['屏幕距离']
-      const fringeSpacing = (wavelength * screenDistance / slitDistance * 2).toFixed(2)
-      const maxOrder = Math.floor(slitDistance / wavelength * 2)
-      setDisplayValues({
-        fringeSpacing: `${fringeSpacing} px`,
-        maxOrder: String(maxOrder),
-        constructiveCount: String(maxOrder + 1),
-        destructiveCount: String(maxOrder)
-      })
+      const wl = label === '波长' ? value : simParams['波长']
+      const sd = label === '双缝间距' ? value : simParams['双缝间距']
+      const sc = label === '屏幕距离' ? value : simParams['屏幕距离']
+      const fs = (wl * sc / sd * 2).toFixed(2)
+      const mo = Math.floor(sd / wl * 2)
+      setDisplayValues({ fringeSpacing: `${fs} px`, maxOrder: String(mo), constructiveCount: String(mo + 1), destructiveCount: String(mo) })
     }
-
     if (caseId === 'trigonometry') {
       const angle = label === '角度θ' ? value : simParams['角度θ']
-      const angleRad = (angle * Math.PI) / 180
-      setDisplayValues({
-        sinValue: Math.sin(angleRad).toFixed(3),
-        cosValue: Math.cos(angleRad).toFixed(3),
-        tanValue: Math.tan(angleRad).toFixed(3),
-        unitCirclePoint: `(${Math.cos(angleRad).toFixed(2)}, ${Math.sin(angleRad).toFixed(2)})`
-      })
+      const rad = (angle * Math.PI) / 180
+      setDisplayValues({ sinValue: Math.sin(rad).toFixed(3), cosValue: Math.cos(rad).toFixed(3), tanValue: Math.tan(rad).toFixed(3), unitCirclePoint: `(${Math.cos(rad).toFixed(2)}, ${Math.sin(rad).toFixed(2)})` })
     }
   }, [caseId, simParams])
 
@@ -720,363 +437,165 @@ export default function CasePage({ caseId, onBack, theme, onToggleTheme }) {
   }, [])
 
   const handleTabClick = useCallback((tabId) => {
-    setPanelState(prev => {
-      if (prev.tab === tabId && prev.open) {
-        return { ...prev, open: false }
-      } else {
-        return { tab: tabId, open: true }
-      }
-    })
+    setPanelState(prev => prev.tab === tabId && prev.open ? { ...prev, open: false } : { tab: tabId, open: true })
   }, [])
 
-  const closePanel = useCallback(() => {
-    setPanelState(prev => ({ ...prev, open: false }))
-  }, [])
+  const closePanel = useCallback(() => setPanelState(prev => ({ ...prev, open: false })), [])
 
   useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement)
-    }
-    document.addEventListener('fullscreenchange', handleFullscreenChange)
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange)
+    const handler = () => setIsFullscreen(!!document.fullscreenElement)
+    document.addEventListener('fullscreenchange', handler)
+    return () => document.removeEventListener('fullscreenchange', handler)
   }, [])
 
   if (!caseData) return null
-
   const { tab: activeTab, open: panelOpen } = panelState
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        background: 'var(--bg-primary)',
-        position: 'relative',
-        overflow: 'hidden'
-      }}
-    >
+    <div ref={containerRef} style={{
+      height: '100vh', display: 'flex', flexDirection: 'column',
+      background: 'var(--bg-primary)', position: 'relative', overflow: 'hidden'
+    }}>
       {/* 顶部导航 */}
       {!isFullscreen && (
         <header style={{
-          padding: '12px 20px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          borderBottom: '1px solid var(--border)',
-          background: 'var(--bg-secondary)',
-          flexShrink: 0,
-          position: 'relative',
-          zIndex: 50
+          padding: '12px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          borderBottom: '1px solid var(--border)', background: 'var(--bg-card)',
+          flexShrink: 0, position: 'relative', zIndex: 50
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <button
-              onClick={onBack}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-secondary)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                fontSize: '14px',
-                padding: '6px 10px',
-                borderRadius: 'var(--radius-sm)',
-                transition: 'all 0.2s'
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.color = 'var(--text-primary)'
-                e.currentTarget.style.background = 'var(--highlight)'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.color = 'var(--text-secondary)'
-                e.currentTarget.style.background = 'transparent'
-              }}
+            <button onClick={onBack} style={{
+              background: 'transparent', border: 'none', color: 'var(--text-secondary)',
+              cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px',
+              fontSize: '14px', padding: '6px 10px', borderRadius: 'var(--radius-sm)', transition: 'all 0.2s'
+            }}
+              onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.background = 'var(--bg-secondary)' }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.background = 'transparent' }}
             >
-              <ArrowLeft size={18} />
-              返回
+              <ArrowLeft size={18} /> 返回
             </button>
             <div style={{ width: '1px', height: '20px', background: 'var(--border)' }} />
             <h1 style={{
-              fontSize: '18px',
-              fontFamily: 'var(--font-display)',
-              color: 'var(--text-primary)',
-              fontWeight: '600',
-              letterSpacing: '0.04em'
+              fontSize: '17px', fontFamily: 'var(--font-display)', fontWeight: '600',
+              color: 'var(--text-primary)', letterSpacing: '0.04em'
             }}>
               {caseData.title}
             </h1>
             <span style={{
-              fontSize: '12px',
-              color: 'var(--text-muted)',
-              background: 'var(--highlight)',
-              padding: '2px 8px',
-              borderRadius: '4px'
+              fontSize: '11px', color: colors.accent, background: colors.bg,
+              padding: '3px 10px', borderRadius: '12px', fontWeight: '500'
             }}>
-              {caseData.subject}
+              {colors.text}
             </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <button
-              onClick={toggleFullscreen}
-              style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius-sm)',
-                padding: '6px 8px',
-                cursor: 'pointer',
-                color: 'var(--text-secondary)',
-                display: 'flex',
-                transition: 'all 0.2s'
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.borderColor = 'var(--border-accent)'
-                e.currentTarget.style.color = 'var(--accent)'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.borderColor = 'var(--border)'
-                e.currentTarget.style.color = 'var(--text-secondary)'
-              }}
-            >
-              {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
-            </button>
-            <button
-              onClick={onToggleTheme}
-              style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius-sm)',
-                padding: '6px 8px',
-                cursor: 'pointer',
-                color: 'var(--text-secondary)',
-                display: 'flex',
-                transition: 'all 0.2s'
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.borderColor = 'var(--border-accent)'
-                e.currentTarget.style.color = 'var(--accent)'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.borderColor = 'var(--border)'
-                e.currentTarget.style.color = 'var(--text-secondary)'
-              }}
-            >
-              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
-          </div>
+          <button onClick={toggleFullscreen} style={{
+            background: 'var(--bg-primary)', border: '1px solid var(--border)',
+            borderRadius: 'var(--radius-sm)', padding: '6px', cursor: 'pointer',
+            color: 'var(--text-secondary)', display: 'flex', transition: 'all 0.2s'
+          }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = colors.accent + '40'; e.currentTarget.style.color = colors.accent }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-secondary)' }}
+          >
+            {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+          </button>
         </header>
       )}
 
-      {/* 主内容区 */}
-      <div style={{
-        flex: 1,
-        display: 'flex',
-        overflow: 'hidden',
-        position: 'relative'
-      }}>
-        {/* 可视化区域 */}
+      {/* 主内容 */}
+      <div style={{ flex: 1, display: 'flex', overflow: 'hidden', position: 'relative' }}>
+        {/* 可视化区 */}
         <div style={{
-          width: panelOpen ? '65%' : '100%',
-          transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-          flexShrink: 0,
-          position: 'relative',
-          background: 'var(--bg-secondary)',
-          zIndex: 1,
-          overflow: 'hidden'
+          width: panelOpen ? '65%' : '100%', transition: 'width 0.4s cubic-bezier(0.4,0,0.2,1)',
+          flexShrink: 0, position: 'relative', background: 'var(--bg-secondary)', zIndex: 1, overflow: 'hidden'
         }}>
-          <VisualizationComponent
-            caseId={caseId}
-            simParams={simParams}
-            isFullscreen={isFullscreen}
-            vizActions={vizActions.current}
-          />
-
+          <VisualizationComponent caseId={caseId} simParams={simParams} isFullscreen={isFullscreen} vizActions={vizActions.current} />
           {isFullscreen && (
-            <button
-              onClick={toggleFullscreen}
-              style={{
-                position: 'absolute',
-                bottom: '20px',
-                right: '20px',
-                padding: '8px 16px',
-                background: 'var(--bg-overlay)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius-md)',
-                color: 'var(--text-secondary)',
-                fontSize: '13px',
-                cursor: 'pointer',
-                backdropFilter: 'blur(8px)',
-                transition: 'all 0.2s'
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.borderColor = 'var(--border-accent)'
-                e.currentTarget.style.color = 'var(--accent)'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.borderColor = 'var(--border)'
-                e.currentTarget.style.color = 'var(--text-secondary)'
-              }}
-            >
+            <button onClick={toggleFullscreen} style={{
+              position: 'absolute', bottom: '20px', right: '20px', padding: '8px 16px',
+              background: 'rgba(255,255,255,0.9)', border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-md)', color: 'var(--text-secondary)',
+              fontSize: '13px', cursor: 'pointer', backdropFilter: 'blur(8px)'
+            }}>
               ESC 退出全屏
             </button>
           )}
         </div>
 
-        {/* 右侧面板 */}
+        {/* 面板 */}
         <div style={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          width: '35%',
-          height: '100%',
-          background: 'var(--bg-card)',
-          borderLeft: '1px solid var(--border)',
+          position: 'absolute', top: 0, right: 0, width: '35%', height: '100%',
+          background: 'var(--bg-card)', borderLeft: '1px solid var(--border)',
           transform: panelOpen ? 'translateX(0)' : 'translateX(100%)',
-          transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-          zIndex: 10,
-          boxShadow: panelOpen ? '-4px 0 20px rgba(0,0,0,0.3)' : 'none'
+          transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1)',
+          zIndex: 10, boxShadow: panelOpen ? '-8px 0 40px rgba(0,0,0,0.06)' : 'none',
+          display: 'flex', flexDirection: 'column'
         }}>
+          {/* 面板头部 */}
           <div style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column'
+            padding: '12px 16px', borderBottom: '1px solid var(--border)',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0
           }}>
-            {/* 面板头部 */}
-            <div style={{
-              padding: '12px 16px',
-              borderBottom: '1px solid var(--border)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexShrink: 0
+            <div style={{ display: 'flex', gap: '4px' }}>
+              {TABS.map(tab => {
+                const Icon = tab.icon
+                const isActive = activeTab === tab.id
+                return (
+                  <button key={tab.id} onClick={() => handleTabClick(tab.id)} style={{
+                    display: 'flex', alignItems: 'center', gap: '5px', padding: '8px 14px',
+                    background: isActive ? colors.bg : 'transparent',
+                    border: isActive ? `1px solid ${colors.accent}25` : '1px solid transparent',
+                    borderRadius: 'var(--radius-sm)', color: isActive ? colors.accent : 'var(--text-secondary)',
+                    cursor: 'pointer', fontSize: '13px', fontWeight: '500', transition: 'all 0.2s'
+                  }}
+                    onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = 'var(--bg-primary)'; e.currentTarget.style.color = 'var(--text-primary)' } }}
+                    onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)' } }}
+                  >
+                    <Icon size={14} /> {tab.label}
+                  </button>
+                )
+              })}
+            </div>
+            <button onClick={closePanel} style={{
+              background: 'transparent', border: 'none', color: 'var(--text-muted)',
+              cursor: 'pointer', padding: '4px', display: 'flex'
             }}>
-              <div style={{ display: 'flex', gap: '6px' }}>
-                {TABS.map(tab => {
-                  const Icon = tab.icon
-                  const isActive = activeTab === tab.id
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => handleTabClick(tab.id)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        padding: '8px 16px',
-                        background: isActive ? 'var(--highlight)' : 'transparent',
-                        border: isActive ? '1px solid var(--border-accent)' : '1px solid transparent',
-                        borderRadius: 'var(--radius-md)',
-                        color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
-                        cursor: 'pointer',
-                        fontSize: '13px',
-                        fontWeight: '500',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={e => {
-                        if (!isActive) {
-                          e.currentTarget.style.background = 'var(--highlight)'
-                          e.currentTarget.style.color = 'var(--text-primary)'
-                        }
-                      }}
-                      onMouseLeave={e => {
-                        if (!isActive) {
-                          e.currentTarget.style.background = 'transparent'
-                          e.currentTarget.style.color = 'var(--text-secondary)'
-                        }
-                      }}
-                    >
-                      <Icon size={14} />
-                      {tab.label}
-                    </button>
-                  )
-                })}
-              </div>
-              <button
-                onClick={closePanel}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'var(--text-muted)',
-                  cursor: 'pointer',
-                  padding: '4px',
-                  display: 'flex'
-                }}
-              >
-                <X size={18} />
-              </button>
-            </div>
+              <X size={18} />
+            </button>
+          </div>
 
-            {/* 面板内容 */}
-            <div style={{ flex: 1, overflow: 'hidden' }}>
-              {activeTab === 'xinfa' && <XinfaPanel caseData={caseData} />}
-              {activeTab === 'kaiwu' && (
-                <KaiwuPanel
-                  caseData={caseData}
-                  simParams={simParams}
-                  onParamChange={handleParamChange}
-                  displayValues={displayValues}
-                  vizActions={vizActions.current}
-                />
-              )}
-              {activeTab === 'wenda' && <WendaPanel caseData={caseData} />}
-            </div>
+          <div style={{ flex: 1, overflow: 'hidden' }}>
+            {activeTab === 'xinfa' && <XinfaPanel caseData={caseData} />}
+            {activeTab === 'kaiwu' && (
+              <KaiwuPanel caseData={caseData} simParams={simParams} onParamChange={handleParamChange}
+                displayValues={displayValues} vizActions={vizActions.current} />
+            )}
+            {activeTab === 'wenda' && <WendaPanel caseData={caseData} />}
           </div>
         </div>
       </div>
 
-      {/* 底部标签栏 */}
+      {/* 底部标签 */}
       {!isFullscreen && (
         <div style={{
-          padding: '12px 20px',
-          borderTop: '1px solid var(--border)',
-          background: 'var(--bg-secondary)',
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '8px',
-          flexShrink: 0,
-          position: 'relative',
-          zIndex: 100
+          padding: '12px 20px', borderTop: '1px solid var(--border)', background: 'var(--bg-card)',
+          display: 'flex', justifyContent: 'center', gap: '8px', flexShrink: 0, position: 'relative', zIndex: 100
         }}>
           {TABS.map(tab => {
             const Icon = tab.icon
             const isActive = activeTab === tab.id && panelOpen
             return (
-              <button
-                key={tab.id}
-                onClick={() => handleTabClick(tab.id)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '10px 24px',
-                  background: isActive ? 'var(--highlight)' : 'var(--bg-card)',
-                  border: isActive ? '1px solid var(--border-accent)' : '1px solid var(--border)',
-                  borderRadius: 'var(--radius-md)',
-                  color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  transition: 'all 0.2s',
-                  position: 'relative',
-                  zIndex: 101
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = 'var(--border-accent)'
-                  e.currentTarget.style.color = 'var(--accent)'
-                }}
-                onMouseLeave={e => {
-                  if (!isActive) {
-                    e.currentTarget.style.borderColor = 'var(--border)'
-                    e.currentTarget.style.color = 'var(--text-secondary)'
-                  }
-                }}
+              <button key={tab.id} onClick={() => handleTabClick(tab.id)} style={{
+                display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 24px',
+                background: isActive ? colors.bg : 'var(--bg-primary)',
+                border: isActive ? `1px solid ${colors.accent}30` : '1px solid var(--border)',
+                borderRadius: 'var(--radius-sm)', color: isActive ? colors.accent : 'var(--text-secondary)',
+                cursor: 'pointer', fontSize: '14px', fontWeight: '500', transition: 'all 0.2s'
+              }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = colors.accent + '30'; e.currentTarget.style.color = colors.accent }}
+                onMouseLeave={e => { if (!isActive) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-secondary)' } }}
               >
-                <Icon size={16} />
-                {tab.label}
+                <Icon size={16} /> {tab.label}
               </button>
             )
           })}
